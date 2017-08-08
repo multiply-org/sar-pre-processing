@@ -1,0 +1,21 @@
+about:
+  summary: "MULTIPLY SAR preprocessing package"
+  home: https://github.com/multiply-org/sar-preprocessing
+
+package:
+  name: multiply-sar-preprocessing
+  version: "0.1"
+
+source:
+  git_url: "https://github.com/multiply-org/sar-preprocessing.git"
+
+build:
+  number: 0
+
+requirements:
+  build:
+    - python
+    - setuptools
+
+  run:
+    - python
