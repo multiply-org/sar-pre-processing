@@ -5,6 +5,11 @@ Wrapper module to launch preprocessor
 import os
 import yaml
 import fnmatch
+import pyproj
+import zipfile
+import shutil
+import ogr
+import xml.etree.ElementTree as etree
 
 import pdb
 
@@ -62,8 +67,6 @@ class SARPreProcessor(PreProcessor):
     def __init__(self, **kwargs):
         super(SARPreProcessor, self).__init__(**kwargs)
 
-
-
         pass
 
         # TODO PUT THE GRAPH DIRECTORIES AND NAMES IN A SEPARATE CONFIG !!!
@@ -91,7 +94,7 @@ class SARPreProcessor(PreProcessor):
     def _decomposition_filename(self, file):
         """
         Decomposition of filename including path in
-        path, fillename, fileshortname and extension
+        path, filename, fileshortname and extension
         """
         (filepath, filename) = os.path.split(file)
         (fileshortname, extension) = os.path.splitext(filename)
@@ -106,6 +109,104 @@ class SARPreProcessor(PreProcessor):
         assert lat_min <= lat_max, 'ERROR: invalid lat'
         assert lon_min <= lon_max, 'ERROR: invalid lon'
         return '%.14f %.14f,%.14f %.14f,%.14f %.14f,%.14f %.14f,%.14f %.14f' % (lon_min, lat_min, lon_min, lat_max, lon_max, lat_max, lon_max, lat_min, lon_min, lat_min)
+
+    def _select_year(self, filelist, year):
+        """
+        Select all S1 data in input_folder of a specific year
+        """
+        # position of year in filename is hard coded!!!
+
+        filelist_new = []
+        for file in filelist:
+            filepath, filename, fileshortname, extension = self._decomposition_filename(
+                file)
+            if filename[17:21] == str(self.config.year):
+                filelist_new.append(file)
+            else:
+                pass
+
+        print('Number of found files for year %s:' %year, len(filelist_new))
+        return filelist_new
+
+    def _check_location(self, file, location, output_folder):
+        """
+        Checks of the area of interest defined by location is contained in file
+        file is a map projected jpeg, the xml file containing the projection
+        needs to be in the same location as sarfile
+
+        THIS VERSION FINALLY WITH INTERSECT OF POLYGONS OGR
+        """
+
+        filepath, filename, fileshortname, extension = self._decomposition_filename(file)
+
+        # # Various file paths and names:
+        # (sarfilepath, sarfilename) = os.path.split(sarfile)
+        # (sarfileshortname, extension) = os.path.splitext(sarfilename)
+
+        # Get metadata
+        # Path to product.xml-file within zipped S1 image
+        xml_file = fileshortname + '.SAFE/preview/map-overlay.kml'
+
+        # Path to product.xml file once extracted
+        xml_file_extracted = os.path.join(output_folder, xml_file)
+
+        # Extract the zipfile
+        try:
+            zfile = zipfile.ZipFile(file, 'r')
+            zfile.extract(xml_file, output_folder)
+            zfile.close()
+        except:
+            print('zipfile cannot open')
+            contained = False
+            return contained
+
+        # Parse the xml file
+        tree = etree.parse(xml_file_extracted)
+        root = tree.getroot()
+
+        # Access corners for Sentinel-1
+        # Get bounding box
+        for tiepoint in root.iter('{http://www.google.com/kml/ext/2.2}LatLonQuad'):
+            child_list = tiepoint.getchildren()
+        bounding_box = child_list[0].text
+        bounding_box_list = bounding_box.split(' ')
+        # WKT requires that last point = first point in polygon, add first point
+        wkt_image1 = 'POLYGON((' + bounding_box + ' ' + bounding_box_list[0] + '))'
+        # WKT requires other use of comma and spaces in coordinate list
+        wkt_image2 = wkt_image1.replace(' ', ';')
+        wkt_image3 = wkt_image2.replace(',', ' ')
+        wkt_image = wkt_image3.replace(';', ',')
+
+        # Define projections
+        datasetEPSG = pyproj.Proj('+init=EPSG:4326')
+        locationEPSG = pyproj.Proj('+init=EPSG:4326')
+
+        # Transform coordinates of location into file coordinates
+        upper_left_x,  upper_left_y = pyproj.transform(locationEPSG, datasetEPSG, location[0], location[1])
+        lower_right_x, lower_right_y = pyproj.transform(locationEPSG, datasetEPSG, location[2], location[3])
+        wkt_location = 'POLYGON((' + str(upper_left_x) + ' ' + str(upper_left_y) + ',' + str(upper_left_x) + ' ' + str(lower_right_y) + ',' + str(lower_right_x) + ' ' + str(lower_right_y) + ',' + str(lower_right_x) + ' ' + str(upper_left_y) + ',' + str(upper_left_x) + ' ' + str(upper_left_y) + '))'
+
+        # Use ogr to check if polygon contained
+        poly_location = ogr.CreateGeometryFromWkt(wkt_location)
+        poly_image = ogr.CreateGeometryFromWkt(wkt_image)
+        contained = poly_location.Intersect(poly_image)
+        # print contained
+        shutil.rmtree(os.path.join(output_folder, fileshortname + '.SAFE'))
+        return contained
+
+
+    def _contain_area_of_interest(self, filelist, location, output_folder):
+        """
+        Check if all files in input_folder contain area of interest
+        """
+        filelist_new = []
+        for file in filelist:
+            contained = self._check_location(file, location, output_folder)
+            if contained is False:
+                continue
+            filelist_new.append(file)
+        print('Number of found files containing area of interest: %s' % (len(filelist_new)))
+        return filelist_new
 
 
     def pre_process(self, **kwargs):
@@ -156,7 +257,18 @@ class SARPreProcessor(PreProcessor):
         # list with all zip files found in input_folder
         filelist = self._create_filelist(input_folder, '*.zip')
 
-        pdb.set_trace()
+        # If Year is specified in config-file pre-processing will be only done for specified year
+        try:
+            filelist = self._select_year(filelist, self.config.year)
+            filelist.sort()
+        except AttributeError:
+            pass
+
+        # Coordinates for location check
+        location = [upper_left_x, upper_left_y, lower_right_x, lower_right_y]
+
+        # list with all zip files that contain area of interest
+        filelist = self._contain_area_of_interest(filelist, location, self.config.output_folder)
 
         # loop to process all files stored in input directory
         for file in filelist:
