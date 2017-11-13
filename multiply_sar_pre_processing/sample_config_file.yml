@@ -1,3 +1,30 @@
+
+# Input folder with SAR data (zip format)
+# input_folder: /media/nas_data/Thomas/Wallerfing/Sentinel_1_data
+input_folder: /media/tweiss/Daten/Versuch
+# Folder to store the pre-processed data
+output_folder: /media/tweiss/Daten/Versuch/pre_processed
+# Location of SNAP's graph-processing-tool
+gpt: /home/tweiss/snap/bin/gpt
+
+
+
+xml_graph:
+  path: '/media/tweiss/Work/python_code/MULTIPLY/pre_processing_Sentinel_1/xml_files'
+  pre_processing: pre_process_slc_kelln_subset.xml
+  coregister: coregister.xml
+  temporal_speckle_filter: blablabla
+
+region:
+  ul:
+    lat: 48.340
+    lon: 11.600
+  lr:
+    lat: 48.200
+    lon: 11.810
+
+
+
 General:
     - roi: POLYGON ( (0, 0), (0,1 )) # blahblah
     - start_time: 2017-01-01
