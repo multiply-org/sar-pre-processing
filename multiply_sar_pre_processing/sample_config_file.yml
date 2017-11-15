@@ -11,8 +11,8 @@ gpt: /home/tweiss/snap/bin/gpt
 
 xml_graph:
   path: /media/tweiss/Work/python_code/MULTIPLY/sar-pre-processing/xml_files
-  pre_processing: pre_process_slc_GC_RC_No_Su.xml
-  coregister: coregister.xml
+  pre_process_step1: pre_process_slc_GC_RC_No_Su.xml
+  pre_process_step2: coregister.xml
   temporal_speckle_filter: blablabla
 
 region:

@@ -209,16 +209,19 @@ class SARPreProcessor(PreProcessor):
         return filelist_new
 
 
-    def pre_process(self, **kwargs):
+    def pre_process_step1(self, **kwargs):
 
         """
-        Keyword parameters
-        ----------
-        input : str
-            name of directory where the downloaded SAR data is
-            located
-        output : str
-            name of directory where to put results
+        Pre-process S1 SLC data with SNAP's GPT
+
+        1) apply precise orbit file
+        2) thermal noise removal
+        3) calibration
+        4) TOPSAR-Deburst
+        5) Geometric Terrain Correction
+        6) Radiometric Correction (after kellndorfer et al.)
+        7) backscatter normalisation on specified angle in config file (based on Lambert's Law)
+
         """
 
         # Check if input folder is specified
@@ -239,7 +242,7 @@ class SARPreProcessor(PreProcessor):
         assert self.config.xml_graph.path is not None, 'ERROR: path of XML files for processing is not not specified'
 
         # Check if XML file for pre-processing is specified
-        assert self.config.xml_graph.pre_processing is not None, 'ERROR: path of XML files for processing is not not specified'
+        assert self.config.xml_graph.pre_process_step1 is not None, 'ERROR: path of XML file for pre-processing step 1 is not not specified'
 
         # Check if XML file for pre-processing is specified
         assert self.config.normalisation_angle is not None, 'ERROR: normalisation angle not specified in configuration file'
@@ -285,11 +288,58 @@ class SARPreProcessor(PreProcessor):
 
             outputfile = os.path.join(output_folder, fileshortname + '_' + xml_addition + '.dim')
 
-            os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_processing) + ' -Pinput="' + file + '" -Poutput="' + outputfile + '" -Pangle="' + str(self.config.normalisation_angle) + '" -Parea="POLYGON ((' + area + '))"')
+            os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_process_step1) + ' -Pinput="' + file + '" -Poutput="' + outputfile + '" -Pangle="' + str(self.config.normalisation_angle) + '" -Parea="POLYGON ((' + area + '))"')
 
         pdb.set_trace()
 
+    def pre_process_step2(self, **kwargs):
 
+        """
+        pre_process_step1 has to be done first
+
+        Pre-process S1 SLC data with SNAP's GPT
+
+        1) co-register pre-processed data
+
+        """
+
+        # Name addition for processed data
+        xml_addition = 'Co'
+
+        # Check if XML file for pre-processing step 2 is specified
+        assert self.config.xml_graph.pre_process_step2 is not None, 'ERROR: path of XML file for pre-processing step 2 is not not specified'
+
+        # Check if output folder for pre_process_step1 is specified
+        output_folder = self.config.output_folder
+        assert output_folder is not None, 'ERROR: output folder needs to be specified'
+
+        # Create new output folder for co-registered data
+        self.output_folder_coregister = os.path.join(output_folder, 'coregister')
+        if not os.path.exists(self.output_folder_coregister):
+            os.makedirs(self.output_folder_coregister)
+
+
+        # list with all dim files found in output-folder of pre_process_step1
+        filelist = self._create_filelist(output_folder, '*.dim')
+        filelist.sort()
+
+        # Set Master image for co-registration
+        master = filelist[0]
+
+        # loop to co-register all found images to master image
+        for file in filelist:
+
+            print('Scene', filelist.index(file) + 1, 'of', len(filelist))
+
+            # Divide filename
+            filepath, filename, fileshortname, extension = self._decomposition_filename(file)
+
+            # Call SNAP routine, xml file
+            print('Process ', filename, ' with SNAP.')
+
+            outputfile = os.path.join(self.output_folder_coregister,fileshortname + '_' + xml_addition + '.dim')
+
+            os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_process_step2) + ' -Pinput="' + master + '" -Pinput1="' + file + '" -Poutput="' + outputfile  + '"')
 
 
 
