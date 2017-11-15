@@ -54,7 +54,7 @@ class PreProcessor(object):
 
     def _get_config(self):
         """
-        Load configuration from self.config.
+        Load configuration from self.config.bb.pre_process()
            writes to self.config.
         """
         with open(self.config, 'r') as cfg:
@@ -241,9 +241,11 @@ class SARPreProcessor(PreProcessor):
         # Check if XML file for pre-processing is specified
         assert self.config.xml_graph.pre_processing is not None, 'ERROR: path of XML files for processing is not not specified'
 
+        # Check if XML file for pre-processing is specified
+        assert self.config.normalisation_angle is not None, 'ERROR: normalisation angle not specified in configuration file'
 
         # Name addition for processed data
-        xml_addition = 'subset'
+        xml_addition = 'GC_RC_No_Su'
 
         lower_right_y = self.config.region['lr']['lat']
         upper_left_y = self.config.region['ul']['lat']
@@ -283,7 +285,7 @@ class SARPreProcessor(PreProcessor):
 
             outputfile = os.path.join(output_folder, fileshortname + '_' + xml_addition + '.dim')
 
-            os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_processing) + ' -Pinput="' + file + '" -Poutput="' + outputfile + '" -Parea="POLYGON ((' + area + '))"')
+            os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_processing) + ' -Pinput="' + file + '" -Poutput="' + outputfile + '" -Pangle="' + str(self.config.normalisation_angle) + '" -Parea="POLYGON ((' + area + '))"')
 
         pdb.set_trace()
 
