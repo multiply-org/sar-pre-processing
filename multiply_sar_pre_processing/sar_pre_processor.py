@@ -95,7 +95,7 @@ class SARPreProcessor(PreProcessor):
             for filename in fnmatch.filter(filenames, expression):
                 filelist.append(os.path.join(root, filename))
             break
-        # print "Number of found files:", len(filelist)
+        print('Number of found files:', len(filelist))
         return filelist
 
     def _decomposition_filename(self, file):
@@ -213,6 +213,123 @@ class SARPreProcessor(PreProcessor):
         print('Number of found files containing area of interest: %s' % (len(filelist_new)))
         return filelist_new
 
+    def _double_processed(self, filelist):
+        """
+        Check if two file names have the exact same time stamp (double processed data by ESA) and choose newest one
+
+        input: file list with double processed data
+        output: file list without double processed data
+        """
+        filelist.sort()
+        filelist_new = []
+        filelist_double_processed = []
+        for file in filelist:
+            index = filelist.index(file)
+            filepath, filename, fileshortname, extension = self._decomposition_filename(
+                file)
+
+            try:
+                filepath1, filename1, fileshortname1, extension1 = self._decomposition_filename(filelist[index+1])
+            except IndexError:
+                filename1 = ''
+                pass
+
+            try:
+                filepath2, filename2, fileshortname2, extension2 = self._decomposition_filename(filelist[index-1])
+            except IndexError:
+                filename2 = ''
+                pass
+
+            if filename[0:62] == filename1[0:62] or filename[0:62] == filename2[0:62]:
+                filelist_double_processed.append(file)
+            else:
+                filelist_new.append(file)
+        print('Number of found files that were double processed: %s' % (len(filelist_double_processed)/2.))
+
+        filelist_end = self._check_timestamp(filelist_double_processed)
+        filelist_end = filelist_end + filelist_new
+        filelist_end.sort()
+
+        return filelist_end
+
+    def _check_processing_timestamp(self, file, file1):
+        """
+        check processing time stamp of input files and return file with newer time stamp
+        """
+
+        filepath, filename, fileshortname, extension = self._decomposition_filename(file)
+        filepath1, filename1, fileshortname1, extension1 = self._decomposition_filename(
+            file1)
+
+        if fileshortname[0:62] == fileshortname1[0:62]:
+            pass
+        else:
+            return
+
+        # Get metadata
+        # Path to product.safe-file within zipped Sentinel image
+        xml_file = fileshortname + '.SAFE/manifest.safe'
+        xml_file1 = fileshortname1 + '.SAFE/manifest.safe'
+
+        # Extract the zipfile
+        try:
+            zfile = zipfile.ZipFile(file, 'r')
+            zfile.extract(xml_file, filepath)
+            zfile.close()
+            zfile = zipfile.ZipFile(file1, 'r')
+            zfile.extract(xml_file1, filepath)
+            zfile.close()
+        except:
+            print('zipfile cannot open !!!!')
+            contained = False
+            return contained
+
+        # Path to product.xml
+        xml_file_extracted = os.path.join(filepath, xml_file)
+        xml_file_extracted1 = os.path.join(filepath, xml_file1)
+
+        # Parse the xml file
+        tree = etree.parse(xml_file_extracted)
+        root = tree.getroot()
+        processing_timestamp = root.find(
+            './/{http://www.esa.int/safe/sentinel-1.0}processing')
+        timestamp = processing_timestamp.items()[0][1]
+
+        tree1 = etree.parse(xml_file_extracted1)
+        root1 = tree1.getroot()
+        processing_timestamp1 = root1.find(
+            './/{http://www.esa.int/safe/sentinel-1.0}processing')
+        timestamp1 = processing_timestamp1.items()[0][1]
+
+        shutil.rmtree(os.path.join(filepath, fileshortname + '.SAFE'))
+        shutil.rmtree(os.path.join(filepath, fileshortname1 + '.SAFE'))
+
+        if timestamp > timestamp1:
+            return file
+        else:
+            return file1
+
+    def _check_timestamp(self, filelist):
+        """
+        Sort out the newest of the double processed files
+        """
+
+        filelist_new = []
+        for file in filelist:
+            index = filelist.index(file)
+            try:
+                file1 = filelist[index+1]
+            except IndexError:
+                continue
+
+            file_timestamp = self._check_processing_timestamp(file, file1)
+            if file_timestamp is None:
+                pass
+            else:
+                filelist_new.append(file_timestamp)
+        return filelist_new
+
+
     def pre_process_step1(self, **kwargs):
 
         """
@@ -272,6 +389,10 @@ class SARPreProcessor(PreProcessor):
 
         # list with all zip files that contain area of interest
         filelist = self._contain_area_of_interest(filelist, location, self.config.input_folder)
+
+        # check for double processed data by ESA and choose newest one
+        filelist = self._double_processed(filelist)
+
 
         # loop to process all files stored in input directory
         for file in filelist:
