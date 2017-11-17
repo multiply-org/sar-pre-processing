@@ -391,16 +391,6 @@ class SARPreProcessor(PreProcessor):
                 else:
                     processing_filelist = filelist[i-7-(8-(len(filelist)-i)):len(filelist)]
 
-
-            filepath, filename, fileshortname, extension = self._decomposition_filename(file)
-            date = datetime.strptime(fileshortname[17:25], '%Y%m%d')
-            date = date.strftime('%d%b%Y')
-
-            # band_select = 'sigma0_vv_kelln_slv1_' + date + '_2,sigma0_vh_kelln_slv2_' + date + '_2,localIncidenceAngle_slv8_' + date + ',sigma0_vv_kelln_slv1_' + date + ',sigma0_vh_kelln_slv2_' + date + ',elevation_slv5_' + date + ',latitude_slv6_' + date + ',longitude_slv7_' + date
-
-            # +', sigma0_vv_kelln_slv1_' + date + ',sigma0_vh_kelln_slv2_' + date
-
-
             list_bands_vv = []
             list_bands_vh = []
 
@@ -416,8 +406,6 @@ class SARPreProcessor(PreProcessor):
 
                 list_bands_vv.append(band_vv_name)
                 list_bands_vh.append(band_vh_name)
-
-
 
             # Divide filename of file of interest
             filepath, filename, fileshortname, extension = self._decomposition_filename(file)
