@@ -10,6 +10,7 @@ import zipfile
 import shutil
 import ogr
 import xml.etree.ElementTree as etree
+from datetime import datetime
 
 import pdb
 
@@ -67,6 +68,13 @@ class SARPreProcessor(PreProcessor):
     def __init__(self, **kwargs):
         super(SARPreProcessor, self).__init__(**kwargs)
 
+        # Check if path of SNAP's graph-processing-tool is specified
+        assert self.config.gpt is not None, 'ERROR: path for SNAPs graph-processing-tool is not not specified'
+
+        # Check if path of path to XML files is specified
+        assert self.config.xml_graph.path is not None, 'ERROR: path of XML files for processing is not not specified'
+
+
         pass
 
         # TODO PUT THE GRAPH DIRECTORIES AND NAMES IN A SEPARATE CONFIG !!!
@@ -90,7 +98,6 @@ class SARPreProcessor(PreProcessor):
         # print "Number of found files:", len(filelist)
         return filelist
 
-
     def _decomposition_filename(self, file):
         """
         Decomposition of filename including path in
@@ -99,7 +106,6 @@ class SARPreProcessor(PreProcessor):
         (filepath, filename) = os.path.split(file)
         (fileshortname, extension) = os.path.splitext(filename)
         return filepath, filename, fileshortname, extension
-
 
     def _get_area(self, lat_min, lat_max, lon_min, lon_max):
         """
@@ -194,7 +200,6 @@ class SARPreProcessor(PreProcessor):
         shutil.rmtree(os.path.join(output_folder, fileshortname + '.SAFE'))
         return contained
 
-
     def _contain_area_of_interest(self, filelist, location, output_folder):
         """
         Check if all files in input_folder contain area of interest
@@ -207,7 +212,6 @@ class SARPreProcessor(PreProcessor):
             filelist_new.append(file)
         print('Number of found files containing area of interest: %s' % (len(filelist_new)))
         return filelist_new
-
 
     def pre_process_step1(self, **kwargs):
 
@@ -230,21 +234,15 @@ class SARPreProcessor(PreProcessor):
         assert os.path.exists(input_folder)
 
         # Check if output folder is specified, if not existing create new folder
-        output_folder = self.config.output_folder
+        output_folder = self.config.output_folder.step1
         assert output_folder is not None, 'ERROR: output folder needs to be specified'
         if not os.path.exists(output_folder):
             os.makedirs(output_folder)
 
-        # Check if path of SNAP's graph-processing-tool is specified
-        assert self.config.gpt is not None, 'ERROR: path for SNAPs graph-processing-tool is not not specified'
-
-        # Check if path of XML files is specified
-        assert self.config.xml_graph.path is not None, 'ERROR: path of XML files for processing is not not specified'
-
         # Check if XML file for pre-processing is specified
         assert self.config.xml_graph.pre_process_step1 is not None, 'ERROR: path of XML file for pre-processing step 1 is not not specified'
 
-        # Check if XML file for pre-processing is specified
+        # Check if normalisation angle is specified
         assert self.config.normalisation_angle is not None, 'ERROR: normalisation angle not specified in configuration file'
 
         # Name addition for processed data
@@ -273,7 +271,7 @@ class SARPreProcessor(PreProcessor):
         location = [upper_left_x, upper_left_y, lower_right_x, lower_right_y]
 
         # list with all zip files that contain area of interest
-        filelist = self._contain_area_of_interest(filelist, location, self.config.output_folder)
+        filelist = self._contain_area_of_interest(filelist, location, self.config.input_folder)
 
         # loop to process all files stored in input directory
         for file in filelist:
@@ -301,6 +299,8 @@ class SARPreProcessor(PreProcessor):
 
         1) co-register pre-processed data
 
+        !!! all files will get metadata of the master image !!! Problem?
+
         """
 
         # Name addition for processed data
@@ -310,17 +310,15 @@ class SARPreProcessor(PreProcessor):
         assert self.config.xml_graph.pre_process_step2 is not None, 'ERROR: path of XML file for pre-processing step 2 is not not specified'
 
         # Check if output folder for pre_process_step1 is specified
-        output_folder = self.config.output_folder
-        assert output_folder is not None, 'ERROR: output folder needs to be specified'
+        assert self.config.output_folder.step1 is not None, 'ERROR: output folder of pre-processing step 1 needs to be specified'
+        assert os.path.exists(self.config.output_folder.step1)
 
-        # Create new output folder for co-registered data
-        self.output_folder_coregister = os.path.join(output_folder, 'coregister')
-        if not os.path.exists(self.output_folder_coregister):
-            os.makedirs(self.output_folder_coregister)
-
+        # Create new output folder for co-registered data if not existing
+        if not os.path.exists(self.config.output_folder.step2):
+            os.makedirs(self.config.output_folder.step2)
 
         # list with all dim files found in output-folder of pre_process_step1
-        filelist = self._create_filelist(output_folder, '*.dim')
+        filelist = self._create_filelist(self.config.output_folder.step1, '*.dim')
         filelist.sort()
 
         # Set Master image for co-registration
@@ -337,9 +335,105 @@ class SARPreProcessor(PreProcessor):
             # Call SNAP routine, xml file
             print('Process ', filename, ' with SNAP.')
 
-            outputfile = os.path.join(self.output_folder_coregister,fileshortname + '_' + xml_addition + '.dim')
+            outputfile = os.path.join(self.config.output_folder.step2,fileshortname + '_' + xml_addition + '.dim')
 
-            os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_process_step2) + ' -Pinput="' + master + '" -Pinput1="' + file + '" -Poutput="' + outputfile  + '"')
+            os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_process_step2) + ' -Pinput="' + master + '" -Pinput2="' + file + '" -Poutput="' + outputfile  + '"')
+
+
+    def pre_process_step3(self, **kwargs):
+
+        """
+        pre_process_step1 and 2 has to be done first
+
+        Pre-process S1 SLC data with SNAP's GPT
+
+        1) apply multi-temporal speckle filter
+
+        """
+
+        # Name addition for processed data
+        xml_addition = 'Co'
+
+        # Check if XML file for pre-processing step 3 is specified
+        assert self.config.xml_graph.pre_process_step3 is not None, 'ERROR: path of XML file for pre-processing step 3 is not not specified'
+
+        # Check if output folder for pre_process_step2 is specified
+        assert self.config.output_folder.step2 is not None, 'ERROR: output folder of pre-processing step 1 needs to be specified'
+        assert os.path.exists(self.config.output_folder.step2)
+
+        # Create new output folder for multi-temporal speckle filter data if not existing
+        if not os.path.exists(self.config.output_folder.step3):
+            os.makedirs(self.config.output_folder.step3)
+
+        # list with all dim files found in output-folder of pre_process_step2
+        filelist = self._create_filelist(self.config.output_folder.step2, '*.dim')
+        filelist.sort()
+
+        # Sort filelist by date (hard coded position in filename!!!)
+        filepath, filename, fileshortname, extension = self._decomposition_filename(filelist[0])
+        filelist.sort(key=lambda x: x[len(filepath)+18:len(filepath)+33])
+
+        new_filelist = []
+
+        # loop to apply multi-temporal filtering
+        # right now 15 scenes if possible 7 before and 7 after multi-temporal filtered scene, vv and vh polarisation are separated
+        # use the speckle filter algorithm metadata? metadata for date might be wrong!!!
+
+        for i, file in enumerate(filelist):
+
+            # apply speckle filter on 15 scenes if possible 7 before and 7 after the scene of interest
+            # what happens if there are less then 15 scenes available
+            if i < 7:
+                processing_filelist = filelist[0:15]
+            else:
+                if i <= len(filelist)-8:
+                    processing_filelist = filelist[i-7:i+8]
+                else:
+                    processing_filelist = filelist[i-7-(8-(len(filelist)-i)):len(filelist)]
+
+
+            filepath, filename, fileshortname, extension = self._decomposition_filename(file)
+            date = datetime.strptime(fileshortname[17:25], '%Y%m%d')
+            date = date.strftime('%d%b%Y')
+
+            # band_select = 'sigma0_vv_kelln_slv1_' + date + '_2,sigma0_vh_kelln_slv2_' + date + '_2,localIncidenceAngle_slv8_' + date + ',sigma0_vv_kelln_slv1_' + date + ',sigma0_vh_kelln_slv2_' + date + ',elevation_slv5_' + date + ',latitude_slv6_' + date + ',longitude_slv7_' + date
+
+            # +', sigma0_vv_kelln_slv1_' + date + ',sigma0_vh_kelln_slv2_' + date
+
+
+            list_bands_vv = []
+            list_bands_vh = []
+
+            for processing_file in processing_filelist:
+                filepath, filename, fileshortname, extension = self._decomposition_filename(processing_file)
+
+                self._create_filelist(os.path.join(filepath,fileshortname+'.data'), '*_slv1_*.img')
+
+                # get filename from folder
+                # think about better way !!!!
+                a, a, band_vv_name, a = self._decomposition_filename(self._create_filelist(os.path.join(filepath,fileshortname+'.data'), '*_slv1_*.img')[0])
+                a, a, band_vh_name, a = self._decomposition_filename(self._create_filelist(os.path.join(filepath,fileshortname+'.data'), '*_slv2_*.img')[0])
+
+                list_bands_vv.append(band_vv_name)
+                list_bands_vh.append(band_vh_name)
+
+
+
+            # Divide filename of file of interest
+            filepath, filename, fileshortname, extension = self._decomposition_filename(file)
+
+            outputfile = os.path.join(self.config.output_folder.step3, fileshortname + '_' + xml_addition + '.dim')
+
+            date = datetime.strptime(fileshortname[17:25], '%Y%m%d')
+            date = date.strftime('%d%b%Y')
+
+            processing_filelist = ','.join(processing_filelist)
+            list_bands_vv = ','.join(list_bands_vv)
+            list_bands_vh = ','.join(list_bands_vh)
+
+            os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_process_step3) + ' -Pinput="' + processing_filelist + '" -Pinput2="' + file  + '" -Poutput="' + outputfile + '" -Plist_bands_vv="' + list_bands_vv + '" -Plist_bands_vh="' + list_bands_vh + '" -Pdate="' + date + '"')
+
+
 
 
 

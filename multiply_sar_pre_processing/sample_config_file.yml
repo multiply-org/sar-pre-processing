@@ -3,7 +3,10 @@
 # input_folder: /media/nas_data/Thomas/Wallerfing/Sentinel_1_data
 input_folder: /media/tweiss/Daten/Versuch
 # Folder to store the pre-processed data
-output_folder: /media/tweiss/Daten/Versuch/pre_processed
+output_folder:
+  step1: /media/tweiss/Daten/Versuch/pre_processed
+  step2: /media/tweiss/Daten/Versuch/pre_processed/coregister
+  step3: /media/tweiss/Daten/Versuch/pre_processed/coregister/multi_temp
 # Location of SNAP's graph-processing-tool
 gpt: /home/tweiss/snap/bin/gpt
 
@@ -13,6 +16,7 @@ xml_graph:
   path: /media/tweiss/Work/python_code/MULTIPLY/sar-pre-processing/xml_files
   pre_process_step1: pre_process_slc_GC_RC_No_Su.xml
   pre_process_step2: coregister.xml
+  pre_process_step3: multi_speckle.xml
   temporal_speckle_filter: blablabla
 
 region:
