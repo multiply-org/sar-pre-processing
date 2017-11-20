@@ -95,7 +95,7 @@ class SARPreProcessor(PreProcessor):
             for filename in fnmatch.filter(filenames, expression):
                 filelist.append(os.path.join(root, filename))
             break
-        print('Number of found files:', len(filelist))
+        # print('Number of found files:', len(filelist))
         return filelist
 
     def _decomposition_filename(self, file):
@@ -409,7 +409,6 @@ class SARPreProcessor(PreProcessor):
 
             os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_process_step1) + ' -Pinput="' + file + '" -Poutput="' + outputfile + '" -Pangle="' + str(self.config.normalisation_angle) + '" -Parea="POLYGON ((' + area + '))"')
 
-        pdb.set_trace()
 
     def pre_process_step2(self, **kwargs):
 
