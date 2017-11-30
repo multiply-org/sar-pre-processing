@@ -198,7 +198,7 @@ htmlhelp_basename = 'sar_pre_processing-doc'
 
 # -- Options for LaTeX output --------------------------------------------------
 
-latex_elements = {
+latex_elements = { 'classoptions': ',openany,oneside'
 # The paper size ('letterpaper' or 'a4paper').
 # 'papersize': 'letterpaper',
 

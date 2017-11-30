@@ -1,5 +1,10 @@
 Installation
 =============
+
+.. code::
+
+    This Section will not be included in Deliverable 4.2
+
 The standard python way
 ------------------------
 You can download the source code from the `project website <https://github.com/multiply-org/sar-pre-processing>`_. Unpack the file you obtained and then run::
