@@ -46,7 +46,7 @@ if on_rtd:
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx', 'sphinx.ext.todo',
               'sphinx.ext.autosummary', 'sphinx.ext.viewcode', 'sphinx.ext.coverage',
               'sphinx.ext.doctest', 'sphinx.ext.ifconfig', 'sphinx.ext.mathjax',
-              'sphinx.ext.napoleon']
+              'sphinx.ext.napoleon', 'sphinxcontrib.bibtex']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -62,7 +62,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'sar-pre-processing'
-copyright = u'2017, McWhity'
+copyright = u'2017, Thomas Weiß'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -213,7 +213,7 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'user_guide.tex', u'sar-pre-processing Documentation',
-   u'McWhity', 'manual'),
+   u'Thomas Weiß', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -247,3 +247,8 @@ intersphinx_mapping = {
     'pandas': ('http://pandas.pydata.org/pandas-docs/stable', None),
     'scipy': ('http://docs.scipy.org/doc/scipy/reference/', None),
 }
+
+
+# add numbered figures
+numfig = True
+
