@@ -45,10 +45,8 @@ class PreProcessor(object):
         self._check()
         self._get_config()
 
-        # self.gpt = self.config.gpt
-
     def _check(self):
-        assert self.config is not None, 'ERROR: configuration needs to be provided'
+        assert self.config is not None, 'ERROR: Configuration file needs to be provided'
 
     def pre_process(self):
         assert False, 'Routine should be implemented in child class'
@@ -68,12 +66,20 @@ class SARPreProcessor(PreProcessor):
     def __init__(self, **kwargs):
         super(SARPreProcessor, self).__init__(**kwargs)
 
+        # Check if output folder is specified
+        assert self.config.output_folder is not None, 'ERROR: output folder needs to be specified'
+
+        # Initialise output folder for different preprocessing steps
+        # (can be put in the YAML config file if needed)
+        self.config.output_folder_step1 = os.path.join(self.config.output_folder, 'step1')
+        self.config.output_folder_step2 = os.path.join(self.config.output_folder, 'step2')
+        self.config.output_folder_step3 = os.path.join(self.config.output_folder, 'step3')
+
         # Check if path of SNAP's graph-processing-tool is specified
         assert self.config.gpt is not None, 'ERROR: path for SNAPs graph-processing-tool is not not specified'
 
         # Check if path of path to XML files is specified
         assert self.config.xml_graph.path is not None, 'ERROR: path of XML files for processing is not not specified'
-
 
         pass
 
@@ -329,7 +335,6 @@ class SARPreProcessor(PreProcessor):
                 filelist_new.append(file_timestamp)
         return filelist_new
 
-
     def pre_process_step1(self, **kwargs):
 
         """
@@ -346,15 +351,13 @@ class SARPreProcessor(PreProcessor):
         """
 
         # Check if input folder is specified
-        input_folder = self.config.input_folder
-        assert input_folder is not None, 'ERROR: input folder not specified'
-        assert os.path.exists(input_folder)
+        assert self.config.input_folder is not None, 'ERROR: input folder not specified'
+        assert os.path.exists(self.config.input_folder)
 
-        # Check if output folder is specified, if not existing create new folder
-        output_folder = self.config.output_folder.step1
-        assert output_folder is not None, 'ERROR: output folder needs to be specified'
-        if not os.path.exists(output_folder):
-            os.makedirs(output_folder)
+        # Check if output folder for step1 is specified, if not existing create new folder
+        assert self.config.output_folder_step1 is not None, 'ERROR: output folder for step1 needs to be specified'
+        if not os.path.exists(self.config.output_folder_step1):
+            os.makedirs(self.config.output_folder_step1)
 
         # Check if XML file for pre-processing is specified
         assert self.config.xml_graph.pre_process_step1 is not None, 'ERROR: path of XML file for pre-processing step 1 is not not specified'
@@ -375,7 +378,7 @@ class SARPreProcessor(PreProcessor):
         area = self._get_area(lower_right_y, upper_left_y, upper_left_x, lower_right_x)
 
         # list with all zip files found in input_folder
-        filelist = self._create_filelist(input_folder, '*.zip')
+        filelist = self._create_filelist(self.config.input_folder, '*.zip')
 
         # If Year is specified in config-file pre-processing will be only done for specified year
         try:
@@ -405,7 +408,7 @@ class SARPreProcessor(PreProcessor):
             # Call SNAP routine, xml file
             print('Process ', filename, ' with SNAP.')
 
-            outputfile = os.path.join(output_folder, fileshortname + '_' + xml_addition + '.dim')
+            outputfile = os.path.join(self.config.output_folder_step1, fileshortname + '_' + xml_addition + '.dim')
 
             os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_process_step1) + ' -Pinput="' + file + '" -Poutput="' + outputfile + '" -Pangle="' + str(self.config.normalisation_angle) + '" -Parea="POLYGON ((' + area + '))"')
 
@@ -430,16 +433,16 @@ class SARPreProcessor(PreProcessor):
         # Check if XML file for pre-processing step 2 is specified
         assert self.config.xml_graph.pre_process_step2 is not None, 'ERROR: path of XML file for pre-processing step 2 is not not specified'
 
-        # Check if output folder for pre_process_step1 is specified
-        assert self.config.output_folder.step1 is not None, 'ERROR: output folder of pre-processing step 1 needs to be specified'
-        assert os.path.exists(self.config.output_folder.step1)
+        # Check if output folder of pre_process_step1 exists
+        assert os.path.exists(self.config.output_folder_step1), 'ERROR: output folder of pre-processing step1 not found'
 
-        # Create new output folder for co-registered data if not existing
-        if not os.path.exists(self.config.output_folder.step2):
-            os.makedirs(self.config.output_folder.step2)
+        # Check if output folder for step2 is specified, if not existing create new folder
+        assert self.config.output_folder_step2 is not None, 'ERROR: output folder for step2 needs to be specified'
+        if not os.path.exists(self.config.output_folder_step2):
+            os.makedirs(self.config.output_folder_step2)
 
         # list with all dim files found in output-folder of pre_process_step1
-        filelist = self._create_filelist(self.config.output_folder.step1, '*.dim')
+        filelist = self._create_filelist(self.config.output_folder_step1, '*.dim')
         filelist.sort()
 
         # Set Master image for co-registration
@@ -456,10 +459,9 @@ class SARPreProcessor(PreProcessor):
             # Call SNAP routine, xml file
             print('Process ', filename, ' with SNAP.')
 
-            outputfile = os.path.join(self.config.output_folder.step2,fileshortname + '_' + xml_addition + '.dim')
+            outputfile = os.path.join(self.config.output_folder_step2, fileshortname + '_' + xml_addition + '.dim')
 
             os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_process_step2) + ' -Pinput="' + master + '" -Pinput2="' + file + '" -Poutput="' + outputfile  + '"')
-
 
     def pre_process_step3(self, **kwargs):
 
@@ -478,16 +480,16 @@ class SARPreProcessor(PreProcessor):
         # Check if XML file for pre-processing step 3 is specified
         assert self.config.xml_graph.pre_process_step3 is not None, 'ERROR: path of XML file for pre-processing step 3 is not not specified'
 
-        # Check if output folder for pre_process_step2 is specified
-        assert self.config.output_folder.step2 is not None, 'ERROR: output folder of pre-processing step 1 needs to be specified'
-        assert os.path.exists(self.config.output_folder.step2)
+        # Check if output folder of pre_process_step1 exists
+        assert os.path.exists(self.config.output_folder_step2), 'ERROR: output folder of pre-processing step2 not found'
 
-        # Create new output folder for multi-temporal speckle filter data if not existing
-        if not os.path.exists(self.config.output_folder.step3):
-            os.makedirs(self.config.output_folder.step3)
+        # Check if output folder for step2 is specified, if not existing create new folder
+        assert self.config.output_folder_step3 is not None, 'ERROR: output folder for step3 needs to be specified'
+        if not os.path.exists(self.config.output_folder_step3):
+            os.makedirs(self.config.output_folder_step3)
 
         # list with all dim files found in output-folder of pre_process_step2
-        filelist = self._create_filelist(self.config.output_folder.step2, '*.dim')
+        filelist = self._create_filelist(os.path.join(self.config.output_folder, 'step2'), '*.dim')
         filelist.sort()
 
         # Sort filelist by date (hard coded position in filename!!!)
@@ -531,7 +533,7 @@ class SARPreProcessor(PreProcessor):
             # Divide filename of file of interest
             filepath, filename, fileshortname, extension = self._decomposition_filename(file)
 
-            outputfile = os.path.join(self.config.output_folder.step3, fileshortname + '_' + xml_addition + '.dim')
+            outputfile = os.path.join(output_folder_step3, fileshortname + '_' + xml_addition + '.dim')
 
             date = datetime.strptime(fileshortname[17:25], '%Y%m%d')
             date = date.strftime('%d%b%Y')
@@ -541,10 +543,6 @@ class SARPreProcessor(PreProcessor):
             list_bands_vh = ','.join(list_bands_vh)
 
             os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_process_step3) + ' -Pinput="' + processing_filelist + '" -Pinput2="' + file  + '" -Poutput="' + outputfile + '" -Plist_bands_vv="' + list_bands_vv + '" -Plist_bands_vh="' + list_bands_vh + '" -Pdate="' + date + '"')
-
-
-
-
 
 
 
