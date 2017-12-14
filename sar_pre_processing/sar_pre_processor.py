@@ -184,17 +184,19 @@ class SARPreProcessor(PreProcessor):
             self.filelist = self._create_filelist(self.config.input_folder, '*.zip')
             filelist.sort()
         else:
+            filelist = []
             for file in self.filelist:
                 if os.path.exists(file) is True:
-            else:
-                print('skip processing for %s. File does not exists' % file)
+                    filelist.append(file)
+                else:
+                    print('skip processing for %s. File does not exists' % file)
 
 
 
         # loop to process all files stored in input directory
-        for file in self.filelist:
+        for file in filelist:
 
-            print('Scene', self.filelist.index(file) + 1, 'of', len(self.filelist))
+            print('Scene', filelist.index(file) + 1, 'of', len(filelist))
 
             # Divide filename
             filepath, filename, fileshortname, extension = self._decomposition_filename(file)
@@ -263,7 +265,7 @@ class SARPreProcessor(PreProcessor):
 
         # Set Master image for co-registration
         master = filelist[0]
-        pdb.set_trace()
+
         # loop to co-register all found images to master image
         for file in filelist:
             print('Scene', filelist.index(file) + 1, 'of', len(filelist))
@@ -277,7 +279,6 @@ class SARPreProcessor(PreProcessor):
             outputfile = os.path.join(self.config.output_folder_step2, fileshortname + self.name_addition_step2 + '.dim')
 
             os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step2) + ' -Pinput="' + master + '" -Pinput2="' + file + '" -Poutput="' + outputfile  + '"')
-
 
     def pre_process_step3(self, **kwargs):
 
