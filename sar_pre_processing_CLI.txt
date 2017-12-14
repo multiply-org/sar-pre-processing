@@ -1,0 +1,28 @@
+Interface sar-pre-processing
+
+multiply sar_pre_processing --config CONFIG --input_folder INPUT_FOLDER --output_folder OUTPUT_FOLDER --gpt_path GPT_PATH --xml_graph_path XML_GRAPH_PATH --file_list FILE_LIST 
+
+	Purpose: process all files listed in file_list. If no file_list is specified all files in input_folder will be processed
+	
+	Input:
+	- file_list: list of all files to be preprocessed (provided by orchestrator?)
+		     if not specified all images in input folder will be processed
+
+	- config: A config file in YAML format. This file will expect the parameters also listed below:
+		mandatory parameters:
+			- input_folder: path to folder where downloaded files stored
+					(format of the downloaded files should be .zip, standard format if downloading from Sentinel Data Hub)
+			- output_folder: path to folder where preprocessed files are saved
+					 (three directorys will be created within the output_folder)
+					- step1 (temporary?)
+					- step2 (temporary?)
+					- step3 (final preprocessed data in NetCDF4 format)
+			- gpt_path: path to location of SNAP's graph-processing-tool, If not given no preprocessing at all
+			- xml_graph_path: path to location with xml-graphs for preprocessing
+		
+		optional parameters:
+			- normalisation_angle
+			- area of interest (for subsetting and therefore reduction of processing time!)
+	
+
+	Returns: output_folder with all processed SAR files in NetCDF4 format
