@@ -127,7 +127,7 @@
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <file>$output</file>
-      <formatName>BEAM-DIMAP</formatName>
+      <formatName>NetCDF4-CF</formatName>
     </parameters>
   </node>
 </graph>
