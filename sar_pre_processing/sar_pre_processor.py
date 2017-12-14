@@ -11,8 +11,11 @@ import shutil
 import ogr
 import xml.etree.ElementTree as etree
 from datetime import datetime
+from file_list_sar_pre_processing import SARList
 
 import pdb
+
+filelist = SARList(config='sample_config_file.yml').create_list()
 
 class AttributeDict(object):
     """
@@ -42,6 +45,7 @@ class PreProcessor(object):
 
     def __init__(self, **kwargs):
         self.config = kwargs.get('config', None)
+        self.filelist = kwargs.get('filelist', None)
         self._check()
         self._get_config()
 
@@ -75,11 +79,23 @@ class SARPreProcessor(PreProcessor):
         self.config.output_folder_step2 = os.path.join(self.config.output_folder, 'step2')
         self.config.output_folder_step3 = os.path.join(self.config.output_folder, 'step3')
 
+        # Initialise name of necessary xml-graphs for preprocessing
+        # (can be put in the YAML config file if needed)
+        self.config.xml_graph_pre_process_step1 = 'pre_process_step1.xml'
+        self.config.xml_graph_pre_process_step2 = 'pre_process_step2.xml'
+        self.config.xml_graph_pre_process_step3 = 'pre_process_step3.xml'
+
+        # Initialise name addition for output files
+        self.name_addition_step1 = '_GC_RC_No_Su'
+        self.name_addition_step2 = '_Co'
+        self.name_addition_step3 = '_speckle'
+
+
         # Check if path of SNAP's graph-processing-tool is specified
         assert self.config.gpt is not None, 'ERROR: path for SNAPs graph-processing-tool is not not specified'
 
         # Check if path of path to XML files is specified
-        assert self.config.xml_graph.path is not None, 'ERROR: path of XML files for processing is not not specified'
+        assert self.config.xml_graph_path is not None, 'ERROR: path of XML files for processing is not not specified'
 
         pass
 
@@ -122,219 +138,6 @@ class SARPreProcessor(PreProcessor):
         assert lon_min <= lon_max, 'ERROR: invalid lon'
         return '%.14f %.14f,%.14f %.14f,%.14f %.14f,%.14f %.14f,%.14f %.14f' % (lon_min, lat_min, lon_min, lat_max, lon_max, lat_max, lon_max, lat_min, lon_min, lat_min)
 
-    def _select_year(self, filelist, year):
-        """
-        Select all S1 data in input_folder of a specific year
-        """
-        # position of year in filename is hard coded!!!
-
-        filelist_new = []
-        for file in filelist:
-            filepath, filename, fileshortname, extension = self._decomposition_filename(
-                file)
-            if filename[17:21] == str(self.config.year):
-                filelist_new.append(file)
-            else:
-                pass
-
-        print('Number of found files for year %s:' %year, len(filelist_new))
-        return filelist_new
-
-    def _check_location(self, file, location, output_folder):
-        """
-        Checks of the area of interest defined by location is contained in file
-        file is a map projected jpeg, the xml file containing the projection
-        needs to be in the same location as sarfile
-
-        THIS VERSION FINALLY WITH INTERSECT OF POLYGONS OGR
-        """
-
-        filepath, filename, fileshortname, extension = self._decomposition_filename(file)
-
-        # # Various file paths and names:
-        # (sarfilepath, sarfilename) = os.path.split(sarfile)
-        # (sarfileshortname, extension) = os.path.splitext(sarfilename)
-
-        # Get metadata
-        # Path to product.xml-file within zipped S1 image
-        xml_file = fileshortname + '.SAFE/preview/map-overlay.kml'
-
-        # Path to product.xml file once extracted
-        xml_file_extracted = os.path.join(output_folder, xml_file)
-
-        # Extract the zipfile
-        try:
-            zfile = zipfile.ZipFile(file, 'r')
-            zfile.extract(xml_file, output_folder)
-            zfile.close()
-        except:
-            print('zipfile cannot open')
-            contained = False
-            return contained
-
-        # Parse the xml file
-        tree = etree.parse(xml_file_extracted)
-        root = tree.getroot()
-
-        # Access corners for Sentinel-1
-        # Get bounding box
-        for tiepoint in root.iter('{http://www.google.com/kml/ext/2.2}LatLonQuad'):
-            child_list = tiepoint.getchildren()
-        bounding_box = child_list[0].text
-        bounding_box_list = bounding_box.split(' ')
-        # WKT requires that last point = first point in polygon, add first point
-        wkt_image1 = 'POLYGON((' + bounding_box + ' ' + bounding_box_list[0] + '))'
-        # WKT requires other use of comma and spaces in coordinate list
-        wkt_image2 = wkt_image1.replace(' ', ';')
-        wkt_image3 = wkt_image2.replace(',', ' ')
-        wkt_image = wkt_image3.replace(';', ',')
-
-        # Define projections
-        datasetEPSG = pyproj.Proj('+init=EPSG:4326')
-        locationEPSG = pyproj.Proj('+init=EPSG:4326')
-
-        # Transform coordinates of location into file coordinates
-        upper_left_x,  upper_left_y = pyproj.transform(locationEPSG, datasetEPSG, location[0], location[1])
-        lower_right_x, lower_right_y = pyproj.transform(locationEPSG, datasetEPSG, location[2], location[3])
-        wkt_location = 'POLYGON((' + str(upper_left_x) + ' ' + str(upper_left_y) + ',' + str(upper_left_x) + ' ' + str(lower_right_y) + ',' + str(lower_right_x) + ' ' + str(lower_right_y) + ',' + str(lower_right_x) + ' ' + str(upper_left_y) + ',' + str(upper_left_x) + ' ' + str(upper_left_y) + '))'
-
-        # Use ogr to check if polygon contained
-        poly_location = ogr.CreateGeometryFromWkt(wkt_location)
-        poly_image = ogr.CreateGeometryFromWkt(wkt_image)
-        contained = poly_location.Intersect(poly_image)
-        # print contained
-        shutil.rmtree(os.path.join(output_folder, fileshortname + '.SAFE'))
-        return contained
-
-    def _contain_area_of_interest(self, filelist, location, output_folder):
-        """
-        Check if all files in input_folder contain area of interest
-        """
-        filelist_new = []
-        for file in filelist:
-            contained = self._check_location(file, location, output_folder)
-            if contained is False:
-                continue
-            filelist_new.append(file)
-        print('Number of found files containing area of interest: %s' % (len(filelist_new)))
-        return filelist_new
-
-    def _double_processed(self, filelist):
-        """
-        Check if two file names have the exact same time stamp (double processed data by ESA) and choose newest one
-
-        input: file list with double processed data
-        output: file list without double processed data
-        """
-        filelist.sort()
-        filelist_new = []
-        filelist_double_processed = []
-        for file in filelist:
-            index = filelist.index(file)
-            filepath, filename, fileshortname, extension = self._decomposition_filename(
-                file)
-
-            try:
-                filepath1, filename1, fileshortname1, extension1 = self._decomposition_filename(filelist[index+1])
-            except IndexError:
-                filename1 = ''
-                pass
-
-            try:
-                filepath2, filename2, fileshortname2, extension2 = self._decomposition_filename(filelist[index-1])
-            except IndexError:
-                filename2 = ''
-                pass
-
-            if filename[0:62] == filename1[0:62] or filename[0:62] == filename2[0:62]:
-                filelist_double_processed.append(file)
-            else:
-                filelist_new.append(file)
-        print('Number of found files that were double processed: %s' % (len(filelist_double_processed)/2.))
-
-        filelist_end = self._check_timestamp(filelist_double_processed)
-        filelist_end = filelist_end + filelist_new
-        filelist_end.sort()
-
-        return filelist_end
-
-    def _check_processing_timestamp(self, file, file1):
-        """
-        check processing time stamp of input files and return file with newer time stamp
-        """
-
-        filepath, filename, fileshortname, extension = self._decomposition_filename(file)
-        filepath1, filename1, fileshortname1, extension1 = self._decomposition_filename(
-            file1)
-
-        if fileshortname[0:62] == fileshortname1[0:62]:
-            pass
-        else:
-            return
-
-        # Get metadata
-        # Path to product.safe-file within zipped Sentinel image
-        xml_file = fileshortname + '.SAFE/manifest.safe'
-        xml_file1 = fileshortname1 + '.SAFE/manifest.safe'
-
-        # Extract the zipfile
-        try:
-            zfile = zipfile.ZipFile(file, 'r')
-            zfile.extract(xml_file, filepath)
-            zfile.close()
-            zfile = zipfile.ZipFile(file1, 'r')
-            zfile.extract(xml_file1, filepath)
-            zfile.close()
-        except:
-            print('zipfile cannot open !!!!')
-            contained = False
-            return contained
-
-        # Path to product.xml
-        xml_file_extracted = os.path.join(filepath, xml_file)
-        xml_file_extracted1 = os.path.join(filepath, xml_file1)
-
-        # Parse the xml file
-        tree = etree.parse(xml_file_extracted)
-        root = tree.getroot()
-        processing_timestamp = root.find(
-            './/{http://www.esa.int/safe/sentinel-1.0}processing')
-        timestamp = processing_timestamp.items()[0][1]
-
-        tree1 = etree.parse(xml_file_extracted1)
-        root1 = tree1.getroot()
-        processing_timestamp1 = root1.find(
-            './/{http://www.esa.int/safe/sentinel-1.0}processing')
-        timestamp1 = processing_timestamp1.items()[0][1]
-
-        shutil.rmtree(os.path.join(filepath, fileshortname + '.SAFE'))
-        shutil.rmtree(os.path.join(filepath, fileshortname1 + '.SAFE'))
-
-        if timestamp > timestamp1:
-            return file
-        else:
-            return file1
-
-    def _check_timestamp(self, filelist):
-        """
-        Sort out the newest of the double processed files
-        """
-
-        filelist_new = []
-        for file in filelist:
-            index = filelist.index(file)
-            try:
-                file1 = filelist[index+1]
-            except IndexError:
-                continue
-
-            file_timestamp = self._check_processing_timestamp(file, file1)
-            if file_timestamp is None:
-                pass
-            else:
-                filelist_new.append(file_timestamp)
-        return filelist_new
-
     def pre_process_step1(self, **kwargs):
 
         """
@@ -360,47 +163,38 @@ class SARPreProcessor(PreProcessor):
             os.makedirs(self.config.output_folder_step1)
 
         # Check if XML file for pre-processing is specified
-        assert self.config.xml_graph.pre_process_step1 is not None, 'ERROR: path of XML file for pre-processing step 1 is not not specified'
+        assert self.config.xml_graph_pre_process_step1 is not None, 'ERROR: path of XML file for pre-processing step 1 is not not specified'
 
-        # Check if normalisation angle is specified
-        assert self.config.normalisation_angle is not None, 'ERROR: normalisation angle not specified in configuration file'
-
-        # Name addition for processed data
-        xml_addition = 'GC_RC_No_Su'
-
-        lower_right_y = self.config.region['lr']['lat']
-        upper_left_y = self.config.region['ul']['lat']
-        upper_left_x = self.config.region['ul']['lon']
-        lower_right_x = self.config.region['lr']['lon']
-        # todo: how is it with coordinates that go across the datum line ??
-
-        # Coordinates for subset area
-        area = self._get_area(lower_right_y, upper_left_y, upper_left_x, lower_right_x)
-
-        # list with all zip files found in input_folder
-        filelist = self._create_filelist(self.config.input_folder, '*.zip')
-
-        # If Year is specified in config-file pre-processing will be only done for specified year
         try:
-            filelist = self._select_year(filelist, self.config.year)
-            filelist.sort()
+            lower_right_y = self.config.region['lr']['lat']
+            upper_left_y = self.config.region['ul']['lat']
+            upper_left_x = self.config.region['ul']['lon']
+            lower_right_x = self.config.region['lr']['lon']
+            # todo: how is it with coordinates that go across the datum line ??
+
+            # Coordinates for subset area
+            area = self._get_area(lower_right_y, upper_left_y, upper_left_x, lower_right_x)
+            process_all = 'no'
         except AttributeError:
-            pass
+            print('area of interest not specified, whole images will be processed')
+            process_all = 'yes'
 
-        # Coordinates for location check
-        location = [upper_left_x, upper_left_y, lower_right_x, lower_right_y]
+        if self.filelist is None:
+            print('no filelist specified therefore all images in input folder will be processed')
+            self.filelist = self._create_filelist(self.config.input_folder, '*.zip')
+            filelist.sort()
+        else:
+            for file in self.filelist:
+                if os.path.exists(file) is True:
+            else:
+                print('skip processing for %s. File does not exists' % file)
 
-        # list with all zip files that contain area of interest
-        filelist = self._contain_area_of_interest(filelist, location, self.config.input_folder)
-
-        # check for double processed data by ESA and choose newest one
-        filelist = self._double_processed(filelist)
 
 
         # loop to process all files stored in input directory
-        for file in filelist:
+        for file in self.filelist:
 
-            print('Scene', filelist.index(file) + 1, 'of', len(filelist))
+            print('Scene', self.filelist.index(file) + 1, 'of', len(self.filelist))
 
             # Divide filename
             filepath, filename, fileshortname, extension = self._decomposition_filename(file)
@@ -408,9 +202,21 @@ class SARPreProcessor(PreProcessor):
             # Call SNAP routine, xml file
             print('Process ', filename, ' with SNAP.')
 
-            outputfile = os.path.join(self.config.output_folder_step1, fileshortname + '_' + xml_addition + '.dim')
+            outputfile = os.path.join(self.config.output_folder_step1, fileshortname + self.name_addition_step1 + '.dim')
 
-            os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_process_step1) + ' -Pinput="' + file + '" -Poutput="' + outputfile + '" -Pangle="' + str(self.config.normalisation_angle) + '" -Parea="POLYGON ((' + area + '))"')
+            try:
+                normalisation_angle = self.config.normalisation_angle
+                if normalisation_angle is None:
+                    normalisation_angle = 35
+                    print('normalisaton angle not specified, default value of 35 is used for processing')
+            except AttributeError:
+                normalisation_angle = 35
+                print('normalisaton angle not specified, default value of 35 is used for processing')
+
+            if process_all == 'no':
+                os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step1) + ' -Pinput="' + file + '" -Poutput="' + outputfile + '" -Pangle="' + str(normalisation_angle) + '" -Parea="POLYGON ((' + area + '))"')
+            else:
+                os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step1) + ' -Pinput="' + file + '" -Poutput="' + outputfile + '" -Pangle="' + str(normalisation_angle) + '"')
 
         pdb.set_trace()
 
@@ -427,11 +233,8 @@ class SARPreProcessor(PreProcessor):
 
         """
 
-        # Name addition for processed data
-        xml_addition = 'Co'
-
         # Check if XML file for pre-processing step 2 is specified
-        assert self.config.xml_graph.pre_process_step2 is not None, 'ERROR: path of XML file for pre-processing step 2 is not not specified'
+        assert self.config.xml_graph_pre_process_step2 is not None, 'ERROR: path of XML file for pre-processing step 2 is not not specified'
 
         # Check if output folder of pre_process_step1 exists
         assert os.path.exists(self.config.output_folder_step1), 'ERROR: output folder of pre-processing step1 not found'
@@ -441,16 +244,28 @@ class SARPreProcessor(PreProcessor):
         if not os.path.exists(self.config.output_folder_step2):
             os.makedirs(self.config.output_folder_step2)
 
-        # list with all dim files found in output-folder of pre_process_step1
-        filelist = self._create_filelist(self.config.output_folder_step1, '*.dim')
-        filelist.sort()
+        # Create filelist with all to be processed images
+        if self.filelist is None:
+            print('no filelist specified therefore all images in output folder step1 will be processed')
+            filelist = self._create_filelist(self.config.output_folder_step1, '*.dim')
+            filelist.sort()
+        else:
+            filelist = []
+            for file in self.filelist:
+                filepath, filename, fileshortname, extension = self._decomposition_filename(file)
+                new_file_name = os.path.join(self.config.output_folder_step1, fileshortname + self.name_addition_step1 + '.dim')
+
+                if os.path.exists(new_file_name) is True:
+                    filelist.append(new_file_name)
+                else:
+                    print('skip processing for %s. File does not exists' % file)
+            filelist.sort()
 
         # Set Master image for co-registration
         master = filelist[0]
-
+        pdb.set_trace()
         # loop to co-register all found images to master image
         for file in filelist:
-
             print('Scene', filelist.index(file) + 1, 'of', len(filelist))
 
             # Divide filename
@@ -459,9 +274,10 @@ class SARPreProcessor(PreProcessor):
             # Call SNAP routine, xml file
             print('Process ', filename, ' with SNAP.')
 
-            outputfile = os.path.join(self.config.output_folder_step2, fileshortname + '_' + xml_addition + '.dim')
+            outputfile = os.path.join(self.config.output_folder_step2, fileshortname + self.name_addition_step2 + '.dim')
 
-            os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_process_step2) + ' -Pinput="' + master + '" -Pinput2="' + file + '" -Poutput="' + outputfile  + '"')
+            os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step2) + ' -Pinput="' + master + '" -Pinput2="' + file + '" -Poutput="' + outputfile  + '"')
+
 
     def pre_process_step3(self, **kwargs):
 
@@ -474,11 +290,8 @@ class SARPreProcessor(PreProcessor):
 
         """
 
-        # Name addition for processed data
-        xml_addition = 'Co'
-
         # Check if XML file for pre-processing step 3 is specified
-        assert self.config.xml_graph.pre_process_step3 is not None, 'ERROR: path of XML file for pre-processing step 3 is not not specified'
+        assert self.config.xml_graph_pre_process_step3 is not None, 'ERROR: path of XML file for pre-processing step 3 is not not specified'
 
         # Check if output folder of pre_process_step1 exists
         assert os.path.exists(self.config.output_folder_step2), 'ERROR: output folder of pre-processing step2 not found'
@@ -491,6 +304,21 @@ class SARPreProcessor(PreProcessor):
         # list with all dim files found in output-folder of pre_process_step2
         filelist = self._create_filelist(os.path.join(self.config.output_folder, 'step2'), '*.dim')
         filelist.sort()
+
+        # Create filelist with all to be processed images
+        if self.filelist is None:
+            print('no filelist specified therefore all images in output folder step2 will be processed')
+            filelist = self._create_filelist(self.config.output_folder_step2, '*.dim')
+        else:
+            filelist = []
+            for file in self.filelist:
+                filepath, filename, fileshortname, extension = self._decomposition_filename(file)
+                new_file_name = os.path.join(self.config.output_folder_step2, fileshortname + self.name_addition_step1 + self.name_addition_step2 + '.dim')
+
+                if os.path.exists(new_file_name) is True:
+                    filelist.append(new_file_name)
+                else:
+                    print('skip processing for %s. File does not exists' % file)
 
         # Sort filelist by date (hard coded position in filename!!!)
         filepath, filename, fileshortname, extension = self._decomposition_filename(filelist[0])
@@ -533,7 +361,7 @@ class SARPreProcessor(PreProcessor):
             # Divide filename of file of interest
             filepath, filename, fileshortname, extension = self._decomposition_filename(file)
 
-            outputfile = os.path.join(output_folder_step3, fileshortname + '_' + xml_addition + '.dim')
+            outputfile = os.path.join(self.config.output_folder_step3, fileshortname + self.name_addition_step3 + '.nc')
 
             date = datetime.strptime(fileshortname[17:25], '%Y%m%d')
             date = date.strftime('%d%b%Y')
@@ -542,7 +370,7 @@ class SARPreProcessor(PreProcessor):
             list_bands_vv = ','.join(list_bands_vv)
             list_bands_vh = ','.join(list_bands_vh)
 
-            os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_process_step3) + ' -Pinput="' + processing_filelist + '" -Pinput2="' + file  + '" -Poutput="' + outputfile + '" -Plist_bands_vv="' + list_bands_vv + '" -Plist_bands_vh="' + list_bands_vh + '" -Pdate="' + date + '"')
+            os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step3) + ' -Pinput="' + processing_filelist + '" -Pinput2="' + file  + '" -Poutput="' + outputfile + '" -Plist_bands_vv="' + list_bands_vv + '" -Plist_bands_vh="' + list_bands_vh + '" -Pdate="' + date + '"')
 
 
 
