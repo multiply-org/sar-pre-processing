@@ -11,11 +11,11 @@ import shutil
 import ogr
 import xml.etree.ElementTree as etree
 from datetime import datetime
-from file_list_sar_pre_processing import SARList
+from . file_list_sar_pre_processing import SARList
 
 import pdb
 
-filelist = SARList(config='sample_config_file.yml').create_list()
+# filelist = SARList(config='sample_config_file.yml').create_list()
 
 class AttributeDict(object):
     """
@@ -25,6 +25,7 @@ class AttributeDict(object):
     allowing you to recurse down nested dicts (like: AttributeDict.attr.attr)
     """
     def __init__(self, **entries):
+
         self.add_entries(**entries)
 
     def add_entries(self, **entries):
@@ -50,9 +51,11 @@ class PreProcessor(object):
         self._get_config()
 
     def _check(self):
+
         assert self.config is not None, 'ERROR: Configuration file needs to be provided'
 
     def pre_process(self):
+
         assert False, 'Routine should be implemented in child class'
 
     def _get_config(self):
