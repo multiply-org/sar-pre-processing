@@ -42,14 +42,14 @@ class SARList(object):
 
     def __init__(self, **kwargs):
         self.config = kwargs.get('config', None)
-        self._get_config()
+        self._load_config()
         self._check()
 
     def _check(self):
         assert self.config is not None, 'ERROR: Configuration file needs to be provided'
         assert self.config.input_folder is not None, 'ERROR: Input folder needs to be provided'
 
-    def _get_config(self):
+    def _load_config(self):
         """
         Load configuration and writes to self.config
         """
