@@ -1,9 +1,11 @@
 
 # Input folder with SAR data (zip format)
-# input_folder: /media/nas_data/Thomas/Wallerfing/Sentinel_1_data
-input_folder: /media/tweiss/Daten/Versuch
+input_folder: /media/nas_data/Thomas/Wallerfing/Sentinel_1_data
+# input_folder: /media/tweiss/Daten/Versuch
+
 # Folder to store the pre-processed data
-output_folder: /media/tweiss/Daten/Versuch
+output_folder: /media/nas_data/Thomas/S1_LMU_site_2017
+# output_folder: /media/tweiss/Daten/Versuch
 
 # Location of SNAP's graph-processing-tool
 gpt: /home/tweiss/snap/bin/gpt
@@ -19,7 +21,7 @@ region:
     lat: 48.200
     lon: 11.810
 
-# year: 2017
+year: 2017
 
 # normalisation_angle:
 

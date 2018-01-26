@@ -5,13 +5,13 @@ Wrapper module to launch preprocessor
 import os
 import yaml
 import fnmatch
-import pyproj
+# import pyproj
 import zipfile
 import shutil
 import ogr
 import xml.etree.ElementTree as etree
 from datetime import datetime
-from . file_list_sar_pre_processing import SARList
+from file_list_sar_pre_processing import SARList
 
 import pdb
 
@@ -370,11 +370,16 @@ class SARPreProcessor(PreProcessor):
             date = datetime.strptime(fileshortname[17:25], '%Y%m%d')
             date = date.strftime('%d%b%Y')
 
+            # to do: Might source name change out to another program or use more generic approach. Hard coded name should work fine right now.
+            name_change_vv = 'sigma0_vv_kelln_normalisation_slv1_' + date
+            name_change_vh = 'sigma0_vh_kelln_normalisation_slv2_' + date
+            name_change_theta = 'localIncidenceAngle_slv10_' + date
+
             processing_filelist = ','.join(processing_filelist)
             list_bands_vv = ','.join(list_bands_vv)
             list_bands_vh = ','.join(list_bands_vh)
 
-            os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step3) + ' -Pinput="' + processing_filelist + '" -Pinput2="' + file  + '" -Poutput="' + outputfile + '" -Plist_bands_vv="' + list_bands_vv + '" -Plist_bands_vh="' + list_bands_vh + '" -Pdate="' + date + '"')
+            os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step3) + ' -Pinput="' + processing_filelist + '" -Pinput2="' + file  + '" -Poutput="' + outputfile + '" -Plist_bands_vv="' + list_bands_vv + '" -Plist_bands_vh="' + list_bands_vh + '" -Pname_change_vv="' + name_change_vv + '" -Pname_change_vh="' + name_change_vh + '" -Pname_change_theta="' + name_change_theta + '" -Pdate="' + date + '"')
 
 
 
@@ -385,3 +390,8 @@ class SARPreProcessor(PreProcessor):
         # a separate class
 
         return 'some data'
+
+
+
+
+
