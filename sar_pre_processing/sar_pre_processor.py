@@ -11,7 +11,7 @@ import shutil
 import ogr
 import xml.etree.ElementTree as etree
 from datetime import datetime
-from file_list_sar_pre_processing import SARList
+from .file_list_sar_pre_processing import SARList
 
 import pdb
 
