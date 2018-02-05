@@ -2,9 +2,14 @@
 
 from setuptools import setup
 
-setup(name='sar-pre-processing',
+requirements = [
+    'pytest'
+]
+
+setup(name='multiply-sar-pre-processing',
       version='0.1',
       description='MULTIPLY SAR Pre-Processing',
       author='MULTIPLY Team',
       packages=['sar_pre_processing'],
-     )
+      install_requires=requirements
+)
