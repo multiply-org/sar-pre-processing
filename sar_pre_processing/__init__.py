@@ -1,3 +1,2 @@
-from .dummy_sar_pre_processor import DummySARPreProcessor
 from .sar_pre_processor import SARPreProcessor
 from .file_list_sar_pre_processing import SARList
