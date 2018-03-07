@@ -7,8 +7,12 @@ requirements = [
     'sphinxcontrib-bibtex'
 ]
 
+__version__ = None
+with open('sar_pre_processing/version.py') as f:
+    exec(f.read())
+
 setup(name='multiply-sar-pre-processing',
-      version='0.3',
+      version=__version__,
       description='MULTIPLY SAR Pre-Processing',
       author='MULTIPLY Team',
       packages=['sar_pre_processing'],
