@@ -108,12 +108,70 @@
       <bandNamePattern>.*$date</bandNamePattern>
     </parameters>
   </node>
+  <node id="BandMaths">
+    <operator>BandMaths</operator>
+    <sources>
+      <sourceProduct refid="BandSelect(3)"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <targetBands>
+        <targetBand>
+          <name>sigma0_VV</name>
+          <type>float32</type>
+          <expression>$name_change_vv</expression>
+          <description/>
+          <unit>linear</unit>
+          <noDataValue>-999</noDataValue>
+        </targetBand>
+      </targetBands>
+      <variables/>
+    </parameters>
+  </node>
+  <node id="BandMaths(2)">
+    <operator>BandMaths</operator>
+    <sources>
+      <sourceProduct refid="BandSelect(4)"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <targetBands>
+        <targetBand>
+          <name>sigma0_VH</name>
+          <type>float32</type>
+          <expression>$name_change_vh</expression>
+          <description/>
+          <unit>linear</unit>
+          <noDataValue>-999</noDataValue>
+        </targetBand>
+      </targetBands>
+      <variables/>
+    </parameters>
+  </node>
+  <node id="BandMaths(3)">
+    <operator>BandMaths</operator>
+    <sources>
+      <sourceProduct refid="Read"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <targetBands>
+        <targetBand>
+          <name>theta</name>
+          <type>float32</type>
+          <expression>$name_change_theta</expression>
+          <description/>
+          <unit>linear</unit>
+          <noDataValue>-999</noDataValue>
+        </targetBand>
+      </targetBands>
+      <variables/>
+    </parameters>
+  </node>
   <node id="BandMerge(2)">
     <operator>BandMerge</operator>
     <sources>
-      <sourceProduct.1 refid="Read"/>
-      <sourceProduct.2 refid="BandSelect(3)"/>
-      <sourceProduct.3 refid="BandSelect(4)"/>
+      <!-- <sourceProduct.1 refid="Read"/> -->
+      <sourceProduct.2 refid="BandMaths"/>
+      <sourceProduct.3 refid="BandMaths(2)"/>
+      <sourceProduct.4 refid="BandMaths(3)"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <sourceBands/>
