@@ -1,75 +1,40 @@
 
 # Input folder with SAR data (zip format)
 # input_folder: /media/nas_data/Thomas/Wallerfing/Sentinel_1_data
-input_folder: /media/tweiss/Daten/Versuch
+#input_folder: /media/tweiss/Daten/Versuch
+input_folder: E:\Projects\Multiply\Data\S1A_L1C
 # Folder to store the pre-processed data
-output_folder: /media/tweiss/Daten/Versuch/pre_processed
+#output_folder: /media/tweiss/Daten/Versuch/pre_processed
+output_folder: E:\Projects\Multiply\Data\S1A_L1C\pre_processed
 # Location of SNAP's graph-processing-tool
-gpt: /home/tweiss/snap/bin/gpt
+#gpt: /home/tweiss/snap/bin/gpt
+#gpt: /home/tweiss/snap/bin/gpt
+gpt: C:\Program Files\snap-6-snapshot\bin\gpt
 
 
 
-xml_graph:
-  path: '/media/tweiss/Work/python_code/MULTIPLY/pre_processing_Sentinel_1/xml_files'
-  pre_processing: pre_process_slc_kelln_subset.xml
-  coregister: coregister.xml
-  temporal_speckle_filter: blablabla
+#xml_graph:
+#  path: /media/tweiss/Work/python_code/MULTIPLY/sar-pre-processing/xml_files
+#  pre_process_step1: pre_process_slc_GC_RC_No_Su.xml
+#  pre_process_step2: coregister.xml
+#  pre_process_step3: multi_speckle.xml
 
 region:
   ul:
-    lat: 48.340
-    lon: 11.600
+    lat: 39
+    lon: -8
   lr:
-    lat: 48.200
-    lon: 11.810
+    lat: 35
+    lon: -4
+
+#region:
+#  ul:
+#    lat: 48.340
+#    lon: 11.600
+#  lr:
+#    lat: 48.200
+#    lon: 11.810
 
 year: 2017
 
 
-General:
-    - roi: POLYGON ( (0, 0), (0,1 )) # blahblah
-    - start_time: 2017-01-01
-    - end_time: 2017-12-31
-    - time_interval: 1 # 1 day
-    - spatial_resolution : 10 # metres
-    - state_mask: /path/to/my/state_mask.tif # Or shape?
-    - output_directory_root: /some/where/
-    # - output_prefix: my_test_33
-    - gpt: /asf/asfd
-
-General2:
-    gpt: /asfdas
-    roi: /asfdasasfsafd
-
-Inference: # inference config
-    - parameters:
-        - LAI
-        - soil_moisture
-    - optical_operator_library: some_operator.nc   # Optional
-    - sar_operator_library: some_other_operator.nc # Optional
-    - a: identity
-    - inflation: 1e3
-
-Prior:
-  priors:
-    sm_clim:
-      type: climatology
-      climatology_file: ../aux_data/CCI_SM_climatology_eur_merged_inv.nc
-    # sm_recent:
-    #       type: recent
-    # sm_static:
-    #       type: static
-    # sm_dynamic:
-    #     type: dynamic
-    #     model:
-    #         - API
-    #         - other
-
-    # veg_pft:
-    #   type: pft
-    #   database: /aux_data/some_DB
-    # veg_spec:
-    #   type: species
-    #   database: /user_data/some_DB
-  add_config:
-# -

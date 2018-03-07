@@ -11,11 +11,14 @@ import shutil
 import ogr
 import xml.etree.ElementTree as etree
 from datetime import datetime
-from file_list_sar_pre_processing import SARList
+from .file_list_sar_pre_processing import SARList
 
 import pdb
+import subprocess
 
-# filelist = SARList(config='sample_config_file.yml').create_list()
+
+# FILE_LIST = SARList(config='sample_config_file.yml').create_list()
+
 
 class AttributeDict(object):
     """
@@ -35,6 +38,20 @@ class AttributeDict(object):
             else:
                 self.__dict__[key] = value
 
+    def has_entry(self, entry: str):
+        return self._has_entry(entry, 0)
+
+    def _has_entry(self, entry: str, current_index: int):
+        entry_keys = entry.split('.')
+        if entry_keys[current_index] in self.__dict__.keys():
+            if current_index < len(entry_keys):
+                dict_entry = self.__dict__[entry_keys[current_index]]
+                if type(dict_entry) is not dict:
+                    return False
+                return dict_entry._has_entry(entry, current_index + 1)
+            return True
+        return False
+
     def __getitem__(self, key):
         """
         Provides dict-style access to attributes
@@ -45,25 +62,26 @@ class AttributeDict(object):
 class PreProcessor(object):
 
     def __init__(self, **kwargs):
-        self.config = kwargs.get('config', None)
+        self.config_file = kwargs.get('config', None)
         self.filelist = kwargs.get('filelist', None)
         self._check()
-        self._get_config()
+        self._load_config()
 
     def _check(self):
 
-        assert self.config is not None, 'ERROR: Configuration file needs to be provided'
+        assert self.config_file is not None, 'ERROR: Configuration file needs to be provided'
+
 
     def pre_process(self):
 
         assert False, 'Routine should be implemented in child class'
 
-    def _get_config(self):
+    def _load_config(self):
         """
         Load configuration from self.config.bb.pre_process()
            writes to self.config.
         """
-        with open(self.config, 'r') as cfg:
+        with open(self.config_file, 'r') as cfg:
             self.config = yaml.load(cfg)
             self.config = AttributeDict(**self.config)
 
@@ -93,14 +111,17 @@ class SARPreProcessor(PreProcessor):
         self.name_addition_step2 = '_Co'
         self.name_addition_step3 = '_speckle'
 
+        self.file_list = SARList(config=self.config_file).create_list()
 
         # Check if path of SNAP's graph-processing-tool is specified
         assert self.config.gpt is not None, 'ERROR: path for SNAPs graph-processing-tool is not not specified'
 
         # Check if path of path to XML files is specified
-        assert self.config.xml_graph_path is not None, 'ERROR: path of XML files for processing is not not specified'
+        if not self.config.has_entry('xml_graph_path') is None:
+            self.config.xml_graph_path = '.\\xml_files'
+        # assert self.config.xml_graph.path is not None, 'ERROR: path of XML files for processing is not not specified'
 
-        pass
+        # pass
 
         # TODO PUT THE GRAPH DIRECTORIES AND NAMES IN A SEPARATE CONFIG !!!
 
@@ -166,7 +187,8 @@ class SARPreProcessor(PreProcessor):
             os.makedirs(self.config.output_folder_step1)
 
         # Check if XML file for pre-processing is specified
-        assert self.config.xml_graph_pre_process_step1 is not None, 'ERROR: path of XML file for pre-processing step 1 is not not specified'
+        assert self.config.xml_graph_pre_process_step1 is not None, \
+            'ERROR: path of XML file for pre-processing step 1 is not not specified'
 
         try:
             lower_right_y = self.config.region['lr']['lat']
@@ -182,24 +204,24 @@ class SARPreProcessor(PreProcessor):
             print('area of interest not specified, whole images will be processed')
             process_all = 'yes'
 
-        if self.filelist is None:
-            print('no filelist specified therefore all images in input folder will be processed')
-            self.filelist = self._create_filelist(self.config.input_folder, '*.zip')
-            filelist.sort()
-        else:
-            filelist = []
-            for file in self.filelist:
-                if os.path.exists(file) is True:
-                    filelist.append(file)
-                else:
-                    print('skip processing for %s. File does not exists' % file)
+        # if self.file_list is None:
+        #     print('no file list specified, therefore all images in input folder will be processed')
+        #     self.file_list = self._create_filelist(self.config.input_folder, '*.zip')
+        #     self.file_list.sort()
+        # else:
+        #     self.file_list = []
+        #     for file in self.file_list:
+        #         if os.path.exists(file) is True:
+        #             self.file_list.append(file)
+        #         else:
+        #             print('skip processing for %s. File does not exist' % file)
 
 
 
         # loop to process all files stored in input directory
-        for file in filelist:
+        for file in self.file_list:
 
-            print('Scene', filelist.index(file) + 1, 'of', len(filelist))
+            print('Scene ', self.file_list.index(file) + 1, ' of ', len(self.file_list))
 
             # Divide filename
             filepath, filename, fileshortname, extension = self._decomposition_filename(file)
@@ -219,9 +241,15 @@ class SARPreProcessor(PreProcessor):
                 print('normalisaton angle not specified, default value of 35 is used for processing')
 
             if process_all == 'no':
-                os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step1) + ' -Pinput="' + file + '" -Poutput="' + outputfile + '" -Pangle="' + str(normalisation_angle) + '" -Parea="POLYGON ((' + area + '))"')
+                subprocess.call(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path,
+                                                               self.config.xml_graph_pre_process_step1) +
+                          ' -Pinput="' + file + '" -Poutput="' + outputfile + '" -Pangle="' + str(normalisation_angle)
+                          + '" -Parea="POLYGON ((' + area + '))" -c 2G -x')
             else:
-                os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step1) + ' -Pinput="' + file + '" -Poutput="' + outputfile + '" -Pangle="' + str(normalisation_angle) + '"')
+                subprocess.call(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path,
+                                                               self.config.xml_graph_pre_process_step1) +
+                          ' -Pinput="' + file + '" -Poutput="' + outputfile + '" -Pangle="' +str(normalisation_angle)
+                          + '" -c 2G -x')
 
         pdb.set_trace()
 
@@ -281,7 +309,9 @@ class SARPreProcessor(PreProcessor):
 
             outputfile = os.path.join(self.config.output_folder_step2, fileshortname + self.name_addition_step2 + '.dim')
 
-            os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step2) + ' -Pinput="' + master + '" -Pinput2="' + file + '" -Poutput="' + outputfile  + '"')
+            subprocess.call(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path,
+                                                           self.config.xml_graph_pre_process_step2) +
+                      ' -Pinput="' + master + '" -Pinput2="' + file + '" -Poutput="' + outputfile  + '"  -c 3G')
 
     def pre_process_step3(self, **kwargs):
 
@@ -317,7 +347,8 @@ class SARPreProcessor(PreProcessor):
             filelist = []
             for file in self.filelist:
                 filepath, filename, fileshortname, extension = self._decomposition_filename(file)
-                new_file_name = os.path.join(self.config.output_folder_step2, fileshortname + self.name_addition_step1 + self.name_addition_step2 + '.dim')
+                new_file_name = os.path.join(self.config.output_folder_step2, fileshortname + self.name_addition_step1
+                                             + self.name_addition_step2 + '.dim')
 
                 if os.path.exists(new_file_name) is True:
                     filelist.append(new_file_name)
@@ -352,12 +383,14 @@ class SARPreProcessor(PreProcessor):
             for processing_file in processing_filelist:
                 filepath, filename, fileshortname, extension = self._decomposition_filename(processing_file)
 
-                self._create_filelist(os.path.join(filepath,fileshortname+'.data'), '*_slv1_*.img')
+                # self._create_filelist(os.path.join(filepath,fileshortname+'.data'), '*_slv1_*.img')
 
                 # get filename from folder
                 # think about better way !!!!
-                a, a, band_vv_name, a = self._decomposition_filename(self._create_filelist(os.path.join(filepath,fileshortname+'.data'), '*_slv1_*.img')[0])
-                a, a, band_vh_name, a = self._decomposition_filename(self._create_filelist(os.path.join(filepath,fileshortname+'.data'), '*_slv2_*.img')[0])
+                a, a, band_vv_name, a = self._decomposition_filename(
+                    self._create_filelist(os.path.join(filepath,fileshortname+'.data'), '*_slv1_*.img')[0])
+                a, a, band_vh_name, a = self._decomposition_filename(
+                    self._create_filelist(os.path.join(filepath,fileshortname+'.data'), '*_slv2_*.img')[0])
 
                 list_bands_vv.append(band_vv_name)
                 list_bands_vh.append(band_vh_name)
@@ -379,7 +412,13 @@ class SARPreProcessor(PreProcessor):
             list_bands_vv = ','.join(list_bands_vv)
             list_bands_vh = ','.join(list_bands_vh)
 
-            os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step3) + ' -Pinput="' + processing_filelist + '" -Pinput2="' + file  + '" -Poutput="' + outputfile + '" -Plist_bands_vv="' + list_bands_vv + '" -Plist_bands_vh="' + list_bands_vh + '" -Pname_change_vv="' + name_change_vv + '" -Pname_change_vh="' + name_change_vh + '" -Pname_change_theta="' + name_change_theta + '" -Pdate="' + date + '"')
+
+            subprocess.call(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path,
+                                                           self.config.xml_graph_pre_process_step3) +
+                      ' -Pinput="' + processing_filelist + '" -Pinput2="' + file  + '" -Poutput="' + outputfile +
+                      '" -Plist_bands_vv="' + list_bands_vv + '" -Plist_bands_vh="' + list_bands_vh +
+                      '" -Pdate="' + date + '"  -c 3G')
+
 
 
 
