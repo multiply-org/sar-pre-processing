@@ -11,7 +11,18 @@ output_folder: /media/nas_data/Thomas/S1_LMU_site_2017
 gpt: /home/tweiss/snap/bin/gpt
 
 # Location of xml files which are needed for processing
-xml_graph_path: /media/tweiss/Work/python_code/MULTIPLY/sar-pre-processing/xml_files
+xml_graph_path: /media/tweiss/Work/GitHub/multiply-org/sar-pre-processing/xml_files
+
+subset: 'yes'
+
+speckle_filter:
+  multi_temporal:
+    apply: 'yes'
+    files: 5
+  single_filter:
+    apply: 'yes'
+
+
 
 region:
   ul:

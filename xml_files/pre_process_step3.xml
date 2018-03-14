@@ -146,7 +146,27 @@
       <variables/>
     </parameters>
   </node>
-  <node id="BandMaths(3)">
+  <node id="Speckle-Filter">
+    <operator>Speckle-Filter</operator>
+    <sources>
+      <sourceProduct refid="Read"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <sourceBands>$list_bands_single_speckle_filter</sourceBands>
+      <filter>Lee Sigma</filter>
+      <filterSizeX>3</filterSizeX>
+      <filterSizeY>3</filterSizeY>
+      <dampingFactor>2</dampingFactor>
+      <estimateENL>true</estimateENL>
+      <enl>1.0</enl>
+      <numLooksStr>1</numLooksStr>
+      <windowSize>7x7</windowSize>
+      <targetWindowSizeStr>3x3</targetWindowSizeStr>
+      <sigmaStr>0.9</sigmaStr>
+      <anSize>50</anSize>
+    </parameters>
+  </node>
+<!--   <node id="BandMaths(3)">
     <operator>BandMaths</operator>
     <sources>
       <sourceProduct refid="Read"/>
@@ -164,14 +184,15 @@
       </targetBands>
       <variables/>
     </parameters>
-  </node>
+  </node> -->
   <node id="BandMerge(2)">
     <operator>BandMerge</operator>
     <sources>
-      <!-- <sourceProduct.1 refid="Read"/> -->
+      <sourceProduct.1 refid="Read"/>
       <sourceProduct.2 refid="BandMaths"/>
       <sourceProduct.3 refid="BandMaths(2)"/>
-      <sourceProduct.4 refid="BandMaths(3)"/>
+      <!-- <sourceProduct.4 refid="BandMaths(3)"/> -->
+      <sourceProduct.4 refid="Speckle-Filter"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <sourceBands/>
