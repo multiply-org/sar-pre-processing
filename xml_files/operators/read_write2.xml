@@ -1,0 +1,86 @@
+<graph id="Graph">
+  <version>1.0</version>
+  <node id="$id">
+    <operator>Read</operator>
+    <sources />
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>$input</file>
+    </parameters>
+  </node>
+<node id="$id">
+    <operator>Apply-Orbit-File</operator>
+    <sources>
+      <sourceProduct refid="$refid" />
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <orbitType>Sentinel Precise (Auto Download)</orbitType>
+      <polyDegree>2</polyDegree>
+      <continueOnFail>false</continueOnFail>
+    </parameters>
+  </node>
+<node id="$id">
+    <operator>ThermalNoiseRemoval</operator>
+    <sources>
+      <sourceProduct refid="$refid" />
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <selectedPolarisations />
+      <removeThermalNoise>true</removeThermalNoise>
+      <reIntroduceThermalNoise>false</reIntroduceThermalNoise>
+    </parameters>
+  </node>
+<node id="$id">
+    <operator>Calibration</operator>
+    <sources>
+      <sourceProduct refid="$refid" />
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <sourceBands />
+      <auxFile>Latest Auxiliary File</auxFile>
+      <externalAuxFile />
+      <outputImageInComplex>false</outputImageInComplex>
+      <outputImageScaleInDb>false</outputImageScaleInDb>
+      <createGammaBand>false</createGammaBand>
+      <createBetaBand>false</createBetaBand>
+      <selectedPolarisations />
+      <outputSigmaBand>true</outputSigmaBand>
+      <outputGammaBand>false</outputGammaBand>
+      <outputBetaBand>false</outputBetaBand>
+    </parameters>
+  </node>
+<node id="$id">
+    <operator>TOPSAR-Deburst</operator>
+    <sources>
+      <sourceProduct refid="$refid" />
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <selectedPolarisations />
+    </parameters>
+  </node>
+<node id="$id">
+    <operator>Subset</operator>
+    <sources>
+      <sourceProduct refid="$refid" />
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <sourceBands />
+      <region>0,0,0,0</region>
+      <geoRegion>$area</geoRegion>
+      <subSamplingX>1</subSamplingX>
+      <subSamplingY>1</subSamplingY>
+      <fullSwath>false</fullSwath>
+      <tiePointGridNames />
+      <copyMetadata>true</copyMetadata>
+    </parameters>
+  </node>
+<node id="$id">
+    <operator>Write</operator>
+    <sources>
+      <sourceProduct refid="$refid" />
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>$output</file>
+      <formatName>BEAM-DIMAP</formatName>
+    </parameters>
+  </node>
+</graph>

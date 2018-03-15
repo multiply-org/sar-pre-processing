@@ -399,7 +399,7 @@ class SARPreProcessor(PreProcessor):
                 list_bands_vv = ','.join(list_bands_vv)
                 list_bands_vh = ','.join(list_bands_vh)
                 pdb.set_trace()
-                os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step3) + ' -Pinput="' + processing_filelist + '" -Pinput2="' + file  + '" -Poutput="' + outputfile + '" -Plist_bands_vv="' + list_bands_vv + '" -Plist_bands_vh="' + list_bands_vh + '" -Pdate="' + date + '" -Plist_bands_single_speckle_filter="' + list_bands_single_speckle_filter + '"')
+                os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step3) + ' -Pinput="' + processing_filelist + '" -Pinput2="' + file  + '" -Poutput="' + outputfile + '" -Plist_bands_vv="' + list_bands_vv + '" -Plist_bands_vh="' + list_bands_vh + '" -Pdate="' + date + '" -Pname_change_vv="' + b + '" -Pname_change_vh="' + c + '" -Plist_bands_single_speckle_filter="' + list_bands_single_speckle_filter + '"')
                 print(datetime.now())
 
 

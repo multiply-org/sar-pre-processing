@@ -1,0 +1,52 @@
+<graph id="Graph">
+  <version>1.0</version>
+  <node id="Read">
+    <operator>Read</operator>
+    <sources/>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>/media/tweiss/Daten/Versuch/step2/S1A_IW_SLC__1SDV_20161018T052616_20161018T052644_013540_015AB8_037D_GC_RC_No_Su_Co.dim</file>
+    </parameters>
+  </node>
+  <node id="Speckle-Filter">
+    <operator>Speckle-Filter</operator>
+    <sources>
+      <sourceProduct refid="Read"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <sourceBands>sigma0_vv_kelln_normalisation_slv1_18Oct2016,sigma0_vh_kelln_normalisation_slv2_18Oct2016,sigma0_vv_kelln_slv3_18Oct2016,sigma0_vh_kelln_slv4_18Oct2016</sourceBands>
+      <filter>Lee Sigma</filter>
+      <filterSizeX>3</filterSizeX>
+      <filterSizeY>3</filterSizeY>
+      <dampingFactor>2</dampingFactor>
+      <estimateENL>true</estimateENL>
+      <enl>1.0</enl>
+      <numLooksStr>1</numLooksStr>
+      <windowSize>7x7</windowSize>
+      <targetWindowSizeStr>3x3</targetWindowSizeStr>
+      <sigmaStr>0.9</sigmaStr>
+      <anSize>50</anSize>
+    </parameters>
+  </node>
+  <node id="Write">
+    <operator>Write</operator>
+    <sources>
+      <sourceProduct refid="Speckle-Filter"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>/media/tweiss/Daten/S1A_IW_SLC__1SDV_20161018T052616_20161018T052644_013540_015AB8_037D_GC_RC_No_Su_Co_Spk.dim</file>
+      <formatName>BEAM-DIMAP</formatName>
+    </parameters>
+  </node>
+  <applicationData id="Presentation">
+    <Description/>
+    <node id="Read">
+            <displayPosition x="43.0" y="86.0"/>
+    </node>
+    <node id="Speckle-Filter">
+      <displayPosition x="190.0" y="92.0"/>
+    </node>
+    <node id="Write">
+            <displayPosition x="455.0" y="135.0"/>
+    </node>
+  </applicationData>
+</graph>
