@@ -52,7 +52,7 @@
       <sourceProduct refid="BandSelect"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <sourceBands>$list_bands_vv</sourceBands>
+      <sourceBands>$list_bands_vv_norm_multi</sourceBands>
       <filter>Lee Sigma</filter>
       <filterSizeX>3</filterSizeX>
       <filterSizeY>3</filterSizeY>
@@ -72,7 +72,7 @@
       <sourceProduct refid="BandSelect(2)"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <sourceBands>$list_bands_vh</sourceBands>
+      <sourceBands>$list_bands_vh_norm_multi</sourceBands>
       <filter>Lee Sigma</filter>
       <filterSizeX>3</filterSizeX>
       <filterSizeY>3</filterSizeY>
@@ -116,9 +116,9 @@
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <targetBands>
         <targetBand>
-          <name>sigma0_VV</name>
+          <name>sigma0_vv_norm_multi</name>
           <type>float32</type>
-          <expression>$name_change_vv</expression>
+          <expression>$name_change_vv_norm_single</expression>
           <description/>
           <unit>linear</unit>
           <noDataValue>-999</noDataValue>
@@ -135,9 +135,138 @@
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <targetBands>
         <targetBand>
-          <name>sigma0_VH</name>
+          <name>sigma0_vh_norm_multi</name>
           <type>float32</type>
-          <expression>$name_change_vh</expression>
+          <expression>$name_change_vh_norm_single</expression>
+          <description/>
+          <unit>linear</unit>
+          <noDataValue>-999</noDataValue>
+        </targetBand>
+      </targetBands>
+      <variables/>
+    </parameters>
+  </node>
+
+
+
+
+
+
+
+  <node id="BandSelect(5)">
+    <operator>BandSelect</operator>
+    <sources>
+      <sourceProduct refid="BandMerge"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <selectedPolarisations/>
+      <sourceBands/>
+      <bandNamePattern>.*slv3.*</bandNamePattern>
+    </parameters>
+  </node>
+  <node id="BandSelect(6)">
+    <operator>BandSelect</operator>
+    <sources>
+      <sourceProduct refid="BandMerge"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <selectedPolarisations/>
+      <sourceBands/>
+      <bandNamePattern>.*slv4.*</bandNamePattern>
+    </parameters>
+  </node>
+  <node id="Multi-Temporal-Speckle-Filter(3)">
+    <operator>Multi-Temporal-Speckle-Filter</operator>
+    <sources>
+      <sourceProduct refid="BandSelect(5)"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <sourceBands>$list_bands_vv_multi</sourceBands>
+      <filter>Lee Sigma</filter>
+      <filterSizeX>3</filterSizeX>
+      <filterSizeY>3</filterSizeY>
+      <dampingFactor>2</dampingFactor>
+      <estimateENL>true</estimateENL>
+      <enl>1.0</enl>
+      <numLooksStr>1</numLooksStr>
+      <windowSize>7x7</windowSize>
+      <targetWindowSizeStr>3x3</targetWindowSizeStr>
+      <sigmaStr>0.9</sigmaStr>
+      <anSize>50</anSize>
+    </parameters>
+  </node>
+  <node id="Multi-Temporal-Speckle-Filter(4)">
+    <operator>Multi-Temporal-Speckle-Filter</operator>
+    <sources>
+      <sourceProduct refid="BandSelect(6)"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <sourceBands>$list_bands_vh_multi</sourceBands>
+      <filter>Lee Sigma</filter>
+      <filterSizeX>3</filterSizeX>
+      <filterSizeY>3</filterSizeY>
+      <dampingFactor>2</dampingFactor>
+      <estimateENL>true</estimateENL>
+      <enl>1.0</enl>
+      <numLooksStr>1</numLooksStr>
+      <windowSize>7x7</windowSize>
+      <targetWindowSizeStr>3x3</targetWindowSizeStr>
+      <sigmaStr>0.9</sigmaStr>
+      <anSize>50</anSize>
+    </parameters>
+  </node>
+  <node id="BandSelect(7)">
+    <operator>BandSelect</operator>
+    <sources>
+      <sourceProduct refid="Multi-Temporal-Speckle-Filter(3)"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <selectedPolarisations/>
+      <sourceBands/>
+      <bandNamePattern>.*$date</bandNamePattern>
+    </parameters>
+  </node>
+  <node id="BandSelect(8)">
+    <operator>BandSelect</operator>
+    <sources>
+      <sourceProduct refid="Multi-Temporal-Speckle-Filter(4)"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <selectedPolarisations/>
+      <sourceBands/>
+      <bandNamePattern>.*$date</bandNamePattern>
+    </parameters>
+  </node>
+  <node id="BandMaths(3)">
+    <operator>BandMaths</operator>
+    <sources>
+      <sourceProduct refid="BandSelect(7)"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <targetBands>
+        <targetBand>
+          <name>sigma0_vv_multi</name>
+          <type>float32</type>
+          <expression>$name_change_vv_single</expression>
+          <description/>
+          <unit>linear</unit>
+          <noDataValue>-999</noDataValue>
+        </targetBand>
+      </targetBands>
+      <variables/>
+    </parameters>
+  </node>
+  <node id="BandMaths(4)">
+    <operator>BandMaths</operator>
+    <sources>
+      <sourceProduct refid="BandSelect(8)"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <targetBands>
+        <targetBand>
+          <name>sigma0_vh_multi</name>
+          <type>float32</type>
+          <expression>$name_change_vh_single</expression>
           <description/>
           <unit>linear</unit>
           <noDataValue>-999</noDataValue>
@@ -166,17 +295,17 @@
       <anSize>50</anSize>
     </parameters>
   </node>
-<!--   <node id="BandMaths(3)">
+  <node id="BandMaths(5)">
     <operator>BandMaths</operator>
     <sources>
-      <sourceProduct refid="Read"/>
+      <sourceProduct refid="Speckle-Filter"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <targetBands>
         <targetBand>
-          <name>theta</name>
+          <name>sigma0_vv_single</name>
           <type>float32</type>
-          <expression>$name_change_theta</expression>
+          <expression>$name_change_vv_single</expression>
           <description/>
           <unit>linear</unit>
           <noDataValue>-999</noDataValue>
@@ -184,15 +313,76 @@
       </targetBands>
       <variables/>
     </parameters>
-  </node> -->
+  </node>
+  <node id="BandMaths(6)">
+    <operator>BandMaths</operator>
+    <sources>
+      <sourceProduct refid="Speckle-Filter"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <targetBands>
+        <targetBand>
+          <name>sigma0_vh_single</name>
+          <type>float32</type>
+          <expression>$name_change_vh_single</expression>
+          <description/>
+          <unit>linear</unit>
+          <noDataValue>-999</noDataValue>
+        </targetBand>
+      </targetBands>
+      <variables/>
+    </parameters>
+  </node>
+  <node id="BandMaths(7)">
+    <operator>BandMaths</operator>
+    <sources>
+      <sourceProduct refid="Speckle-Filter"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <targetBands>
+        <targetBand>
+          <name>sigma0_vv_norm_single</name>
+          <type>float32</type>
+          <expression>$name_change_vv_norm_single</expression>
+          <description/>
+          <unit>linear</unit>
+          <noDataValue>-999</noDataValue>
+        </targetBand>
+      </targetBands>
+      <variables/>
+    </parameters>
+  </node>
+  <node id="BandMaths(8)">
+    <operator>BandMaths</operator>
+    <sources>
+      <sourceProduct refid="Speckle-Filter"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <targetBands>
+        <targetBand>
+          <name>sigma0_vh_norm_single</name>
+          <type>float32</type>
+          <expression>$name_change_vh_norm_single</expression>
+          <description/>
+          <unit>linear</unit>
+          <noDataValue>-999</noDataValue>
+        </targetBand>
+      </targetBands>
+      <variables/>
+    </parameters>
+  </node>
   <node id="BandMerge(2)">
     <operator>BandMerge</operator>
     <sources>
       <sourceProduct.1 refid="Read"/>
       <sourceProduct.2 refid="BandMaths"/>
       <sourceProduct.3 refid="BandMaths(2)"/>
-      <!-- <sourceProduct.4 refid="BandMaths(3)"/> -->
-      <sourceProduct.4 refid="Speckle-Filter"/>
+      <sourceProduct.3 refid="BandMaths(3)"/>
+      <sourceProduct.3 refid="BandMaths(4)"/>
+      <sourceProduct.3 refid="BandMaths(5)"/>
+      <sourceProduct.3 refid="BandMaths(6)"/>
+      <sourceProduct.3 refid="BandMaths(7)"/>
+      <sourceProduct.3 refid="BandMaths(8)"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <sourceBands/>

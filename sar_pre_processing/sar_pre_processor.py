@@ -207,6 +207,7 @@ class SARPreProcessor(PreProcessor):
         else:
             raise ValueError('subset has to be set to "yes" or "no"')
 
+
         # loop to process all files stored in input directory
         for file in self.file_list:
 
@@ -370,10 +371,20 @@ class SARPreProcessor(PreProcessor):
                 a,a,d,a = self._decomposition_filename(self._create_filelist(os.path.join(filepath,fileshortname+'.data'), '*_slv3_*.img')[0])
                 a,a,e,a = self._decomposition_filename(self._create_filelist(os.path.join(filepath,fileshortname+'.data'), '*_slv4_*.img')[0])
                 list_bands_single_speckle_filter = ','.join([b,c,d,e])
+
+
+                name_change_vv_single = d
+                name_change_vh_single = e
+                name_change_vv_norm_single = b
+                name_change_vh_norm_single = c
+
                 # pdb.set_trace()
 
-                list_bands_vv = []
-                list_bands_vh = []
+                list_bands_vv_multi = []
+                list_bands_vh_multi = []
+
+                list_bands_vv_norm_multi = []
+                list_bands_vh_norm_multi = []
 
                 for processing_file in processing_filelist:
                     filepath, filename, fileshortname, extension = self._decomposition_filename(processing_file)
@@ -381,11 +392,16 @@ class SARPreProcessor(PreProcessor):
 
                     # get filename from folder
                     # think about better way !!!!
-                    a, a, band_vv_name, a = self._decomposition_filename(self._create_filelist(os.path.join(filepath,fileshortname+'.data'), '*_slv1_*.img')[0])
-                    a, a, band_vh_name, a = self._decomposition_filename(self._create_filelist(os.path.join(filepath,fileshortname+'.data'), '*_slv2_*.img')[0])
+                    a, a, band_vv_name_multi, a = self._decomposition_filename(self._create_filelist(os.path.join(filepath,fileshortname+'.data'), '*_slv3_*.img')[0])
+                    a, a, band_vh_name_multi, a = self._decomposition_filename(self._create_filelist(os.path.join(filepath,fileshortname+'.data'), '*_slv4_*.img')[0])
+                    a, a, band_vv_name_norm_multi, a = self._decomposition_filename(self._create_filelist(os.path.join(filepath,fileshortname+'.data'), '*_slv1_*.img')[0])
+                    a, a, band_vh_name_norm_multi, a = self._decomposition_filename(self._create_filelist(os.path.join(filepath,fileshortname+'.data'), '*_slv2_*.img')[0])
 
-                    list_bands_vv.append(band_vv_name)
-                    list_bands_vh.append(band_vh_name)
+                    list_bands_vv_multi.append(band_vv_name_multi)
+                    list_bands_vh_multi.append(band_vh_name_multi)
+
+                    list_bands_vv_norm_multi.append(band_vv_name_norm_multi)
+                    list_bands_vh_norm_multi.append(band_vh_name_norm_multi)
 
                 # Divide filename of file of interest
                 filepath, filename, fileshortname, extension = self._decomposition_filename(file)
@@ -396,10 +412,15 @@ class SARPreProcessor(PreProcessor):
                 date = date.strftime('%d%b%Y')
 
                 processing_filelist = ','.join(processing_filelist)
-                list_bands_vv = ','.join(list_bands_vv)
-                list_bands_vh = ','.join(list_bands_vh)
+                list_bands_vv_multi = ','.join(list_bands_vv_multi)
+                list_bands_vh_multi = ','.join(list_bands_vh_multi)
+                list_bands_vv_norm_multi = ','.join(list_bands_vv_norm_multi)
+                list_bands_vh_norm_multi = ','.join(list_bands_vh_norm_multi)
+
+
+
                 pdb.set_trace()
-                os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step3) + ' -Pinput="' + processing_filelist + '" -Pinput2="' + file  + '" -Poutput="' + outputfile + '" -Plist_bands_vv="' + list_bands_vv + '" -Plist_bands_vh="' + list_bands_vh + '" -Pdate="' + date + '" -Pname_change_vv="' + b + '" -Pname_change_vh="' + c + '" -Plist_bands_single_speckle_filter="' + list_bands_single_speckle_filter + '"')
+                os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step3) + ' -Pinput="' + processing_filelist + '" -Pinput2="' + file  + '" -Poutput="' + outputfile + '" -Plist_bands_vv_multi="' + list_bands_vv_multi + '" -Plist_bands_vh_multi="' + list_bands_vh_multi + '" -Plist_bands_vv_norm_multi="' + list_bands_vv_norm_multi + '" -Plist_bands_vh_norm_multi="' + list_bands_vh_norm_multi + '" -Pdate="' + date + '" -Pname_change_vv_single="' + name_change_vv_single + '" -Pname_change_vh_single="' + name_change_vh_single + '" -Pname_change_vv_norm_single="' + name_change_vv_norm_single + '" -Pname_change_vh_norm_single="' + name_change_vh_norm_single +  '" -Plist_bands_single_speckle_filter="' + list_bands_single_speckle_filter + '"')
                 print(datetime.now())
 
 
