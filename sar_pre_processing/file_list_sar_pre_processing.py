@@ -197,7 +197,10 @@ class SARList(object):
                 pass
 
             try:
-                filepath2, filename2, fileshortname2, extension2 = self._decomposition_filename(filelist[index-1])
+                if index == 0:
+                    filename2 = ''
+                else:
+                    filepath2, filename2, fileshortname2, extension2 = self._decomposition_filename(filelist[index-1])
             except IndexError:
                 filename2 = ''
                 pass
