@@ -434,3 +434,10 @@ class SARPreProcessor(PreProcessor):
         return 'finished'
 
 
+# filtertype = self.config.speckle_filter.multi_temporal.filter
+# filtersizex = self.config.speckle_filter.multi_temporal.filtersizex
+# filtersizey = self.config.speckle_filter.multi_temporal.filtersizey
+# windowsize = self.config.speckle_filter.multi_temporal.windowsize
+# targetwindowsize = self.config.speckle_filter.multi_temporal.targetwindowsize
+
+
