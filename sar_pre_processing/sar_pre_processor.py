@@ -98,11 +98,12 @@ class SARPreProcessor(PreProcessor):
         self.config.output_folder_step2 = os.path.join(
             self.config.output_folder, 'step2')
         self.config.output_folder_step3 = os.path.join(
-            self.config.output_folder, 'step3')
+            self.config.output_folder, 'step33')
 
         # Initialise name of necessary xml-graphs for preprocessing
         # (can be put in the YAML config file if needed)
         self.config.xml_graph_pre_process_step1 = 'pre_process_step1.xml'
+        self.config.xml_graph_pre_process_step1_border = 'pre_process_step1_border.xml'
         self.config.xml_graph_pre_process_step2 = 'pre_process_step2.xml'
         self.config.xml_graph_pre_process_step3 = 'pre_process_step3.xml'
 
@@ -110,8 +111,6 @@ class SARPreProcessor(PreProcessor):
         self.name_addition_step1 = '_GC_RC_No_Su'
         self.name_addition_step2 = '_Co'
         self.name_addition_step3 = '_speckle'
-
-        self.file_list = SARList(config=self.config_file).create_list()
 
         # Check if path of SNAP's graph-processing-tool is specified
         assert self.config.gpt is not None, 'ERROR: path for SNAPs graph-processing-tool is not not specified'
@@ -177,6 +176,9 @@ class SARPreProcessor(PreProcessor):
 
         """
 
+        # create filelist
+        self.file_list = SARList(config=self.config_file).create_list()
+
         # Check if input folder is specified
         assert self.config.input_folder is not None, 'ERROR: input folder not specified'
         assert os.path.exists(self.config.input_folder)
@@ -213,10 +215,10 @@ class SARPreProcessor(PreProcessor):
             raise ValueError('subset has to be set to "yes" or "no"')
 
         # loop to process all files stored in input directory
-        for file in self.file_list:
+        for file in self.file_list[0]:
 
-            print('Scene ', self.file_list.index(
-                file) + 1, ' of ', len(self.file_list))
+            print('Scene ', self.file_list[0].index(
+                file) + 1, ' of ', len(self.file_list[0]))
 
             # Divide filename
             filepath, filename, fileshortname, extension = self._decomposition_filename(
@@ -246,6 +248,34 @@ class SARPreProcessor(PreProcessor):
             else:
                 subprocess.call(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step1) +
                                 ' -Pinput="' + file + '" -Poutput="' + outputfile + '" -Pangle="' + str(normalisation_angle) + '" -c 2G -x', shell=True)
+
+        # pdb.set_trace()
+        for i, file in enumerate(self.file_list[1][::2]):
+            file_list2 = self.file_list[1][1::2]
+            file2 = file_list2[i]
+
+            # Divide filename
+            filepath, filename, fileshortname, extension = self._decomposition_filename(
+                file)
+
+            outputfile = os.path.join(
+                self.config.output_folder_step1, fileshortname + self.name_addition_step1 + '.dim')
+
+            try:
+                normalisation_angle = self.config.normalisation_angle
+                if normalisation_angle is None:
+                    normalisation_angle = 35
+                    print('normalisaton angle not specified, default value of 35 is used for processing')
+            except AttributeError:
+                normalisation_angle = 35
+                print('normalisaton angle not specified, default value of 35 is used for processing')
+            # pdb.set_trace()
+            if process_all == 'no':
+                subprocess.call(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step1_border) + ' -Pinput="' +
+                                file + '" -Pinput2="' + file2 + '" -Poutput="' + outputfile + '" -Pangle="' + str(normalisation_angle) + '" -Parea="POLYGON ((' + area + '))" -c 2G -x', shell=True)
+            else:
+                subprocess.call(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step1_border) +
+                                ' -Pinput="' + file + '" -Pinput2="' + file2 + '" -Poutput="' + outputfile + '" -Pangle="' + str(normalisation_angle) + '" -c 2G -x', shell=True)
 
     def pre_process_step2(self, **kwargs):
         """
@@ -363,6 +393,7 @@ class SARPreProcessor(PreProcessor):
                                                                                     0])
         filelist.sort(key=lambda x: x[len(filepath) + 18:len(filepath) + 33])
 
+
         if self.config.speckle_filter.multi_temporal.apply == 'yes':
 
             # Check if XML file for pre-processing step 3 is specified
@@ -377,19 +408,21 @@ class SARPreProcessor(PreProcessor):
 
             for i, file in enumerate(filelist):
 
+
                 # apply speckle filter on 15 scenes if possible 7 before and 7 after the scene of interest
                 # what happens if there are less then 15 scenes available
-                if i < 7:
-                    processing_filelist = filelist[0:15]
+                if i < 2:
+                    processing_filelist = filelist[0:5]
                 else:
-                    if i <= len(filelist) - 8:
-                        processing_filelist = filelist[i - 7:i + 8]
+                    if i <= len(filelist) - 3:
+                        processing_filelist = filelist[i - 2:i + 3]
                     else:
                         processing_filelist = filelist[
-                            i - 7 - (8 - (len(filelist) - i)):len(filelist)]
+                            i - 2 - (3 - (len(filelist) - i)):len(filelist)]
 
                 filepath, filename, fileshortname, extension = self._decomposition_filename(
                     file)
+
                 a, a, b, a = self._decomposition_filename(self._create_filelist(
                     os.path.join(filepath, fileshortname + '.data'), '*_slv1_*.img')[0])
                 a, a, c, a = self._decomposition_filename(self._create_filelist(
@@ -444,6 +477,8 @@ class SARPreProcessor(PreProcessor):
                 date = datetime.strptime(fileshortname[17:25], '%Y%m%d')
                 date = date.strftime('%d%b%Y')
 
+                theta = 'localIncidenceAngle_slv10_' + date
+
                 processing_filelist = ','.join(processing_filelist)
                 list_bands_vv_multi = ','.join(list_bands_vv_multi)
                 list_bands_vh_multi = ','.join(list_bands_vh_multi)
@@ -451,8 +486,7 @@ class SARPreProcessor(PreProcessor):
                 list_bands_vh_norm_multi = ','.join(list_bands_vh_norm_multi)
 
                 # pdb.set_trace()
-                os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step3) + ' -Pinput="' + processing_filelist + '" -Pinput2="' + file + '" -Poutput="' + outputfile + '" -Plist_bands_vv_multi="' + list_bands_vv_multi + '" -Plist_bands_vh_multi="' + list_bands_vh_multi + '" -Plist_bands_vv_norm_multi="' + list_bands_vv_norm_multi + '" -Plist_bands_vh_norm_multi="' +
-                          list_bands_vh_norm_multi + '" -Pdate="' + date + '" -Pname_change_vv_single="' + name_change_vv_single + '" -Pname_change_vh_single="' + name_change_vh_single + '" -Pname_change_vv_norm_single="' + name_change_vv_norm_single + '" -Pname_change_vh_norm_single="' + name_change_vh_norm_single + '" -Plist_bands_single_speckle_filter="' + list_bands_single_speckle_filter + '"')
+                os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step3) + ' -Pinput="' + processing_filelist + '" -Pinput2="' + file + '" -Poutput="' + outputfile + '" -Ptheta="' + theta + '" -Plist_bands_vv_multi="' + list_bands_vv_multi + '" -Plist_bands_vh_multi="' + list_bands_vh_multi + '" -Plist_bands_vv_norm_multi="' + list_bands_vv_norm_multi + '" -Plist_bands_vh_norm_multi="' + list_bands_vh_norm_multi + '" -Pdate="' + date + '" -Pname_change_vv_single="' + name_change_vv_single + '" -Pname_change_vh_single="' + name_change_vh_single + '" -Pname_change_vv_norm_single="' + name_change_vv_norm_single + '" -Pname_change_vh_norm_single="' + name_change_vh_norm_single + '" -Plist_bands_single_speckle_filter="' + list_bands_single_speckle_filter + '"')
                 print(datetime.now())
 
         # o.k., now the rest of the preprocessor can be added here
