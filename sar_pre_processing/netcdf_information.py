@@ -63,7 +63,7 @@ for file in filelist:
     if sarfileshortname[0:3] == 'S1A':
         sat = 'S1A'
     elif sarfileshortname[0:3] == 'S1B':
-        sat = 'S2B'
+        sat = 'S1B'
     else:
         pass
 
