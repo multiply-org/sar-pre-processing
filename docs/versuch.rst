@@ -1,1 +1,1 @@
-.. include:: ../prior-engine/docs/index.rst
+.. include:: ../../prior-engine/docs/index.rst
