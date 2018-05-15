@@ -9,10 +9,11 @@ import fnmatch
 # import zipfile
 # import shutil
 # import ogr
-# import xml.etree.ElementTree as etree
+import xml.etree.ElementTree as etree
 from datetime import datetime
 from file_list_sar_pre_processing import SARList
 import subprocess
+from netCDF4 import Dataset
 
 import pdb
 
@@ -98,7 +99,7 @@ class SARPreProcessor(PreProcessor):
         self.config.output_folder_step2 = os.path.join(
             self.config.output_folder, 'step2')
         self.config.output_folder_step3 = os.path.join(
-            self.config.output_folder, 'step33')
+            self.config.output_folder, 'step3')
 
         # Initialise name of necessary xml-graphs for preprocessing
         # (can be put in the YAML config file if needed)
@@ -489,11 +490,86 @@ class SARPreProcessor(PreProcessor):
                 os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step3) + ' -Pinput="' + processing_filelist + '" -Pinput2="' + file + '" -Poutput="' + outputfile + '" -Ptheta="' + theta + '" -Plist_bands_vv_multi="' + list_bands_vv_multi + '" -Plist_bands_vh_multi="' + list_bands_vh_multi + '" -Plist_bands_vv_norm_multi="' + list_bands_vv_norm_multi + '" -Plist_bands_vh_norm_multi="' + list_bands_vh_norm_multi + '" -Pdate="' + date + '" -Pname_change_vv_single="' + name_change_vv_single + '" -Pname_change_vh_single="' + name_change_vh_single + '" -Pname_change_vv_norm_single="' + name_change_vv_norm_single + '" -Pname_change_vh_norm_single="' + name_change_vh_norm_single + '" -Plist_bands_single_speckle_filter="' + list_bands_single_speckle_filter + '"')
                 print(datetime.now())
 
-        # o.k., now the rest of the preprocessor can be added here
-        # to keep things most flexible it would be good to have that in
-        # a separate class
 
-        return 'finished'
+    def netcdf_information(self, **kwargs):
+
+        # input folder
+        input_folder = self.config.output_folder_step3
+        expression = '*.nc'
+
+        filelist = self._create_filelist(input_folder, expression)
+
+        # for loop though all measurement points
+        for file in filelist:
+
+            # Divide filename
+            filepath, filename, fileshortname, extension = self._decomposition_filename(
+                    file)
+
+            filepath2 = self.config.output_folder_step1
+
+            # extract orbitdirection from metadata
+            metadata = etree.parse(os.path.join(filepath2,filename[0:79]+'.dim'))
+            for i in metadata.findall('Dataset_Sources'):
+                for ii in i.findall('MDElem'):
+                    for iii in ii.findall('MDElem'):
+                        for iiii in iii.findall('MDATTR'):
+                            r = iiii.get('name')
+                            if r == 'PASS':
+                                orbitdir = iiii.text
+                                if orbitdir == 'ASCENDING':
+                                    orbitdir = 'ASCENDING'
+                                elif orbitdir =='DESCENDING':
+                                    orbitdir = 'DESCENDING'
+                                else:
+                                    pass
+                            continue
+
+            # extract orbit from metadata
+            metadata = etree.parse(os.path.join(filepath2,filename[0:79]+'.dim'))
+            for i in metadata.findall('Dataset_Sources'):
+                for ii in i.findall('MDElem'):
+                    for iii in ii.findall('MDElem'):
+                        for iiii in iii.findall('MDATTR'):
+                            r = iiii.get('name')
+                            if r == 'REL_ORBIT':
+                                relorbit = iiii.text
+
+
+            # extract satellite name from name tag
+            if fileshortname[0:3] == 'S1A':
+                sat = 'S1A'
+            elif fileshortname[0:3] == 'S1B':
+                sat = 'S1B'
+            else:
+                pass
+
+            dset = Dataset(file, 'r+', format="NETCDF4")
+
+            orbitdirection = dset.setncattr_string('orbitdirection', orbitdir)
+            relativeorbit = dset.setncattr_string('relativeorbit', relorbit)
+            satellite = dset.setncattr_string('satellite', sat)
+
+
+"""run script"""
+
+if __name__ == "__main__":
+    processing = SARPreProcessor(config='sample_config_file.yml')
+    processing.pre_process_step1()
+    processing.pre_process_step2()
+    processing.pre_process_step3()
+    subprocess.call(os.path.join(os.getcwd(),'projection_problem.sh ' + processing.config.output_folder_step3), shell=True)
+    processing.netcdf_information()
+    print('finished')
+
+
+
+
+
+
+
+
+
 
 
 # filtertype = self.config.speckle_filter.multi_temporal.filter
