@@ -8,7 +8,6 @@ sar-pre-processing
     01_Introduction
     02_Installation
     03_Theory
-    versuch
 
 .. toctree::
     :maxdepth: 2
