@@ -60,7 +60,7 @@
       <estimateENL>true</estimateENL>
       <enl>1.0</enl>
       <numLooksStr>1</numLooksStr>
-      <windowSize>7x7</windowSize>
+      <windowSize>5x5</windowSize>
       <targetWindowSizeStr>3x3</targetWindowSizeStr>
       <sigmaStr>0.9</sigmaStr>
       <anSize>50</anSize>
@@ -80,7 +80,7 @@
       <estimateENL>true</estimateENL>
       <enl>1.0</enl>
       <numLooksStr>1</numLooksStr>
-      <windowSize>7x7</windowSize>
+      <windowSize>5x5</windowSize>
       <targetWindowSizeStr>3x3</targetWindowSizeStr>
       <sigmaStr>0.9</sigmaStr>
       <anSize>50</anSize>
@@ -189,7 +189,7 @@
       <estimateENL>true</estimateENL>
       <enl>1.0</enl>
       <numLooksStr>1</numLooksStr>
-      <windowSize>7x7</windowSize>
+      <windowSize>5x5</windowSize>
       <targetWindowSizeStr>3x3</targetWindowSizeStr>
       <sigmaStr>0.9</sigmaStr>
       <anSize>50</anSize>
@@ -209,7 +209,7 @@
       <estimateENL>true</estimateENL>
       <enl>1.0</enl>
       <numLooksStr>1</numLooksStr>
-      <windowSize>7x7</windowSize>
+      <windowSize>5x5</windowSize>
       <targetWindowSizeStr>3x3</targetWindowSizeStr>
       <sigmaStr>0.9</sigmaStr>
       <anSize>50</anSize>
@@ -289,7 +289,7 @@
       <estimateENL>true</estimateENL>
       <enl>1.0</enl>
       <numLooksStr>1</numLooksStr>
-      <windowSize>7x7</windowSize>
+      <windowSize>5x5</windowSize>
       <targetWindowSizeStr>3x3</targetWindowSizeStr>
       <sigmaStr>0.9</sigmaStr>
       <anSize>50</anSize>
@@ -371,10 +371,29 @@
       <variables/>
     </parameters>
   </node>
+  <node id="BandMaths(9)">
+    <operator>BandMaths</operator>
+    <sources>
+      <sourceProduct refid="Read"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <targetBands>
+        <targetBand>
+          <name>theta</name>
+          <type>float32</type>
+          <expression>$theta</expression>
+          <description/>
+          <unit>linear</unit>
+          <noDataValue>-999</noDataValue>
+        </targetBand>
+      </targetBands>
+      <variables/>
+    </parameters>
+  </node>
   <node id="BandMerge(2)">
     <operator>BandMerge</operator>
     <sources>
-      <sourceProduct.1 refid="Read"/>
+      <sourceProduct.1 refid="BandMaths(9)"/>
       <sourceProduct.2 refid="BandMaths"/>
       <sourceProduct.3 refid="BandMaths(2)"/>
       <sourceProduct.3 refid="BandMaths(3)"/>

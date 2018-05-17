@@ -294,6 +294,49 @@ class SARList(object):
                 filelist_new.append(file_timestamp)
         return filelist_new
 
+    def _border_control(self, filelist):
+        """
+        ?????
+        """
+        filelist.sort()
+        filelist_new = []
+        filelist_border_control = []
+        for file in filelist:
+            index = filelist.index(file)
+            filepath, filename, fileshortname, extension = self._decomposition_filename(
+                file)
+
+            try:
+                filepath1, filename1, fileshortname1, extension1 = self._decomposition_filename(filelist[index+1])
+            except IndexError:
+                filename1 = ''
+                pass
+
+            try:
+                if index == 0:
+                    filename2 = ''
+                else:
+                    filepath2, filename2, fileshortname2, extension2 = self._decomposition_filename(filelist[index-1])
+            except IndexError:
+                filename2 = ''
+                pass
+
+            if filename[0:25] == filename1[0:25] or filename[0:25] == filename2[0:25]:
+                filelist_border_control.append(file)
+            else:
+                filelist_new.append(file)
+        print('Number of found files with border issues: %s' % (len(filelist_border_control)))
+
+        # pdb.set_trace()
+        # filelist_end = self._check_timestamp(filelist_double_processed)
+        # filelist_end = filelist_end + filelist_new
+        # filelist_end.sort()
+
+        return filelist_new, filelist_border_control
+
+
+
+
     def create_list(self, **kwargs):
 
         # list with all zip files found in input_folder
@@ -332,7 +375,9 @@ class SARList(object):
         # check for double processed data by ESA and choose newest one
         filelist = self._double_processed(filelist)
 
-        print('Number of files that will be processed: %s' % len(filelist))
+        filelist = self._border_control(filelist)
+
+        # print('Number of files that will be processed: %s' % len(filelist[0]+len(filelist[1])))
 
 
         return filelist
