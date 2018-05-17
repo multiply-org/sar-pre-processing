@@ -16,12 +16,12 @@ xml_graph_path: /media/tweiss/Work/GIT/GitHub/multiply-org/sar-pre-processing/xm
 # xml_graph_path: /media/wodan/data/Arbeit/GitHub/multiply-org/sar-pre-processing/xml_files
 
 
-subset: 'no'
+subset: 'yes'
 
 # if subset = 'yes', region must be specified
 region:
   ul:
-    lat: 48.340
+    lat: 48.360
     lon: 11.600
   lr:
     lat: 48.200
