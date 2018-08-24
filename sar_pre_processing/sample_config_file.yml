@@ -1,11 +1,13 @@
 
 # Input folder with SAR data (zip format)
 # input_folder: /media/nas_data/Thomas/Wallerfing/Sentinel_1_data
-input_folder: /media/tweiss/Daten/test_preprocessing/data
+# input_folder: /media/tweiss/Daten/test_preprocessing/data
+input_folder: /media/nas_data/Thomas/Sentinel_1_data/biebrza_poland
 
 # Folder to store the pre-processed data
 # output_folder: /media/nas_data/Thomas/S1_LMU_site_2017_new
-output_folder: /media/tweiss/Daten/test_preprocessing
+# output_folder: /media/tweiss/Daten/test_preprocessing
+output_folder: /media/nas_data/Thomas/biebrza_poland_processed
 
 # Location of SNAP's graph-processing-tool
 gpt: /home/tweiss/snap/bin/gpt
@@ -19,13 +21,32 @@ xml_graph_path: /media/tweiss/Work/GIT/GitHub/multiply-org/sar-pre-processing/xm
 subset: 'yes'
 
 # if subset = 'yes', region must be specified
+# region:
+#   ul:
+#     lat: 48.360
+#     lon: 11.600
+#   lr:
+#     lat: 48.200
+#     lon: 11.810
+
+# foggia
+# region:
+#   ul:
+#     lat: 41.44310092761187
+#     lon: 15.396523233452278
+#   lr:
+#     lat: 41.299146707374895
+#     lon: 15.5871227545953
+
+# poland
 region:
   ul:
-    lat: 48.360
-    lon: 11.600
+    lat: 53.75
+    lon: 22.25
   lr:
-    lat: 48.200
-    lon: 11.810
+    lat: 53.16667
+    lon: 23.25
+
 
 speckle_filter:
   multi_temporal:
@@ -33,8 +54,6 @@ speckle_filter:
     files: 5
   single_filter:
     apply: 'yes'
-
-
 
 year: 2017
 
