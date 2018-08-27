@@ -11,7 +11,7 @@ import fnmatch
 # import ogr
 import xml.etree.ElementTree as etree
 from datetime import datetime
-from file_list_sar_pre_processing import SARList
+from .file_list_sar_pre_processing import SARList
 import subprocess
 from netCDF4 import Dataset
 
@@ -390,105 +390,109 @@ class SARPreProcessor(PreProcessor):
                     print('skip processing for %s. File does not exists' % file)
 
         # Sort filelist by date (hard coded position in filename!!!)
-        filepath, filename, fileshortname, extension = self._decomposition_filename(filelist[
-                                                                                    0])
+        filepath, filename, fileshortname, extension = self._decomposition_filename(filelist[0])
         filelist.sort(key=lambda x: x[len(filepath) + 18:len(filepath) + 33])
+        filelist_old = filelist
 
 
-        if self.config.speckle_filter.multi_temporal.apply == 'yes':
+        for i in ['S1A', 'S1B']:
 
-            # Check if XML file for pre-processing step 3 is specified
-            assert self.config.xml_graph_pre_process_step3 is not None, 'ERROR: path of XML file for pre-processing step 3 is not not specified'
+            filelist = [k for k in filelist_old if i in k]
 
-            new_filelist = []
+            if self.config.speckle_filter.multi_temporal.apply == 'yes':
 
-            # loop to apply multi-temporal filtering
-            # right now 15 scenes if possible 7 before and 7 after multi-temporal filtered scene, vv and vh polarisation are separated
-            # use the speckle filter algorithm metadata? metadata for date
-            # might be wrong!!!
+                # Check if XML file for pre-processing step 3 is specified
+                assert self.config.xml_graph_pre_process_step3 is not None, 'ERROR: path of XML file for pre-processing step 3 is not not specified'
 
-            for i, file in enumerate(filelist):
+                new_filelist = []
+
+                # loop to apply multi-temporal filtering
+                # right now 15 scenes if possible 7 before and 7 after multi-temporal filtered scene, vv and vh polarisation are separated
+                # use the speckle filter algorithm metadata? metadata for date
+                # might be wrong!!!
+
+                for i, file in enumerate(filelist):
 
 
-                # apply speckle filter on 15 scenes if possible 7 before and 7 after the scene of interest
-                # what happens if there are less then 15 scenes available
-                if i < 2:
-                    processing_filelist = filelist[0:5]
-                else:
-                    if i <= len(filelist) - 3:
-                        processing_filelist = filelist[i - 2:i + 3]
+                    # apply speckle filter on 15 scenes if possible 7 before and 7 after the scene of interest
+                    # what happens if there are less then 15 scenes available
+                    if i < 2:
+                        processing_filelist = filelist[0:5]
                     else:
-                        processing_filelist = filelist[
-                            i - 2 - (3 - (len(filelist) - i)):len(filelist)]
+                        if i <= len(filelist) - 3:
+                            processing_filelist = filelist[i - 2:i + 3]
+                        else:
+                            processing_filelist = filelist[
+                                i - 2 - (3 - (len(filelist) - i)):len(filelist)]
 
-                filepath, filename, fileshortname, extension = self._decomposition_filename(
-                    file)
-
-                a, a, b, a = self._decomposition_filename(self._create_filelist(
-                    os.path.join(filepath, fileshortname + '.data'), '*_slv1_*.img')[0])
-                a, a, c, a = self._decomposition_filename(self._create_filelist(
-                    os.path.join(filepath, fileshortname + '.data'), '*_slv2_*.img')[0])
-                a, a, d, a = self._decomposition_filename(self._create_filelist(
-                    os.path.join(filepath, fileshortname + '.data'), '*_slv3_*.img')[0])
-                a, a, e, a = self._decomposition_filename(self._create_filelist(
-                    os.path.join(filepath, fileshortname + '.data'), '*_slv4_*.img')[0])
-                list_bands_single_speckle_filter = ','.join([b, c, d, e])
-
-                name_change_vv_single = d
-                name_change_vh_single = e
-                name_change_vv_norm_single = b
-                name_change_vh_norm_single = c
-
-                # pdb.set_trace()
-
-                list_bands_vv_multi = []
-                list_bands_vh_multi = []
-
-                list_bands_vv_norm_multi = []
-                list_bands_vh_norm_multi = []
-
-                for processing_file in processing_filelist:
                     filepath, filename, fileshortname, extension = self._decomposition_filename(
-                        processing_file)
+                        file)
 
-                    # get filename from folder
-                    # think about better way !!!!
-                    a, a, band_vv_name_multi, a = self._decomposition_filename(self._create_filelist(
-                        os.path.join(filepath, fileshortname + '.data'), '*_slv3_*.img')[0])
-                    a, a, band_vh_name_multi, a = self._decomposition_filename(self._create_filelist(
-                        os.path.join(filepath, fileshortname + '.data'), '*_slv4_*.img')[0])
-                    a, a, band_vv_name_norm_multi, a = self._decomposition_filename(self._create_filelist(
+                    a, a, b, a = self._decomposition_filename(self._create_filelist(
                         os.path.join(filepath, fileshortname + '.data'), '*_slv1_*.img')[0])
-                    a, a, band_vh_name_norm_multi, a = self._decomposition_filename(self._create_filelist(
+                    a, a, c, a = self._decomposition_filename(self._create_filelist(
                         os.path.join(filepath, fileshortname + '.data'), '*_slv2_*.img')[0])
+                    a, a, d, a = self._decomposition_filename(self._create_filelist(
+                        os.path.join(filepath, fileshortname + '.data'), '*_slv3_*.img')[0])
+                    a, a, e, a = self._decomposition_filename(self._create_filelist(
+                        os.path.join(filepath, fileshortname + '.data'), '*_slv4_*.img')[0])
+                    list_bands_single_speckle_filter = ','.join([b, c, d, e])
 
-                    list_bands_vv_multi.append(band_vv_name_multi)
-                    list_bands_vh_multi.append(band_vh_name_multi)
+                    name_change_vv_single = d
+                    name_change_vh_single = e
+                    name_change_vv_norm_single = b
+                    name_change_vh_norm_single = c
 
-                    list_bands_vv_norm_multi.append(band_vv_name_norm_multi)
-                    list_bands_vh_norm_multi.append(band_vh_name_norm_multi)
+                    # pdb.set_trace()
 
-                # Divide filename of file of interest
-                filepath, filename, fileshortname, extension = self._decomposition_filename(
-                    file)
+                    list_bands_vv_multi = []
+                    list_bands_vh_multi = []
 
-                outputfile = os.path.join(
-                    self.config.output_folder_step3, fileshortname + self.name_addition_step3 + '.nc')
+                    list_bands_vv_norm_multi = []
+                    list_bands_vh_norm_multi = []
 
-                date = datetime.strptime(fileshortname[17:25], '%Y%m%d')
-                date = date.strftime('%d%b%Y')
+                    for processing_file in processing_filelist:
+                        filepath, filename, fileshortname, extension = self._decomposition_filename(
+                            processing_file)
 
-                theta = 'localIncidenceAngle_slv10_' + date
+                        # get filename from folder
+                        # think about better way !!!!
+                        a, a, band_vv_name_multi, a = self._decomposition_filename(self._create_filelist(
+                            os.path.join(filepath, fileshortname + '.data'), '*_slv3_*.img')[0])
+                        a, a, band_vh_name_multi, a = self._decomposition_filename(self._create_filelist(
+                            os.path.join(filepath, fileshortname + '.data'), '*_slv4_*.img')[0])
+                        a, a, band_vv_name_norm_multi, a = self._decomposition_filename(self._create_filelist(
+                            os.path.join(filepath, fileshortname + '.data'), '*_slv1_*.img')[0])
+                        a, a, band_vh_name_norm_multi, a = self._decomposition_filename(self._create_filelist(
+                            os.path.join(filepath, fileshortname + '.data'), '*_slv2_*.img')[0])
 
-                processing_filelist = ','.join(processing_filelist)
-                list_bands_vv_multi = ','.join(list_bands_vv_multi)
-                list_bands_vh_multi = ','.join(list_bands_vh_multi)
-                list_bands_vv_norm_multi = ','.join(list_bands_vv_norm_multi)
-                list_bands_vh_norm_multi = ','.join(list_bands_vh_norm_multi)
+                        list_bands_vv_multi.append(band_vv_name_multi)
+                        list_bands_vh_multi.append(band_vh_name_multi)
 
-                # pdb.set_trace()
-                os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step3) + ' -Pinput="' + processing_filelist + '" -Pinput2="' + file + '" -Poutput="' + outputfile + '" -Ptheta="' + theta + '" -Plist_bands_vv_multi="' + list_bands_vv_multi + '" -Plist_bands_vh_multi="' + list_bands_vh_multi + '" -Plist_bands_vv_norm_multi="' + list_bands_vv_norm_multi + '" -Plist_bands_vh_norm_multi="' + list_bands_vh_norm_multi + '" -Pdate="' + date + '" -Pname_change_vv_single="' + name_change_vv_single + '" -Pname_change_vh_single="' + name_change_vh_single + '" -Pname_change_vv_norm_single="' + name_change_vv_norm_single + '" -Pname_change_vh_norm_single="' + name_change_vh_norm_single + '" -Plist_bands_single_speckle_filter="' + list_bands_single_speckle_filter + '"')
-                print(datetime.now())
+                        list_bands_vv_norm_multi.append(band_vv_name_norm_multi)
+                        list_bands_vh_norm_multi.append(band_vh_name_norm_multi)
+
+                    # Divide filename of file of interest
+                    filepath, filename, fileshortname, extension = self._decomposition_filename(
+                        file)
+
+                    outputfile = os.path.join(
+                        self.config.output_folder_step3, fileshortname + self.name_addition_step3 + '.nc')
+
+                    date = datetime.strptime(fileshortname[17:25], '%Y%m%d')
+                    date = date.strftime('%d%b%Y')
+
+                    theta = 'localIncidenceAngle_slv10_' + date
+
+                    processing_filelist = ','.join(processing_filelist)
+                    list_bands_vv_multi = ','.join(list_bands_vv_multi)
+                    list_bands_vh_multi = ','.join(list_bands_vh_multi)
+                    list_bands_vv_norm_multi = ','.join(list_bands_vv_norm_multi)
+                    list_bands_vh_norm_multi = ','.join(list_bands_vh_norm_multi)
+
+                    # pdb.set_trace()
+                    os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step3) + ' -Pinput="' + processing_filelist + '" -Pinput2="' + file + '" -Poutput="' + outputfile + '" -Ptheta="' + theta + '" -Plist_bands_vv_multi="' + list_bands_vv_multi + '" -Plist_bands_vh_multi="' + list_bands_vh_multi + '" -Plist_bands_vv_norm_multi="' + list_bands_vv_norm_multi + '" -Plist_bands_vh_norm_multi="' + list_bands_vh_norm_multi + '" -Pdate="' + date + '" -Pname_change_vv_single="' + name_change_vv_single + '" -Pname_change_vh_single="' + name_change_vh_single + '" -Pname_change_vv_norm_single="' + name_change_vv_norm_single + '" -Pname_change_vh_norm_single="' + name_change_vh_norm_single + '" -Plist_bands_single_speckle_filter="' + list_bands_single_speckle_filter + '"')
+                    print(datetime.now())
 
 
     def netcdf_information(self, **kwargs):
