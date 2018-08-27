@@ -8,7 +8,7 @@ import fnmatch
 import pyproj
 import zipfile
 import shutil
-import ogr
+# import ogr
 import xml.etree.ElementTree as etree
 from datetime import datetime
 
