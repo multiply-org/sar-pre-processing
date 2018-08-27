@@ -8,10 +8,10 @@ Sar-Pre-Processing
    :undoc-members:
    :show-inheritance:
 
-.. File list for Sar-Pre-Processing
-.. ---------------------------------
-.. .. automodule:: sar_pre_processing.file_list_sar_pre_processing
-..    :members:
-..    :noindex:
-..    :undoc-members:
-..    :show-inheritance:
+File list for Sar-Pre-Processing
+---------------------------------
+.. automodule:: sar_pre_processing.file_list_sar_pre_processing
+   :members:
+   :noindex:
+   :undoc-members:
+   :show-inheritance:
