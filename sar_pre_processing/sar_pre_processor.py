@@ -11,9 +11,10 @@ import fnmatch
 # import ogr
 import xml.etree.ElementTree as etree
 from datetime import datetime
-from .file_list_sar_pre_processing import SARList
+from file_list_sar_pre_processing import SARList
 import subprocess
 from netCDF4 import Dataset
+from netcdf_stack import NetcdfStack
 
 import pdb
 
@@ -559,11 +560,13 @@ class SARPreProcessor(PreProcessor):
 
 if __name__ == "__main__":
     processing = SARPreProcessor(config='sample_config_file.yml')
-    processing.pre_process_step1()
-    processing.pre_process_step2()
-    processing.pre_process_step3()
-    subprocess.call(os.path.join(os.getcwd(),'projection_problem.sh ' + processing.config.output_folder_step3), shell=True)
-    processing.netcdf_information()
+    # processing.pre_process_step1()
+    # processing.pre_process_step2()
+    # processing.pre_process_step3()
+    # subprocess.call(os.path.join(os.getcwd(),'projection_problem.sh ' + processing.config.output_folder_step3), shell=True)
+    # processing.netcdf_information()
+    NetcdfStack(input_folder=processing.config.output_folder_step3, output_path=processing.config.output_folder_step3.rsplit('/', 1)[0] , output_filename=processing.config.output_folder_step3.rsplit('/', 2)[1])
+
     print('finished')
 
 
