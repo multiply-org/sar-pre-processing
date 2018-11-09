@@ -555,7 +555,7 @@ class SARPreProcessor(PreProcessor):
             relativeorbit = dset.setncattr_string('relativeorbit', relorbit)
             satellite = dset.setncattr_string('satellite', sat)
 
-
+pdb.set_trace()
 """run script"""
 
 if __name__ == "__main__":

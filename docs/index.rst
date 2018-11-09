@@ -1,6 +1,6 @@
-==================
-sar-pre-processing
-==================
+=============================
+SAR pre processing framework
+=============================
 
 .. toctree::
     :maxdepth: 2

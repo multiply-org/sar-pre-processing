@@ -73,15 +73,15 @@ class NetcdfStack(object):
         # self.incidenceAngleFromEllipsoid = self.dataset.createVariable('incidenceAngleFromEllipsoid', np.float32,('time','lat','lon'), fill_value=-99999)
         # self.incidenceAngleFromEllipsoid.units = 'degree'
 
-        self.sigma0_vv_db = self.dataset.createVariable('sigma0_vv_multi_db', np.float32,('time','lat','lon'), fill_value=-99999)
-        self.sigma0_vv_db.units = 'dB'
-        self.sigma0_vh_db = self.dataset.createVariable('sigma0_vh_multi_db', np.float32,('time','lat','lon'), fill_value=-99999)
-        self.sigma0_vh_db.units = 'dB'
+        self.sigma0_vv = self.dataset.createVariable('sigma0_vv_multi', np.float32,('time','lat','lon'), fill_value=-99999)
+        self.sigma0_vv.units = 'linear'
+        self.sigma0_vh = self.dataset.createVariable('sigma0_vh_multi', np.float32,('time','lat','lon'), fill_value=-99999)
+        self.sigma0_vh.units = 'linear'
 
-        self.sigma0_vv_tempspeckl_db = self.dataset.createVariable('sigma0_vv_norm_multi_db', np.float32,('time','lat','lon'), fill_value=-99999)
-        self.sigma0_vv_tempspeckl_db.units = 'dB'
-        self.sigma0_vh_tempspeckl_db = self.dataset.createVariable('sigma0_vh_norm_multi_db', np.float32,('time','lat','lon'), fill_value=-99999)
-        self.sigma0_vh_tempspeckl_db.units = 'dB'
+        self.sigma0_vv_tempspeckl = self.dataset.createVariable('sigma0_vv_norm_multi', np.float32,('time','lat','lon'), fill_value=-99999)
+        self.sigma0_vv_tempspeckl.units = 'linear'
+        self.sigma0_vh_tempspeckl = self.dataset.createVariable('sigma0_vh_norm_multi', np.float32,('time','lat','lon'), fill_value=-99999)
+        self.sigma0_vh_tempspeckl.units = 'linear'
 
     def stacking(self):
         """stack all file in one"""
@@ -160,11 +160,11 @@ class NetcdfStack(object):
             # self.projectedLocalIncidenceAngle[index,:,:] = data.variables['projectedLocalIncidenceAngle_slv9_' + date_file_tag][:]
             # self.incidenceAngleFromEllipsoid[index,:,:] = data.variables['incidenceAngleFromEllipsoid_slv10_' + date_file_tag][:]
 
-            self.sigma0_vv_db[index,:,:] = data.variables['sigma0_vv_multi'][:]
-            self.sigma0_vh_db[index,:,:] = data.variables['sigma0_vh_multi'][:]
+            self.sigma0_vv[index,:,:] = data.variables['sigma0_vv_multi'][:]
+            self.sigma0_vh[index,:,:] = data.variables['sigma0_vh_multi'][:]
 
-            self.sigma0_vv_tempspeckl_db[index,:,:] = data.variables['sigma0_vv_norm_multi'][:]
-            self.sigma0_vh_tempspeckl_db[index,:,:] = data.variables['sigma0_vh_norm_multi'][:]
+            self.sigma0_vv_tempspeckl[index,:,:] = data.variables['sigma0_vv_norm_multi'][:]
+            self.sigma0_vh_tempspeckl[index,:,:] = data.variables['sigma0_vh_norm_multi'][:]
 
         self.dataset.close()
 
