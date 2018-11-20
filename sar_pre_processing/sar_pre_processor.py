@@ -14,7 +14,7 @@ from datetime import datetime
 from .file_list_sar_pre_processing import SARList
 import subprocess
 from netCDF4 import Dataset
-from netcdf_stack import NetcdfStack
+from .netcdf_stack import NetcdfStack
 
 import pdb
 
