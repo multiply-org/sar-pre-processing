@@ -11,4 +11,5 @@ dependencies:
     - sphinxcontrib-bibtex
     - pyproj
     - netCDF4
+    - xarray
 
