@@ -1,3 +1,0 @@
-sphinxcontrib-bibtex
-pyproj
-netCDF4

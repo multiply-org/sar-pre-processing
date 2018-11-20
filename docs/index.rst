@@ -1,5 +1,4 @@
-=============================
-SAR pre processing framework
+SAR pre-processing framework
 =============================
 
 .. toctree::
@@ -14,7 +13,6 @@ SAR pre processing framework
     :maxdepth: 2
     :caption: anything else
 
-    License <license>
     Authors <authors>
     Changelog <changes>
 
