@@ -11,10 +11,10 @@ import fnmatch
 # import ogr
 import xml.etree.ElementTree as etree
 from datetime import datetime
-from .file_list_sar_pre_processing import SARList
+from file_list_sar_pre_processing import SARList
 import subprocess
 from netCDF4 import Dataset
-from .netcdf_stack import NetcdfStack
+from netcdf_stack import NetcdfStack
 
 import pdb
 
@@ -540,6 +540,15 @@ class SARPreProcessor(PreProcessor):
                             if r == 'REL_ORBIT':
                                 relorbit = iiii.text
 
+            # extract frequency from metadata
+            metadata = etree.parse(os.path.join(filepath2,filename[0:79]+'.dim'))
+            for i in metadata.findall('Dataset_Sources'):
+                for ii in i.findall('MDElem'):
+                    for iii in ii.findall('MDElem'):
+                        for iiii in iii.findall('MDATTR'):
+                            r = iiii.get('name')
+                            if r == 'radar_frequency':
+                                frequency = float(iiii.text)/1000.
 
             # extract satellite name from name tag
             if fileshortname[0:3] == 'S1A':
@@ -549,11 +558,21 @@ class SARPreProcessor(PreProcessor):
             else:
                 pass
 
-            dset = Dataset(file, 'r+', format="NETCDF4")
+            # extract date from filename
+            date = datetime.strptime(fileshortname[17:32], '%Y%m%dT%H%M%S')
 
-            orbitdirection = dset.setncattr_string('orbitdirection', orbitdir)
-            relativeorbit = dset.setncattr_string('relativeorbit', relorbit)
-            satellite = dset.setncattr_string('satellite', sat)
+            dset = Dataset(file, 'r+', format="NETCDF4")
+            try:
+                dset.delncattr('start_date')
+                dset.delncattr('stop_date')
+            except:
+                RuntimeError
+
+            dset.setncattr_string('date', str(date))
+            dset.setncattr_string('orbitdirection', orbitdir)
+            dset.setncattr_string('relativeorbit', relorbit)
+            dset.setncattr_string('satellite', sat)
+            dset.setncattr_string('frequency', str(frequency))
 
 """run script"""
 
@@ -562,9 +581,9 @@ if __name__ == "__main__":
     # processing.pre_process_step1()
     # processing.pre_process_step2()
     # processing.pre_process_step3()
-    # subprocess.call(os.path.join(os.getcwd(),'projection_problem.sh ' + processing.config.output_folder_step3), shell=True)
+    subprocess.call(os.path.join(os.getcwd(),'projection_problem.sh ' + processing.config.output_folder_step3), shell=True)
     # processing.netcdf_information()
-    NetcdfStack(input_folder=processing.config.output_folder_step3, output_path=processing.config.output_folder_step3.rsplit('/', 1)[0] , output_filename=processing.config.output_folder_step3.rsplit('/', 2)[1])
+    # NetcdfStack(input_folder=processing.config.output_folder_step3, output_path=processing.config.output_folder_step3.rsplit('/', 1)[0] , output_filename=processing.config.output_folder_step3.rsplit('/', 2)[1])
 
     print('finished')
 
