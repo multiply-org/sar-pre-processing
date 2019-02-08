@@ -1,4 +1,4 @@
-SAR pre-processing framework
+MULTIPLY - SAR Pre Processing
 =============================
 
 .. toctree::
