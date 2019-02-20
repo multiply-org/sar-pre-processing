@@ -54,7 +54,7 @@ class SARList(object):
         Load configuration and writes to self.config
         """
         with open(self.config, 'r') as cfg:
-            self.config = yaml.load(cfg)
+            self.config = yaml.safe_load(cfg)
             self.config = AttributeDict(**self.config)
 
     def _create_filelist(self, input_folder, expression):
