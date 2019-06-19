@@ -3,7 +3,7 @@
 from setuptools import setup
 
 requirements = [
-
+    'pyproj',
     'pytest',
     'sphinxcontrib-bibtex'
 ]

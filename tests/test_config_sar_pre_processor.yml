@@ -9,7 +9,9 @@ output_folder: E:\Projects\Multiply\Data\S1A_L1C\pre_processed
 # Location of SNAP's graph-processing-tool
 #gpt: /home/tweiss/snap/bin/gpt
 #gpt: /home/tweiss/snap/bin/gpt
-gpt: C:\Program Files\snap-6-snapshot\bin\gpt
+# change this. This cannot be used in a test like this
+gpt: 'C:\Program Files\snap-6-snapshot\bin\gpt'
+xml_graph_path: 'C:\Users\tonio\Projekte\multiply\sar-pre-processing\xml_files'
 
 
 
@@ -18,6 +20,12 @@ gpt: C:\Program Files\snap-6-snapshot\bin\gpt
 #  pre_process_step1: pre_process_slc_GC_RC_No_Su.xml
 #  pre_process_step2: coregister.xml
 #  pre_process_step3: multi_speckle.xml
+
+subset: 'yes'
+
+speckle_filter:
+  multi_temporal:
+    apply: 'yes'
 
 region:
   ul:

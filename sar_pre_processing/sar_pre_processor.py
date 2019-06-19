@@ -11,7 +11,7 @@ import fnmatch
 # import ogr
 import xml.etree.ElementTree as etree
 from datetime import datetime
-from file_list_sar_pre_processing import SARList
+from sar_pre_processing.file_list_sar_pre_processing import SARList
 import subprocess
 from netCDF4 import Dataset
 from netcdf_stack import NetcdfStack
@@ -53,11 +53,9 @@ class PreProcessor(object):
         self._load_config()
 
     def _check(self):
-
         assert self.config_file is not None, 'ERROR: Configuration file needs to be provided'
 
     def pre_process(self):
-
         assert False, 'Routine should be implemented in child class'
 
     def _load_config(self):
@@ -142,7 +140,8 @@ class SARPreProcessor(PreProcessor):
 
         assert lat_min <= lat_max, 'ERROR: invalid lat'
         assert lon_min <= lon_max, 'ERROR: invalid lon'
-        return '%.14f %.14f,%.14f %.14f,%.14f %.14f,%.14f %.14f,%.14f %.14f' % (lon_min, lat_min, lon_min, lat_max, lon_max, lat_max, lon_max, lat_min, lon_min, lat_min)
+        return '%.14f %.14f,%.14f %.14f,%.14f %.14f,%.14f %.14f,%.14f %.14f' % (
+        lon_min, lat_min, lon_min, lat_max, lon_max, lat_max, lon_max, lat_min, lon_min, lat_min)
 
     def _create_processing_filelist(self):
         # create filelist
@@ -225,11 +224,17 @@ class SARPreProcessor(PreProcessor):
                     'normalisaton angle not specified, default value of 35 is used for processing')
 
             if process_all == 'no':
-                subprocess.call(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step1) + ' -Pinput="' +
-                                file + '" -Poutput="' + outputfile + '" -Pangle="' + str(normalisation_angle) + '" -Parea="POLYGON ((' + area + '))" -c 2G -x', shell=True)
+
+                # pdb.set_trace()
+                command = '\"' + self.config.gpt + '\" ' + os.path.join(self.config.xml_graph_path,
+                                                                  self.config.xml_graph_pre_process_step1) + ' -Pinput="' + file + '" -Poutput="' + outputfile + '" -Pangle="' + str(
+                    normalisation_angle) + '" -Parea="POLYGON ((' + area + '))" -c 3G -x'
+                subprocess.call(command)
             else:
-                subprocess.call(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step1) +
-                                ' -Pinput="' + file + '" -Poutput="' + outputfile + '" -Pangle="' + str(normalisation_angle) + '" -c 2G -x', shell=True)
+                subprocess.call(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path,
+                                                                      self.config.xml_graph_pre_process_step1) +
+                                 ' -Pinput="' + file + '" -Poutput="' + outputfile + '" -Pangle="' + str(
+                    normalisation_angle) + '" -c 3G -x')
 
         for i, file in enumerate(self.file_list[1][::2]):
             file_list2 = self.file_list[1][1::2]
@@ -252,11 +257,15 @@ class SARPreProcessor(PreProcessor):
                 print('normalisaton angle not specified, default value of 35 is used for processing')
 
             if process_all == 'no':
-                subprocess.call(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step1_border) + ' -Pinput="' +
-                                file + '" -Pinput2="' + file2 + '" -Poutput="' + outputfile + '" -Pangle="' + str(normalisation_angle) + '" -Parea="POLYGON ((' + area + '))" -c 2G -x', shell=True)
+                subprocess.call('\"' + self.config.gpt + '\" ' + os.path.join(self.config.xml_graph_path,
+                                                                     self.config.xml_graph_pre_process_step1_border) + ' -Pinput="' +
+                                file + '" -Pinput2="' + file2 + '" -Poutput="' + outputfile + '" -Pangle="' + str(
+                    normalisation_angle) + '" -Parea="POLYGON ((' + area + '))" -c 3G -x', shell=True)
             else:
-                subprocess.call(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step1_border) +
-                                ' -Pinput="' + file + '" -Pinput2="' + file2 + '" -Poutput="' + outputfile + '" -Pangle="' + str(normalisation_angle) + '" -c 2G -x', shell=True)
+                subprocess.call('\"' + self.config.gpt + '\" ' + os.path.join(self.config.xml_graph_path,
+                                                                     self.config.xml_graph_pre_process_step1_border) +
+                                ' -Pinput="' + file + '" -Pinput2="' + file2 + '" -Poutput="' + outputfile + '" -Pangle="' + str(
+                    normalisation_angle) + '" -c 3G -x', shell=True)
 
     def pre_process_step2(self, **kwargs):
         """
@@ -321,8 +330,9 @@ class SARPreProcessor(PreProcessor):
             outputfile = os.path.join(
                 self.config.output_folder_step2, fileshortname + self.name_addition_step2 + '.dim')
 
-            os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step2) +
-                      ' -Pinput="' + master + '" -Pinput2="' + file + '" -Poutput="' + outputfile + '"')
+            command = '\"' + self.config.gpt + '\" ' + ' ' + os.path.join(self.config.xml_graph_path,
+                                                                    self.config.xml_graph_pre_process_step2) + ' -Pinput="' + master + '" -Pinput2="' + file + '" -Poutput="' + outputfile + '" -c 3G'
+            subprocess.call(command)
             print(datetime.now())
 
     def pre_process_step3(self, **kwargs):
@@ -362,7 +372,8 @@ class SARPreProcessor(PreProcessor):
                 filepath, filename, fileshortname, extension = self._decomposition_filename(
                     file)
                 new_file_name = os.path.join(
-                    self.config.output_folder_step2, fileshortname + self.name_addition_step1 + self.name_addition_step2 + '.dim')
+                    self.config.output_folder_step2,
+                    fileshortname + self.name_addition_step1 + self.name_addition_step2 + '.dim')
 
                 if os.path.exists(new_file_name) is True:
                     filelist.append(new_file_name)
@@ -374,9 +385,7 @@ class SARPreProcessor(PreProcessor):
         filelist.sort(key=lambda x: x[len(filepath) + 18:len(filepath) + 33])
         filelist_old = filelist
 
-
         for i in ['S1A', 'S1B']:
-
             filelist = [k for k in filelist_old if i in k]
 
             if self.config.speckle_filter.multi_temporal.apply == 'yes':
@@ -470,9 +479,11 @@ class SARPreProcessor(PreProcessor):
                     list_bands_vh_norm_multi = ','.join(list_bands_vh_norm_multi)
 
 
-                    os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step3) + ' -Pinput="' + processing_filelist + '" -Pinput2="' + file + '" -Poutput="' + outputfile + '" -Ptheta="' + theta + '" -Plist_bands_vv_multi="' + list_bands_vv_multi + '" -Plist_bands_vh_multi="' + list_bands_vh_multi + '" -Plist_bands_vv_norm_multi="' + list_bands_vv_norm_multi + '" -Plist_bands_vh_norm_multi="' + list_bands_vh_norm_multi + '" -Pdate="' + date + '" -Pname_change_vv_single="' + name_change_vv_single + '" -Pname_change_vh_single="' + name_change_vh_single + '" -Pname_change_vv_norm_single="' + name_change_vv_norm_single + '" -Pname_change_vh_norm_single="' + name_change_vh_norm_single + '" -Plist_bands_single_speckle_filter="' + list_bands_single_speckle_filter + '"')
-                    print(datetime.now())
-
+                # pdb.set_trace()
+                command = '\"' + self.config.gpt + '\" ' + os.path.join(self.config.xml_graph_path,
+                                                                  self.config.xml_graph_pre_process_step3) + ' -Pinput="' + processing_filelist + '" -Pinput2="' + file + '" -Poutput="' + outputfile + '" -Ptheta="' + theta + '" -Plist_bands_vv_multi="' + list_bands_vv_multi + '" -Plist_bands_vh_multi="' + list_bands_vh_multi + '" -Plist_bands_vv_norm_multi="' + list_bands_vv_norm_multi + '" -Plist_bands_vh_norm_multi="' + list_bands_vh_norm_multi + '" -Pdate="' + date + '" -Pname_change_vv_single="' + name_change_vv_single + '" -Pname_change_vh_single="' + name_change_vh_single + '" -Pname_change_vv_norm_single="' + name_change_vv_norm_single + '" -Pname_change_vh_norm_single="' + name_change_vh_norm_single + '" -Plist_bands_single_speckle_filter="' + list_bands_single_speckle_filter + '" -c 3G'
+                subprocess.call(command)
+                print(datetime.now())
 
     def netcdf_information(self, **kwargs):
 
@@ -487,12 +498,12 @@ class SARPreProcessor(PreProcessor):
 
             # Divide filename
             filepath, filename, fileshortname, extension = self._decomposition_filename(
-                    file)
+                file)
 
             filepath2 = self.config.output_folder_step1
 
             # extract orbitdirection from metadata
-            metadata = etree.parse(os.path.join(filepath2,filename[0:79]+'.dim'))
+            metadata = etree.parse(os.path.join(filepath2, filename[0:79] + '.dim'))
             for i in metadata.findall('Dataset_Sources'):
                 for ii in i.findall('MDElem'):
                     for iii in ii.findall('MDElem'):
@@ -502,14 +513,14 @@ class SARPreProcessor(PreProcessor):
                                 orbitdir = iiii.text
                                 if orbitdir == 'ASCENDING':
                                     orbitdir = 'ASCENDING'
-                                elif orbitdir =='DESCENDING':
+                                elif orbitdir == 'DESCENDING':
                                     orbitdir = 'DESCENDING'
                                 else:
                                     pass
                             continue
 
             # extract orbit from metadata
-            metadata = etree.parse(os.path.join(filepath2,filename[0:79]+'.dim'))
+            metadata = etree.parse(os.path.join(filepath2, filename[0:79] + '.dim'))
             for i in metadata.findall('Dataset_Sources'):
                 for ii in i.findall('MDElem'):
                     for iii in ii.findall('MDElem'):
@@ -565,16 +576,6 @@ if __name__ == "__main__":
     # NetcdfStack(input_folder=processing.config.output_folder_step3, output_path=processing.config.output_folder_step3.rsplit('/', 1)[0] , output_filename=processing.config.output_folder_step3.rsplit('/', 2)[1])
 
     print('finished')
-
-
-
-
-
-
-
-
-
-
 
 # filtertype = self.config.speckle_filter.multi_temporal.filter
 # filtersizex = self.config.speckle_filter.multi_temporal.filtersizex
