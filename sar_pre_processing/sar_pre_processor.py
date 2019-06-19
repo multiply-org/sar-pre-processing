@@ -11,10 +11,10 @@ import fnmatch
 # import ogr
 import xml.etree.ElementTree as etree
 from datetime import datetime
-from .file_list_sar_pre_processing import SARList
+from file_list_sar_pre_processing import SARList
 import subprocess
 from netCDF4 import Dataset
-from .netcdf_stack import NetcdfStack
+from netcdf_stack import NetcdfStack
 
 import pdb
 
@@ -28,7 +28,6 @@ class AttributeDict(object):
     """
 
     def __init__(self, **entries):
-
         self.add_entries(**entries)
 
     def add_entries(self, **entries):
@@ -37,20 +36,6 @@ class AttributeDict(object):
                 self.__dict__[key] = AttributeDict(**value)
             else:
                 self.__dict__[key] = value
-
-    # def has_entry(self, entry: str):
-    #     return self._has_entry(entry, 0)
-
-    # def _has_entry(self, entry: str, current_index: int):
-    #     entry_keys = entry.split('.')
-    #     if entry_keys[current_index] in self.__dict__.keys():
-    #         if current_index < len(entry_keys):
-    #             dict_entry = self.__dict__[entry_keys[current_index]]
-    #             if type(dict_entry) is not dict:
-    #                 return False
-    #             return dict_entry._has_entry(entry, current_index + 1)
-    #         return True
-    #     return False
 
     def __getitem__(self, key):
         """
@@ -126,13 +111,8 @@ class SARPreProcessor(PreProcessor):
 
         # TODO PUT THE GRAPH DIRECTORIES AND NAMES IN A SEPARATE CONFIG !!!
 
-        # # xml-processing graph
-        # self.xmlgraphpath = '/media/tweiss/Work/python_code/MULTIPLY/pre_processing_Sentinel_1/xml_files/'
-        # # the XML config files should gfo somewhere in a specific directory in the multiply-core repo
-        # self.xmlgraph = 'preprocess_v01.xml'
-
     # todo discuss if input/output specification part of processing or part of
-    # instantiation of the object itself
+    # initialization of the object itself
 
     def _create_filelist(self, input_folder, expression):
         """
@@ -164,6 +144,10 @@ class SARPreProcessor(PreProcessor):
         assert lon_min <= lon_max, 'ERROR: invalid lon'
         return '%.14f %.14f,%.14f %.14f,%.14f %.14f,%.14f %.14f,%.14f %.14f' % (lon_min, lat_min, lon_min, lat_max, lon_max, lat_max, lon_max, lat_min, lon_min, lat_min)
 
+    def _create_processing_filelist(self):
+        # create filelist
+        self.file_list = SARList(config=self.config_file).create_list()
+
     def pre_process_step1(self, **kwargs):
         """
         Pre-process S1 SLC data with SNAP's GPT
@@ -177,9 +161,6 @@ class SARPreProcessor(PreProcessor):
         7) backscatter normalisation on specified angle in config file (based on Lambert's Law)
 
         """
-
-        # create filelist
-        self.file_list = SARList(config=self.config_file).create_list()
 
         # Check if input folder is specified
         assert self.config.input_folder is not None, 'ERROR: input folder not specified'
@@ -244,14 +225,12 @@ class SARPreProcessor(PreProcessor):
                     'normalisaton angle not specified, default value of 35 is used for processing')
 
             if process_all == 'no':
-                # pdb.set_trace()
                 subprocess.call(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step1) + ' -Pinput="' +
                                 file + '" -Poutput="' + outputfile + '" -Pangle="' + str(normalisation_angle) + '" -Parea="POLYGON ((' + area + '))" -c 2G -x', shell=True)
             else:
                 subprocess.call(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step1) +
                                 ' -Pinput="' + file + '" -Poutput="' + outputfile + '" -Pangle="' + str(normalisation_angle) + '" -c 2G -x', shell=True)
 
-        # pdb.set_trace()
         for i, file in enumerate(self.file_list[1][::2]):
             file_list2 = self.file_list[1][1::2]
             file2 = file_list2[i]
@@ -271,7 +250,7 @@ class SARPreProcessor(PreProcessor):
             except AttributeError:
                 normalisation_angle = 35
                 print('normalisaton angle not specified, default value of 35 is used for processing')
-            # pdb.set_trace()
+
             if process_all == 'no':
                 subprocess.call(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step1_border) + ' -Pinput="' +
                                 file + '" -Pinput2="' + file2 + '" -Poutput="' + outputfile + '" -Pangle="' + str(normalisation_angle) + '" -Parea="POLYGON ((' + area + '))" -c 2G -x', shell=True)
@@ -444,7 +423,6 @@ class SARPreProcessor(PreProcessor):
                     name_change_vv_norm_single = b
                     name_change_vh_norm_single = c
 
-                    # pdb.set_trace()
 
                     list_bands_vv_multi = []
                     list_bands_vh_multi = []
@@ -491,7 +469,7 @@ class SARPreProcessor(PreProcessor):
                     list_bands_vv_norm_multi = ','.join(list_bands_vv_norm_multi)
                     list_bands_vh_norm_multi = ','.join(list_bands_vh_norm_multi)
 
-                    # pdb.set_trace()
+
                     os.system(self.config.gpt + ' ' + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step3) + ' -Pinput="' + processing_filelist + '" -Pinput2="' + file + '" -Poutput="' + outputfile + '" -Ptheta="' + theta + '" -Plist_bands_vv_multi="' + list_bands_vv_multi + '" -Plist_bands_vh_multi="' + list_bands_vh_multi + '" -Plist_bands_vv_norm_multi="' + list_bands_vv_norm_multi + '" -Plist_bands_vh_norm_multi="' + list_bands_vh_norm_multi + '" -Pdate="' + date + '" -Pname_change_vv_single="' + name_change_vv_single + '" -Pname_change_vh_single="' + name_change_vh_single + '" -Pname_change_vv_norm_single="' + name_change_vv_norm_single + '" -Pname_change_vh_norm_single="' + name_change_vh_norm_single + '" -Plist_bands_single_speckle_filter="' + list_bands_single_speckle_filter + '"')
                     print(datetime.now())
 
@@ -578,10 +556,11 @@ class SARPreProcessor(PreProcessor):
 
 if __name__ == "__main__":
     processing = SARPreProcessor(config='sample_config_file.yml')
+    processing._create_processing_filelist()
     # processing.pre_process_step1()
     # processing.pre_process_step2()
     # processing.pre_process_step3()
-    subprocess.call(os.path.join(os.getcwd(),'projection_problem.sh ' + processing.config.output_folder_step3), shell=True)
+    # subprocess.call(os.path.join(os.getcwd(),'projection_problem.sh ' + processing.config.output_folder_step3), shell=True)
     # processing.netcdf_information()
     # NetcdfStack(input_folder=processing.config.output_folder_step3, output_path=processing.config.output_folder_step3.rsplit('/', 1)[0] , output_filename=processing.config.output_folder_step3.rsplit('/', 2)[1])
 

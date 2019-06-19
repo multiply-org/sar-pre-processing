@@ -11,6 +11,7 @@ import shutil
 # import ogr
 import xml.etree.ElementTree as etree
 from datetime import datetime
+from osgeo import ogr
 
 import pdb
 
@@ -334,9 +335,6 @@ class SARList(object):
 
         return filelist_new, filelist_border_control
 
-
-
-
     def create_list(self, **kwargs):
 
         # list with all zip files found in input_folder
@@ -347,16 +345,8 @@ class SARList(object):
             filelist = self._select_year(filelist, self.config.year)
             filelist.sort()
         except AttributeError:
-            pass
-
-        # If Year is specified in config-file pre-processing will be only done for specified year
-        try:
-            filelist = self._select_year(filelist, self.config.year)
-            filelist.sort()
-        except AttributeError:
             print('year not specified')
             pass
-
 
         # list with all zip files that contain area of interest
         try:
@@ -367,7 +357,6 @@ class SARList(object):
             # todo: how is it with coordinates that go across the datum line ??
 
             location = [upper_left_x, upper_left_y, lower_right_x, lower_right_y]
-
             filelist = self._contain_area_of_interest(filelist, location, self.config.input_folder)
         except AttributeError:
             print('area of interest not specified')
