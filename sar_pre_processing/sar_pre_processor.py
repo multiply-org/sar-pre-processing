@@ -66,7 +66,7 @@ class PreProcessor(object):
            writes to self.config.
         """
         with open(self.config_file, 'r') as cfg:
-            self.config = yaml.load(cfg)
+            self.config = yaml.safe_load(cfg)
             self.config = AttributeDict(**self.config)
 
 
