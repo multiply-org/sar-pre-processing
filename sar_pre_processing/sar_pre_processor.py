@@ -343,6 +343,8 @@ class SARPreProcessor(PreProcessor):
 
         1) apply multi-temporal speckle filter
 
+        Problem: different tracks (orbits!!!)
+
         """
 
         # Check if output folder of pre_process_step1 exists
