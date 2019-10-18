@@ -172,73 +172,46 @@ class SARPreProcessor(PreProcessor):
 
                 # Coordinates for subset area
                 area = self._get_area(lower_right_y, upper_left_y, upper_left_x, lower_right_x)
-                process_all = 'no'
             except AttributeError:
                 print('area of interest not specified, whole images will be processed')
-                process_all = 'yes'
-        elif self.config.subset == 'no':
-            process_all = 'yes'
         else:
             raise ValueError('subset has to be set to "yes" or "no"')
         # loop to process all files stored in input directory
+        try:
+            normalisation_angle = self.config.normalisation_angle
+            if normalisation_angle is None:
+                normalisation_angle = '35'
+                logging.info('normalisation angle not specified, default value of 35 is used for processing')
+        except AttributeError:
+            normalisation_angle = '35'
+            logging.info('normalisation angle not specified, default value of 35 is used for processing')
         for file in self.file_list[0]:
-            print('Scene ', self.file_list[0].index(file) + 1, ' of ', len(self.file_list[0]))
-            # Divide filename
-            filepath, filename, fileshortname, extension = self._decomposition_filename(file)
-            # Call SNAP routine, xml file
-            print('Process ', filename, ' with SNAP.')
-            output_file = os.path.join(self.config.output_folder_step1,
-                                       fileshortname + self.name_addition_step1 + '.dim')
-            try:
-                normalisation_angle = self.config.normalisation_angle
-                if normalisation_angle is None:
-                    normalisation_angle = 35
-                    logging.info('normalisaton angle not specified, default value of 35 is used for processing')
-            except AttributeError:
-                normalisation_angle = 35
-                logging.info('normalisaton angle not specified, default value of 35 is used for processing')
-
-            if area is not None:
-                call = '"' + self.config.gpt + '" "' + \
-                       os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step1) + \
-                       '" -Pinput="' + file + '" -Poutput="' + output_file + '" -Pangle="' + \
-                       str(normalisation_angle) + '" -Parea="POLYGON ((' + area + '))" -c 2G -x'
-
-            else:
-                call = '"' + self.config.gpt + '" "' + \
-                       os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_process_step1) + \
-                       '" -Pinput="' + file + '" -Poutput="' + output_file + '" -Pangle="' + \
-                       str(normalisation_angle) + '" -c 2G -x'
-            return_code = subprocess.call(call, shell=True)
-            logging.info(return_code)
-
+            logging.info('Scene ', self.file_list[0].index(file) + 1, ' of ', len(self.file_list[0]))
+            self._gpt_step1(file, area, normalisation_angle)
         for i, file in enumerate(self.file_list[1][::2]):
             file_list2 = self.file_list[1][1::2]
             file2 = file_list2[i]
-            # Divide filename
-            filepath, filename, fileshortname, extension = self._decomposition_filename(file)
-            output_file = os.path.join(self.config.output_folder_step1,
-                                       fileshortname + self.name_addition_step1 + '.dim')
-            try:
-                normalisation_angle = self.config.normalisation_angle
-                if normalisation_angle is None:
-                    normalisation_angle = 35
-                    logging.info('normalisaton angle not specified, default value of 35 is used for processing')
-            except AttributeError:
-                normalisation_angle = 35
-                logging.info('normalisaton angle not specified, default value of 35 is used for processing')
-            if process_all == 'no':
-                call = '"' + self.config.gpt + '" "' + os.path.join(self.config.xml_graph.path,
-                                                                    self.config.xml_graph.pre_process_step1_border) + \
-                       '" -Pinput="' + file + '" -Pinput2="' + file2 + '" -Poutput="' + output_file + '" -Pangle="' + \
-                       str(normalisation_angle) + '" -Parea="POLYGON ((' + area + '))" -c 2G -x'
-            else:
-                call = '"' + self.config.gpt + '" "' + os.path.join(self.config.xml_graph.path,
-                                                                    self.config.xml_graph.pre_process_step1_border) + \
-                       '" -Pinput="' + file + '" -Pinput2="' + file2 + '" -Poutput="' + output_file + '" -Pangle="' + \
-                       str(normalisation_angle) + '" -c 2G -x'
-            return_code = subprocess.call(call, shell=True)
-            logging.info(return_code)
+            self._gpt_step1(file2, area, normalisation_angle)
+
+    def _gpt_step1(self, file: str, area: str, normalisation_angle: str):
+        # Divide filename
+        filepath, filename, fileshortname, extension = self._decomposition_filename(file)
+        # Call SNAP routine, xml file
+        logging.info('Process ', filename, ' with SNAP.')
+        output_file = os.path.join(self.config.output_folder_step1,
+                                   fileshortname + self.name_addition_step1 + '.dim')
+        if area is None:
+            call = '"' + self.config.gpt + '" "' + \
+                   os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_process_step1_border) + \
+                   '" -Pinput="' + file + '" -Pinput2="' + file + '" -Poutput="' + output_file + '" -Pangle="' + \
+                   normalisation_angle + '" -c 2G -x'
+        else:
+            call = '"' + self.config.gpt + '" "' + \
+                   os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_process_step1_border) + \
+                   '" -Pinput="' + file + '" -Pinput2="' + file + '" -Poutput="' + output_file + '" -Pangle="' + \
+                   normalisation_angle + '" -Parea="POLYGON ((' + area + '))" -c 2G -x'
+        return_code = subprocess.call(call, shell=True)
+        logging.info(return_code)
 
     def pre_process_step2(self):
         """
