@@ -4,6 +4,7 @@ Wrapper module to launch preprocessor
 
 import logging
 import os
+import pkg_resources
 import yaml
 import fnmatch
 import xml.etree.ElementTree as ETree
@@ -83,10 +84,10 @@ class SARPreProcessor(PreProcessor):
 
         # Initialise name of necessary xml-graphs for preprocessing
         # (can be put in the YAML config file if needed)
-        self.config.xml_graph_pre_process_step1 = 'pre_process_step1.xml'
-        self.config.xml_graph_pre_process_step1_border = 'pre_process_step1_border.xml'
-        self.config.xml_graph_pre_process_step2 = 'pre_process_step2.xml'
-        self.config.xml_graph_pre_process_step3 = 'pre_process_step3.xml'
+        self._configure_config_graph('xml_graph_pre_process_step1', 'pre_process_step1.xml')
+        self._configure_config_graph('xml_graph_pre_process_step1_border', 'pre_process_step1_border.xml')
+        self._configure_config_graph('xml_graph_pre_process_step2', 'pre_process_step2.xml')
+        self._configure_config_graph('xml_graph_pre_process_step3', 'pre_process_step3.xml')
 
         # Initialise name addition for output files
         self.name_addition_step1 = '_GC_RC_No_Su'
@@ -98,6 +99,16 @@ class SARPreProcessor(PreProcessor):
 
         # TODO PUT THE GRAPH DIRECTORIES AND NAMES IN A SEPARATE CONFIG !!!
         # todo discuss if input/output specification part of processing or part of initialization of the object itself
+
+    def _configure_config_graph(self, key_name: str, default_name: str):
+        if key_name in self.config:
+            if not os.path.exists(self.config[key_name]):
+                if 'xml_graph_path' in self.config:
+                    self.config[key_name] = os.path.join(self.config.xml_graph_path, self.config[key_name])
+                else:
+                    raise UserWarning(f'Could not determine location of {self.config[key_name]}.')
+        else:
+            self.config[key_name] = pkg_resources.resource_stream('sar_pre_processing.default_graphs', default_name)
 
     @staticmethod
     def _create_file_list(input_folder, expression):
