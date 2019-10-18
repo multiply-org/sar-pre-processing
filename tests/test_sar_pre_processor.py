@@ -7,6 +7,7 @@ Testing the SAR Preprocessor
 
 def test_select_year():
     SAR = SARPreProcessor(config='./tests/test_config_sar_pre_processor.yml')
+    SAR.create_processing_file_list()
     print('Start pre-processing step 1 ...')
     SAR.pre_process_step1()
     print('Start pre-processing step 2 ...')

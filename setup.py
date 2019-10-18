@@ -3,9 +3,10 @@
 from setuptools import setup
 
 requirements = [
-
-    'pytest',
-    'sphinxcontrib-bibtex'
+      'netCDF4',
+      'PyYAML'  
+      'pytest',
+      'sphinxcontrib-bibtex'
 ]
 
 __version__ = None
