@@ -61,7 +61,10 @@ class PreProcessor(object):
         """
         with open(self.config_file, 'r') as cfg:
             self.config = yaml.safe_load(cfg)
-            self.config = AttributeDict(**self.config)
+            if 'SAR' in self.config:
+                self.config = AttributeDict(**self.config['SAR'])
+            else:
+                self.config = AttributeDict(**self.config)
 
 
 class SARPreProcessor(PreProcessor):
@@ -162,20 +165,16 @@ class SARPreProcessor(PreProcessor):
             'ERROR: path of XML file for pre-processing step 1 is not not specified'
 
         area = None
-        if self.config.subset == 'yes':
-            try:
-                lower_right_y = self.config.region['lr']['lat']
-                upper_left_y = self.config.region['ul']['lat']
-                upper_left_x = self.config.region['ul']['lon']
-                lower_right_x = self.config.region['lr']['lon']
-                # todo: how is it with coordinates that go across the datum
-
-                # Coordinates for subset area
-                area = self._get_area(lower_right_y, upper_left_y, upper_left_x, lower_right_x)
-            except AttributeError:
-                logging.info('area of interest not specified, whole images will be processed')
-        else:
-            raise ValueError('subset has to be set to "yes" or "no"')
+        try:
+            lower_right_y = self.config.region['lr']['lat']
+            upper_left_y = self.config.region['ul']['lat']
+            upper_left_x = self.config.region['ul']['lon']
+            lower_right_x = self.config.region['lr']['lon']
+            # todo: how is it with coordinates that go across the datum
+            # Coordinates for subset area
+            area = self._get_area(lower_right_y, upper_left_y, upper_left_x, lower_right_x)
+        except AttributeError:
+            logging.info('area of interest not specified, whole images will be processed')
         # loop to process all files stored in input directory
         try:
             normalisation_angle = self.config.normalisation_angle

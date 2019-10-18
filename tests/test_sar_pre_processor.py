@@ -5,6 +5,11 @@ Testing the SAR Preprocessor
 """
 
 
+def test_create_sar_pre_processor_with_vm_config():
+    pre_processor = SARPreProcessor(config='./tests/vm_config.yml')
+    assert pre_processor is not None
+
+
 def test_select_year():
     SAR = SARPreProcessor(config='./tests/test_config_sar_pre_processor.yml')
     SAR.create_processing_file_list()
@@ -17,11 +22,9 @@ def test_select_year():
     # SAR._select_year()
 
 
-from sar_pre_processing import sar_pre_processor
-
-
 def inc(x):
     return x + 1
+
 
 def test_answer():
     assert inc(3) == 4
