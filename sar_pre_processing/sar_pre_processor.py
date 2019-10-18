@@ -110,7 +110,7 @@ class SARPreProcessor(PreProcessor):
         return file_list
 
     @staticmethod
-    def _decomposition_filename(file):
+    def _decompose_filename(file):
         """
         Decomposition of filename including path in
         path, filename, fileshortname and extension
@@ -173,7 +173,7 @@ class SARPreProcessor(PreProcessor):
                 # Coordinates for subset area
                 area = self._get_area(lower_right_y, upper_left_y, upper_left_x, lower_right_x)
             except AttributeError:
-                print('area of interest not specified, whole images will be processed')
+                logging.info('area of interest not specified, whole images will be processed')
         else:
             raise ValueError('subset has to be set to "yes" or "no"')
         # loop to process all files stored in input directory
@@ -191,25 +191,24 @@ class SARPreProcessor(PreProcessor):
         for i, file in enumerate(self.file_list[1][::2]):
             file_list2 = self.file_list[1][1::2]
             file2 = file_list2[i]
-            self._gpt_step1(file2, area, normalisation_angle)
+            self._gpt_step1(file, file2, area, normalisation_angle, self.config.xml_graph_pre_process_step1_border)
 
-    def _gpt_step1(self, file: str, area: str, normalisation_angle: str):
+    def _gpt_step1(self, file: str, file2: str, area: str, normalisation_angle: str, script_path: str):
         # Divide filename
-        filepath, filename, fileshortname, extension = self._decomposition_filename(file)
+        filepath, filename, fileshortname, extension = self._decompose_filename(file)
         # Call SNAP routine, xml file
         logging.info('Process ', filename, ' with SNAP.')
         output_file = os.path.join(self.config.output_folder_step1,
                                    fileshortname + self.name_addition_step1 + '.dim')
-        if area is None:
-            call = '"' + self.config.gpt + '" "' + \
-                   os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_process_step1_border) + \
-                   '" -Pinput="' + file + '" -Pinput2="' + file + '" -Poutput="' + output_file + '" -Pangle="' + \
-                   normalisation_angle + '" -c 2G -x'
-        else:
-            call = '"' + self.config.gpt + '" "' + \
-                   os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_process_step1_border) + \
-                   '" -Pinput="' + file + '" -Pinput2="' + file + '" -Poutput="' + output_file + '" -Pangle="' + \
-                   normalisation_angle + '" -Parea="POLYGON ((' + area + '))" -c 2G -x'
+        area_part = ''
+        if area is not None:
+            area_part = '-Parea="POLYGON ((' + area + '))" '
+        file2_part = ''
+        if file2 is not None:
+            file2_part = ' -Pinput2="' + file2 + '"'
+        call = '"' + self.config.gpt + '" "' + os.path.join(self.config.xml_graph_path, script_path) + \
+               '" -Pinput="' + file + '"' + file2_part + ' -Poutput="' + output_file + \
+               '" -Pangle="' + normalisation_angle + '" ' + area_part + '-c 2G -x'
         return_code = subprocess.call(call, shell=True)
         logging.info(return_code)
 
@@ -225,7 +224,7 @@ class SARPreProcessor(PreProcessor):
 
         """
         # Check if XML file for pre-processing step 2 is specified
-        assert self.config.xml_graph.pre_process_step2 is not None, \
+        assert self.config.xml_graph_pre_process_step2 is not None, \
             'ERROR: path of XML file for pre-processing step 2 is not not specified'
         # Check if output folder of pre_process_step1 exists
         assert os.path.exists(self.config.output_folder_step1), \
@@ -243,14 +242,15 @@ class SARPreProcessor(PreProcessor):
             file_list.sort()
         else:
             file_list = []
-            for file in self.filelist:
-                filepath, filename, file_short_name, extension = self._decomposition_filename(file)
-                new_file_name = os.path.join(
-                    self.config.output_folder_step1, file_short_name + self.name_addition_step1 + '.dim')
-                if os.path.exists(new_file_name) is True:
-                    file_list.append(new_file_name)
-                else:
-                    logging.info('skip processing for %s. File does not exist' % file)
+            for list in self.file_list:
+                for file in list:
+                    filepath, filename, file_short_name, extension = self._decompose_filename(file)
+                    new_file_name = os.path.join(
+                        self.config.output_folder_step1, file_short_name + self.name_addition_step1 + '.dim')
+                    if os.path.exists(new_file_name) is True:
+                        file_list.append(new_file_name)
+                    else:
+                        logging.info('skip processing for %s. File does not exist' % file)
             file_list.sort()
         # Set Master image for co-registration
         master = file_list[0]
@@ -258,13 +258,13 @@ class SARPreProcessor(PreProcessor):
         for file in file_list:
             logging.info('Scene', file_list.index(file) + 1, 'of', len(file_list))
             # Divide filename
-            filepath, filename, file_short_name, extension = self._decomposition_filename(file)
+            filepath, filename, file_short_name, extension = self._decompose_filename(file)
             # Call SNAP routine, xml file
             logging.info('Process ', filename, ' with SNAP.')
             output_file = os.path.join(
                 self.config.output_folder_step2, file_short_name + self.name_addition_step2 + '.dim')
             call = '"' + self.config.gpt + '" "' + \
-                   os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_process_step2) + \
+                   os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step2) + \
                    '" -Pinput="' + master + '" -Pinput2="' + file + '" -Poutput="' + output_file + '"'
             return_code = subprocess.call(call)
             logging.info(return_code)
@@ -293,28 +293,29 @@ class SARPreProcessor(PreProcessor):
         file_list.sort()
 
         # Create filelist with all to be processed images
-        if self.filelist is None:
+        if self.file_list is None:
             logging.info('no file list specified, therefore all images in output folder step2 will be processed')
             file_list = self._create_file_list(self.config.output_folder_step2, '*.dim')
         else:
             file_list = []
-            for file in self.filelist:
-                file_path, filename, file_short_name, extension = self._decomposition_filename(file)
-                new_file_name = os.path.join(self.config.output_folder_step2, file_short_name +
-                                             self.name_addition_step1 + self.name_addition_step2 + '.dim')
-                if os.path.exists(new_file_name) is True:
-                    file_list.append(new_file_name)
-                else:
-                    logging.info('skip processing for %s. File does not exists' % file)
+            for list in self.file_list:
+                for file in list:
+                    file_path, filename, file_short_name, extension = self._decompose_filename(file)
+                    new_file_name = os.path.join(self.config.output_folder_step2, file_short_name +
+                                                 self.name_addition_step1 + self.name_addition_step2 + '.dim')
+                    if os.path.exists(new_file_name) is True:
+                        file_list.append(new_file_name)
+                    else:
+                        logging.info('skip processing for %s. File does not exists' % file)
         # Sort file list by date (hard coded position in filename!!!)
-        file_path, filename, file_short_name, extension = self._decomposition_filename(file_list[0])
+        file_path, filename, file_short_name, extension = self._decompose_filename(file_list[0])
         file_list.sort(key=lambda x: x[len(file_path) + 18:len(file_path) + 33])
         file_list_old = file_list
         for sensor in ['S1A', 'S1B']:
             file_list = [k for k in file_list_old if sensor in k]
             if self.config.speckle_filter.multi_temporal.apply == 'yes':
                 # Check if XML file for pre-processing step 3 is specified
-                assert self.config.xml_graph.pre_process_step3 is not None, \
+                assert self.config.xml_graph_pre_process_step3 is not None, \
                     'ERROR: path of XML file for pre-processing step 3 is not not specified'
                 # loop to apply multi-temporal filtering
                 # right now 15 scenes if possible 7 before and 7 after multi-temporal filtered scene,
@@ -329,14 +330,14 @@ class SARPreProcessor(PreProcessor):
                         processing_file_list = file_list[i - 2:i + 3]
                     else:
                         processing_file_list = file_list[i - 2 - (3 - (len(file_list) - i)):len(file_list)]
-                    file_path, filename, file_short_name, extension = self._decomposition_filename(file)
-                    a, a, b, a = self._decomposition_filename(self._create_file_list(
+                    file_path, filename, file_short_name, extension = self._decompose_filename(file)
+                    a, a, b, a = self._decompose_filename(self._create_file_list(
                         os.path.join(file_path, file_short_name + '.data'), '*_slv1_*.img')[0])
-                    a, a, c, a = self._decomposition_filename(self._create_file_list(
+                    a, a, c, a = self._decompose_filename(self._create_file_list(
                         os.path.join(file_path, file_short_name + '.data'), '*_slv2_*.img')[0])
-                    a, a, d, a = self._decomposition_filename(self._create_file_list(
+                    a, a, d, a = self._decompose_filename(self._create_file_list(
                         os.path.join(file_path, file_short_name + '.data'), '*_slv3_*.img')[0])
-                    a, a, e, a = self._decomposition_filename(self._create_file_list(
+                    a, a, e, a = self._decompose_filename(self._create_file_list(
                         os.path.join(file_path, file_short_name + '.data'), '*_slv4_*.img')[0])
                     list_bands_single_speckle_filter = ','.join([b, c, d, e])
 
@@ -352,16 +353,16 @@ class SARPreProcessor(PreProcessor):
                     list_bands_vh_norm_multi = []
 
                     for processing_file in processing_file_list:
-                        file_path, filename, file_short_name, extension = self._decomposition_filename(processing_file)
+                        file_path, filename, file_short_name, extension = self._decompose_filename(processing_file)
                         # get filename from folder
                         # think about better way !!!!
-                        a, a, band_vv_name_multi, a = self._decomposition_filename(self._create_file_list(
+                        a, a, band_vv_name_multi, a = self._decompose_filename(self._create_file_list(
                             os.path.join(file_path, file_short_name + '.data'), '*_slv3_*.img')[0])
-                        a, a, band_vh_name_multi, a = self._decomposition_filename(self._create_file_list(
+                        a, a, band_vh_name_multi, a = self._decompose_filename(self._create_file_list(
                             os.path.join(file_path, file_short_name + '.data'), '*_slv4_*.img')[0])
-                        a, a, band_vv_name_norm_multi, a = self._decomposition_filename(self._create_file_list(
+                        a, a, band_vv_name_norm_multi, a = self._decompose_filename(self._create_file_list(
                             os.path.join(file_path, file_short_name + '.data'), '*_slv1_*.img')[0])
-                        a, a, band_vh_name_norm_multi, a = self._decomposition_filename(self._create_file_list(
+                        a, a, band_vh_name_norm_multi, a = self._decompose_filename(self._create_file_list(
                             os.path.join(file_path, file_short_name + '.data'), '*_slv2_*.img')[0])
 
                         list_bands_vv_multi.append(band_vv_name_multi)
@@ -371,7 +372,7 @@ class SARPreProcessor(PreProcessor):
                         list_bands_vh_norm_multi.append(band_vh_name_norm_multi)
 
                     # Divide filename of file of interest
-                    file_path, filename, file_short_name, extension = self._decomposition_filename(file)
+                    file_path, filename, file_short_name, extension = self._decompose_filename(file)
 
                     output_file = os.path.join(
                         self.config.output_folder_step3, file_short_name + self.name_addition_step3 + '.nc')
@@ -388,7 +389,7 @@ class SARPreProcessor(PreProcessor):
                     list_bands_vh_norm_multi = ','.join(list_bands_vh_norm_multi)
 
                     call = '"' + self.config.gpt + '" "' \
-                           + os.path.join(self.config.xml_graph.path, self.config.xml_graph.pre_process_step3) + \
+                           + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step3) + \
                            '" -Pinput="' + processing_file_list + '" -Pinput2="' + file + \
                            '" -Poutput="' + output_file + '" -Ptheta="' + theta + \
                            '" -Plist_bands_vv_multi="' + list_bands_vv_multi + \
@@ -412,7 +413,7 @@ class SARPreProcessor(PreProcessor):
         # for loop though all measurement points
         for file in file_list:
             # Divide filename
-            file_path, filename, file_short_name, extension = self._decomposition_filename(file)
+            file_path, filename, file_short_name, extension = self._decompose_filename(file)
             file_path2 = self.config.output_folder_step1
             # extract date from filename
             date = datetime.strptime(file_short_name[17:32], '%Y%m%dT%H%M%S')
