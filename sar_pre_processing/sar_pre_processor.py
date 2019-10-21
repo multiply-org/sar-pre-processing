@@ -211,7 +211,7 @@ class SARPreProcessor(PreProcessor):
         file2_part = ''
         if file2 is not None:
             file2_part = ' -Pinput2="' + file2 + '"'
-        call = '"' + self.config.gpt + '" "' + os.path.join(self.config.xml_graph_path, script_path) + \
+        call = '"' + self.config.gpt + '" "' + script_path + \
                '" -Pinput="' + file + '"' + file2_part + ' -Poutput="' + output_file + \
                '" -Pangle="' + normalisation_angle + '" ' + area_part + '-c 2G -x'
         return_code = subprocess.call(call, shell=True)
@@ -268,8 +268,7 @@ class SARPreProcessor(PreProcessor):
             logging.info('Process ', filename, ' with SNAP.')
             output_file = os.path.join(
                 self.config.output_folder_step2, file_short_name + self.name_addition_step2 + '.dim')
-            call = '"' + self.config.gpt + '" "' + \
-                   os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step2) + \
+            call = '"' + self.config.gpt + '" "' + self.config.xml_graph_pre_process_step2 + \
                    '" -Pinput="' + master + '" -Pinput2="' + file + '" -Poutput="' + output_file + '"'
             return_code = subprocess.call(call)
             logging.info(return_code)
@@ -391,8 +390,7 @@ class SARPreProcessor(PreProcessor):
                     list_bands_vv_norm_multi = ','.join(list_bands_vv_norm_multi)
                     list_bands_vh_norm_multi = ','.join(list_bands_vh_norm_multi)
 
-                    call = '"' + self.config.gpt + '" "' \
-                           + os.path.join(self.config.xml_graph_path, self.config.xml_graph_pre_process_step3) + \
+                    call = '"' + self.config.gpt + '" "' + self.config.xml_graph_pre_process_step3 + \
                            '" -Pinput="' + processing_file_list + '" -Pinput2="' + file + \
                            '" -Poutput="' + output_file + '" -Ptheta="' + theta + \
                            '" -Plist_bands_vv_multi="' + list_bands_vv_multi + \
