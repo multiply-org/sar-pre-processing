@@ -101,7 +101,14 @@ class SARPreProcessor(PreProcessor):
         self.name_addition_step3 = '_speckle'
 
         # Check if path of SNAP's graph-processing-tool is specified
-        assert self.config.gpt is not None, 'ERROR: path for SNAPs graph-processing-tool is not not specified'
+        if not self.config.has_entry('gpt'):
+            # test that gpt is available as parameter
+            try:
+                return_code = subprocess.call("gpt Subset -h")
+                if return_code > 0:
+                    raise UserWarning('ERROR: path for SNAPs graph-processing-tool is not specified correctly')
+            except FileNotFoundError:
+                raise UserWarning('ERROR: path for SNAPs graph-processing-tool is not specified correctly')
 
         # TODO PUT THE GRAPH DIRECTORIES AND NAMES IN A SEPARATE CONFIG !!!
         # todo discuss if input/output specification part of processing or part of initialization of the object itself
