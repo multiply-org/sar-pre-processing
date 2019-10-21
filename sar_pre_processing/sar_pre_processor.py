@@ -99,7 +99,7 @@ class SARPreProcessor(PreProcessor):
                 else:
                     raise UserWarning(f'Could not determine location of {self.config[key_name]}.')
         else:
-            default_graph = pkg_resources.resource_stream('sar_pre_processing.default_graphs', default_name)
+            default_graph = pkg_resources.resource_filename('sar_pre_processing.default_graphs', default_name)
             self.config.add_entry(key_name, default_graph)
 
     def set_file_list(self, file_list: List[str]):
