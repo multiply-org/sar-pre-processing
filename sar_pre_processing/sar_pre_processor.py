@@ -192,7 +192,7 @@ class SARPreProcessor(PreProcessor):
             logging.info('normalisation angle not specified, default value of 35 is used for processing')
         for file in self.file_list[0]:
             logging.info('Scene ', self.file_list[0].index(file) + 1, ' of ', len(self.file_list[0]))
-            self._gpt_step1(file, area, normalisation_angle)
+            self._gpt_step1(file, None, area, normalisation_angle, self.config.xml_graph_pre_process_step1)
         for i, file in enumerate(self.file_list[1][::2]):
             file_list2 = self.file_list[1][1::2]
             file2 = file_list2[i]
