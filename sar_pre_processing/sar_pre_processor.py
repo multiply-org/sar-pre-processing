@@ -27,10 +27,16 @@ class AttributeDict(object):
 
     def add_entries(self, **entries):
         for key, value in entries.items():
-            if type(value) is dict:
-                self.__dict__[key] = AttributeDict(**value)
-            else:
-                self.__dict__[key] = value
+            self.add_entry(key, value)
+
+    def add_entry(self, key, value):
+        if type(value) is dict:
+            self.__dict__[key] = AttributeDict(**value)
+        else:
+            self.__dict__[key] = value
+
+    def has_entry(self, key):
+        return key in self.__dict__
 
     def __getitem__(self, key):
         """
@@ -101,14 +107,18 @@ class SARPreProcessor(PreProcessor):
         # todo discuss if input/output specification part of processing or part of initialization of the object itself
 
     def _configure_config_graph(self, key_name: str, default_name: str):
-        if key_name in self.config:
+        if self.config.has_entry(key_name):
             if not os.path.exists(self.config[key_name]):
-                if 'xml_graph_path' in self.config:
-                    self.config[key_name] = os.path.join(self.config.xml_graph_path, self.config[key_name])
+                if self.config.has_entry('xml_graph_path'):
+                    graph_path = os.path.join(self.config.xml_graph_path, self.config[key_name])
+                    if not os.path.exists(graph_path):
+                        raise UserWarning(f'Could not determine location of {self.config[key_name]}.')
+                    self.config.add_entry(key_name, graph_path)
                 else:
                     raise UserWarning(f'Could not determine location of {self.config[key_name]}.')
         else:
-            self.config[key_name] = pkg_resources.resource_stream('sar_pre_processing.default_graphs', default_name)
+            default_graph = pkg_resources.resource_stream('sar_pre_processing.default_graphs', default_name)
+            self.config.add_entry(key_name, default_graph)
 
     @staticmethod
     def _create_file_list(input_folder, expression):

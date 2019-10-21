@@ -6,7 +6,7 @@ Testing the SAR Preprocessor
 
 
 def test_create_sar_pre_processor_with_vm_config():
-    pre_processor = SARPreProcessor(config='./tests/vm_config.yml')
+    pre_processor = SARPreProcessor(config='./tests/test_data/vm_config.yml')
     assert pre_processor is not None
 
 

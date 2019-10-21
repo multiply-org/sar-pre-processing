@@ -16,10 +16,14 @@ General:
     output_directory_root: /some/where/
 
 SAR:
-  input_folder: ./tests/test/data/inputs
-  output_folder: ./tests/test/data/outputs
+  input_folder: ./tests/test_data/inputs
+  output_folder: ./tests/test_data/outputs
   gpt: \any\path\gpt  # Location of SNAP's graph-processing-tool
-  xml_graph_path: C:\Users\tonio\Projekte\multiply\sar-pre-processing\xml_files
+  xml_graph_path: ./tests/test_data
+  xml_graph_pre_process_step1: dummy_graph_file.xml
+  xml_graph_pre_process_step1_border: ./tests/test_data_2/another_dummy_graph_file.xml
+#  xml_graph_pre_process_step2: Not included on purpose
+#  xml_graph_pre_process_step3: Not included on purpose
   speckle_filter:
     multi_temporal:
       apply: 'yes'
