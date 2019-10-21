@@ -12,6 +12,7 @@ from datetime import datetime
 from .file_list_sar_pre_processing import SARList
 import subprocess
 from netCDF4 import Dataset
+from typing import List
 
 
 class AttributeDict(object):
@@ -130,6 +131,9 @@ class SARPreProcessor(PreProcessor):
         else:
             default_graph = pkg_resources.resource_stream('sar_pre_processing.default_graphs', default_name)
             self.config.add_entry(key_name, default_graph)
+
+    def set_file_list(self, file_list: List[str]):
+        self.file_list = file_list
 
     @staticmethod
     def _create_file_list(input_folder, expression):
