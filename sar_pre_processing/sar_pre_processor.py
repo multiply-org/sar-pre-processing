@@ -52,6 +52,10 @@ class PreProcessor(object):
         self.filelist = kwargs.get('filelist', None)
         self._check()
         self._load_config()
+        if kwargs.get('input', None) is not None:
+            self.config.input_folder = kwargs.get('input', None)
+        if kwargs.get('output', None) is not None:
+            self.config.output_folder = kwargs.get('output', None)
 
     def _check(self):
 
