@@ -8,42 +8,17 @@ import fnmatch
 import pyproj
 import zipfile
 import shutil
-# import ogr
 import xml.etree.ElementTree as etree
-from datetime import datetime
 from osgeo import ogr
+from sar_pre_processing.attribute_dict import AttributeDict
 
-import pdb
-
-
-class AttributeDict(object):
-    """
-    A class to convert a nested Dictionary into an object with key-values
-    accessibly using attribute notation (AttributeDict.attribute) instead of
-    key notation (Dict["key"]). This class recursively sets Dicts to objects,
-    allowing you to recurse down nested dicts (like: AttributeDict.attr.attr)
-    """
-    def __init__(self, **entries):
-        self.add_entries(**entries)
-
-    def add_entries(self, **entries):
-        for key, value in entries.items():
-            if type(value) is dict:
-                self.__dict__[key] = AttributeDict(**value)
-            else:
-                self.__dict__[key] = value
-
-    def __getitem__(self, key):
-        """
-        Provides dict-style access to attributes
-        """
-        return getattr(self, key)
 
 class SARList(object):
 
     def __init__(self, **kwargs):
         self.config = kwargs.get('config', None)
-        self._load_config()
+        if type(self.config) is not AttributeDict:
+            self._load_config()
         self._check()
 
     def _check(self):
@@ -336,7 +311,6 @@ class SARList(object):
         return filelist_new, filelist_border_control
 
     def create_list(self, **kwargs):
-
         # list with all zip files found in input_folder
         filelist = self._create_filelist(self.config.input_folder, '*.zip')
 

@@ -9,41 +9,11 @@ import yaml
 import fnmatch
 import xml.etree.ElementTree as ETree
 from datetime import datetime
+from .attribute_dict import AttributeDict
 from .file_list_sar_pre_processing import SARList
 import subprocess
 from netCDF4 import Dataset
 from typing import List
-
-
-class AttributeDict(object):
-    """
-    A class to convert a nested Dictionary into an object with key-values
-    accessibly using attribute notation (AttributeDict.attribute) instead of
-    key notation (Dict["key"]). This class recursively sets Dicts to objects,
-    allowing you to recurse down nested dicts (like: AttributeDict.attr.attr)
-    """
-
-    def __init__(self, **entries):
-        self.add_entries(**entries)
-
-    def add_entries(self, **entries):
-        for key, value in entries.items():
-            self.add_entry(key, value)
-
-    def add_entry(self, key, value):
-        if type(value) is dict:
-            self.__dict__[key] = AttributeDict(**value)
-        else:
-            self.__dict__[key] = value
-
-    def has_entry(self, key):
-        return key in self.__dict__
-
-    def __getitem__(self, key):
-        """
-        Provides dict-style access to attributes
-        """
-        return getattr(self, key)
 
 
 class PreProcessor(object):
@@ -170,7 +140,7 @@ class SARPreProcessor(PreProcessor):
 
     def create_processing_file_list(self):
         # create filelist
-        self.file_list = SARList(config=self.config_file).create_list()
+        self.file_list = SARList(config=self.config).create_list()
 
     def pre_process_step1(self):
         """
