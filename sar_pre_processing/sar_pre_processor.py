@@ -316,8 +316,6 @@ class SARPreProcessor(PreProcessor):
             os.makedirs(self.config.output_folder_step3)
 
         # list with all dim files found in output-folder of pre_process_step2
-        file_list = self._create_file_list(os.path.join(self.config.output_folder, 'step2'), '*.dim')
-        file_list.sort()
 
         # Create filelist with all to be processed images
         if self.file_list is None:
