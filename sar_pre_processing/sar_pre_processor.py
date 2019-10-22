@@ -269,8 +269,8 @@ class SARPreProcessor(PreProcessor):
             output_file = os.path.join(
                 self.config.output_folder_step2, file_short_name + self.name_addition_step2 + '.dim')
             call = '"' + self.config.gpt + '" "' + self.config.xml_graph_pre_process_step2 + \
-                   '" -Pinput="' + master + '" -Pinput2="' + file + '" -Poutput="' + output_file + '"'
-            return_code = subprocess.call(call)
+                   '" -Pinput="' + master + '" -Pinput2="' + file + '" -Poutput="' + output_file + '" -c 2G -x'
+            return_code = subprocess.call(call, shell=True)
             logging.info(return_code)
             logging.info(datetime.now())
 
@@ -401,8 +401,8 @@ class SARPreProcessor(PreProcessor):
                            '" -Pname_change_vh_single="' + name_change_vh_single + \
                            '" -Pname_change_vv_norm_single="' + name_change_vv_norm_single + \
                            '" -Pname_change_vh_norm_single="' + name_change_vh_norm_single + \
-                           '" -Plist_bands_single_speckle_filter="' + list_bands_single_speckle_filter + '"'
-                    return_code = subprocess.call(call)
+                           '" -Plist_bands_single_speckle_filter="' + list_bands_single_speckle_filter + '" -c 2G -x'
+                    return_code = subprocess.call(call, shell=True)
                     logging.info(return_code)
                     logging.info(datetime.now())
 
