@@ -141,6 +141,7 @@ class SARPreProcessor(PreProcessor):
     def create_processing_file_list(self):
         # create filelist
         self.file_list = SARList(config=self.config).create_list()
+        return self.file_list
 
     def pre_process_step1(self):
         """
