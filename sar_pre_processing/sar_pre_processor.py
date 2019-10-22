@@ -15,6 +15,8 @@ import subprocess
 from netCDF4 import Dataset
 from typing import List
 
+logging.getLogger().setLevel(logging.INFO)
+
 
 class PreProcessor(object):
 
@@ -192,7 +194,7 @@ class SARPreProcessor(PreProcessor):
             normalisation_angle = '35'
             logging.info('normalisation angle not specified, default value of 35 is used for processing')
         for file in self.file_list[0]:
-            logging.info('Scene ', self.file_list[0].index(file) + 1, ' of ', len(self.file_list[0]))
+            logging.info(f'Scene {self.file_list[0].index(file) + 1} of {len(self.file_list[0])}')
             self._gpt_step1(file, None, area, normalisation_angle, self.config.xml_graph_pre_process_step1)
         for i, file in enumerate(self.file_list[1][::2]):
             file_list2 = self.file_list[1][1::2]
@@ -204,7 +206,7 @@ class SARPreProcessor(PreProcessor):
         # Divide filename
         filepath, filename, fileshortname, extension = self._decompose_filename(file)
         # Call SNAP routine, xml file
-        logging.info('Process ', filename, ' with SNAP.')
+        logging.info(f'Process {filename} with SNAP.')
         output_file = os.path.join(self.config.output_folder_step1,
                                    fileshortname + self.name_addition_step1 + '.dim')
         area_part = ''
@@ -257,17 +259,17 @@ class SARPreProcessor(PreProcessor):
                     if os.path.exists(new_file_name) is True:
                         file_list.append(new_file_name)
                     else:
-                        logging.info('skip processing for %s. File does not exist' % file)
+                        logging.info(f'skip processing for {file}. File does not exist')
             file_list.sort()
         # Set Master image for co-registration
         master = file_list[0]
         # loop to co-register all found images to master image
         for file in file_list:
-            logging.info('Scene', file_list.index(file) + 1, 'of', len(file_list))
+            logging.info(f'Scene {file_list.index(file) + 1} of {len(file_list)}')
             # Divide filename
             filepath, filename, file_short_name, extension = self._decompose_filename(file)
             # Call SNAP routine, xml file
-            logging.info('Process ', filename, ' with SNAP.')
+            logging.info(f'Process {filename} with SNAP.')
             output_file = os.path.join(
                 self.config.output_folder_step2, file_short_name + self.name_addition_step2 + '.dim')
             call = '"' + self.config.gpt + '" "' + self.config.xml_graph_pre_process_step2 + \
@@ -310,7 +312,7 @@ class SARPreProcessor(PreProcessor):
                     if os.path.exists(new_file_name) is True:
                         file_list.append(new_file_name)
                     else:
-                        logging.info('skip processing for %s. File does not exists' % file)
+                        logging.info(f'skip processing for {file}. File does not exist')
         # Sort file list by date (hard coded position in filename!!!)
         file_path, filename, file_short_name, extension = self._decompose_filename(file_list[0])
         file_list.sort(key=lambda x: x[len(file_path) + 18:len(file_path) + 33])
