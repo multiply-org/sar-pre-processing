@@ -315,7 +315,7 @@ class SARPreProcessor(PreProcessor):
                     if os.path.exists(new_file_name) is True:
                         file_list.append(new_file_name)
                     else:
-                        logging.info(f'skip processing for {file}. File does not exist')
+                        logging.info(f'skip processing for {file}. File {new_file_name} does not exist.')
         # Sort file list by date (hard coded position in filename!!!)
         file_path, filename, file_short_name, extension = self._decompose_filename(file_list[0])
         file_list.sort(key=lambda x: x[len(file_path) + 18:len(file_path) + 33])
