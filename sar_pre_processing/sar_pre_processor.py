@@ -261,6 +261,9 @@ class SARPreProcessor(PreProcessor):
                     else:
                         logging.info(f'skip processing for {file}. File does not exist')
             file_list.sort()
+        if len(file_list) == 0:
+            logging.info('No valid files found for pre-processing step 2.')
+            return
         # Set Master image for co-registration
         master = file_list[0]
         # loop to co-register all found images to master image
