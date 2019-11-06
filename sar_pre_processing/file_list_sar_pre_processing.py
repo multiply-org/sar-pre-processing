@@ -2,6 +2,7 @@
 Create List of SAR data which will be processed by sar_pre_processer module
 """
 
+import logging
 import os
 import yaml
 import fnmatch
@@ -69,7 +70,7 @@ class SARList(object):
             else:
                 pass
 
-        print('Number of found files for year %s:' %year, len(filelist_new))
+        logging.info('Number of found files for year %s:' %year, len(filelist_new))
         return filelist_new
 
     def _check_location(self, file, location, output_folder):
