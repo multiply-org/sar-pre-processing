@@ -2,10 +2,11 @@
 
 from setuptools import setup
 
+# removed dependencies to prevent multiple installations
 requirements = [
-      'netCDF4',
-      'PyYAML',
-      'pytest'
+      # 'netCDF4',
+      # 'PyYAML',
+      # 'pytest'
       # 'sphinxcontrib-bibtex'
 ]
 
