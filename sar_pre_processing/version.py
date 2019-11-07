@@ -1,3 +1,1 @@
-import very_good_setuptools_git_version
-
-__version__= very_good_setuptools_git_version.get_tag()
+__version__= 'v0.4.dev'

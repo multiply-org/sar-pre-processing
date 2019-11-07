@@ -7,9 +7,8 @@ dependencies:
   - cftime
   - pip
   - pip:
-    - very-good-setuptools-git-version
+#    - very-good-setuptools-git-version
     - sphinxcontrib-bibtex
     - pyproj
     - netCDF4
     - xarray
-
