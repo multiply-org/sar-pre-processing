@@ -1,14 +1,14 @@
 
 # Input folder with SAR data (zip format)
-# input_folder: /media/nas_data/Thomas/S1/processed/MNI_2017
+input_folder: /media/nas_data/Thomas/S1/processed/MNI_2017
 # input_folder: /media/tweiss/Daten/test_preprocessing/data
 # input_folder: /media/nas_data/Thomas/Sentinel_1_data/biebrza_poland
 # input_folder: /media/nas_data/Thomas/Sentinel_1_data/foggia_italy
-input_folder: /media/nas_data/Thomas/S1/data/Wallerfing
+# input_folder: /media/nas_data/Thomas/S1/data/Wallerfing
 
 # Folder to store the pre-processed data
 # output_folder: /media/nas_data/Thomas/S1/processed/MNI_2017
-output_folder: /media/tweiss/Daten/test_preprocessing
+output_folder: /media/tweiss/Daten/test_preprocessing2
 # output_folder: /media/nas_data/Thomas/poland_processed
 # output_folder: /media/nas_data/Thomas/foggia_italy_processed
 
@@ -57,7 +57,7 @@ speckle_filter:
   single_filter:
     apply: 'yes'
 
-year: 2016
+year: 2018
 
 # normalisation_angle:
 
