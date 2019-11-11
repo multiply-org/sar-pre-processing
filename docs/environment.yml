@@ -6,10 +6,9 @@ dependencies:
   - python=3.6*
   - cftime
   - pip
-  - pip:
-    - very-good-setuptools-git-version
-    - sphinxcontrib-bibtex
-    - pyproj
-    - netCDF4
-    - xarray
-
+#  - pip:
+#    - very-good-setuptools-git-version
+#    - sphinxcontrib-bibtex
+#    - pyproj
+#    - netCDF4
+#    - xarray

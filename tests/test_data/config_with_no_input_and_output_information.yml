@@ -1,0 +1,93 @@
+requestName : request_test_all
+productionType : multiply-adapted-iterative-4
+simulation : False
+data_root : /data/m9
+
+General:
+    roi: 'POLYGON((-2.20397502663252 39.09868106889479,-1.9142106223355313 39.09868106889479,
+    -1.9142106223355313 38.94504502508093,-2.20397502663252 38.94504502508093,-2.20397502663252 39.09868106889479))'
+    roi_grid: 'EPSG:4326' # bounds given in WGS84
+    start_time: 2017-06-01
+    end_time: 2017-06-10
+    time_interval: 1 #days
+    spatial_resolution : 60 # metres
+    destination_grid: 'EPSG:32632' # destination to be given in UTM Zone 32N
+    state_mask: /home/user/multiply-inst/Barrax_pivots.tif
+    output_directory_root: /some/where/
+
+SAR:
+  gpt: \any\path\gpt  # Location of SNAP's graph-processing-tool
+  speckle_filter:
+    multi_temporal:
+      apply: 'yes'
+  region:
+    ul:
+      lat: 39.09868106889479
+      lon: -2.20397502663252
+    lr:
+      lat: 38.94504502508093
+      lon: -1.9142106223355313
+  year: 2017
+
+Inference: # inference config
+    parameters:
+        - n
+        - cab
+        - car
+        - cb
+        - cw
+        - cdm
+        - lai
+        - ala
+        - bsoil
+        - psoil
+    optical_operator_library: some_operator.nc   # Optional
+    sar_operator_library: some_other_operator.nc # Optional
+    a: identity
+    inflation: 1e3
+    time_interval: 1 # 1 day
+
+Prior:
+# Prior section conventions
+
+# - 1. sub-level contains all potential variables (sm, roughness, lai, ..)
+#   which are asked for/being inferred from Orchestrator/Inferrence Engine
+#   and for which prior information is provided.
+# - 2. sub-level contains prior type (ptype). These can be commented out
+#   to be omitted.
+  output_directory: /data/m10/priors/
+  General:
+     directory_data: /data/auxiliary/priors/Static/Vegetation/
+  lai:
+    database:
+        static_dir: 'same as General directory_data'
+  cab:
+    database:
+        static_dir: 'same as General directory_data'
+  car:
+    database:
+        static_dir: 'same as General directory_data'
+  cw:
+    database:
+        static_dir: 'same as General directory_data'
+  cdm:
+    database:
+        static_dir: 'same as General directory_data'
+  n:
+    database:
+        static_dir: 'same as General directory_data'
+  cb:
+    database:
+        static_dir: 'same as General directory_data'
+  cm:
+    database:
+        static_dir: 'same as General directory_data'
+  ala:
+    database:
+        static_dir: 'same as General directory_data'
+  bsoil:
+    database:
+        static_dir: 'same as General directory_data'
+  psoil:
+    database:
+        static_dir: 'same as General directory_data'
