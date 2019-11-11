@@ -289,8 +289,8 @@
       <estimateENL>true</estimateENL>
       <enl>1.0</enl>
       <numLooksStr>1</numLooksStr>
-      <windowSize>5x5</windowSize>
-      <targetWindowSizeStr>3x3</targetWindowSizeStr>
+      <windowSize>11x11</windowSize>
+      <targetWindowSizeStr>5x5</targetWindowSizeStr>
       <sigmaStr>0.9</sigmaStr>
       <anSize>50</anSize>
     </parameters>

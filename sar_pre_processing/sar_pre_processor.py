@@ -559,10 +559,10 @@ if __name__ == "__main__":
     processing._create_processing_filelist()
     # processing.pre_process_step1()
     # processing.pre_process_step2()
-    # processing.pre_process_step3()
-    # subprocess.call(os.path.join(os.getcwd(),'projection_problem.sh ' + processing.config.output_folder_step3), shell=True)
-    # processing.netcdf_information()
-    # NetcdfStack(input_folder=processing.config.output_folder_step3, output_path=processing.config.output_folder_step3.rsplit('/', 1)[0] , output_filename=processing.config.output_folder_step3.rsplit('/', 2)[1])
+    processing.pre_process_step3()
+    subprocess.call(os.path.join(os.getcwd(),'projection_problem.sh ' + processing.config.output_folder_step3), shell=True)
+    processing.netcdf_information()
+    NetcdfStack(input_folder=processing.config.output_folder_step3, output_path=processing.config.output_folder_step3.rsplit('/', 1)[0] , output_filename=processing.config.output_folder_step3.rsplit('/', 2)[1])
 
     print('finished')
 
