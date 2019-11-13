@@ -197,6 +197,7 @@ class SARPreProcessor(PreProcessor):
         for file in self.file_list[0]:
             logging.info(f'Scene {self.file_list[0].index(file) + 1} of {len(self.file_list[0])}')
             self._gpt_step1(file, None, area, normalisation_angle, self.config.xml_graph_pre_process_step1)
+
         for i, file in enumerate(self.file_list[1][::2]):
             file_list2 = self.file_list[1][1::2]
             if i < len(file_list2):
@@ -219,6 +220,7 @@ class SARPreProcessor(PreProcessor):
         call = '"' + self.config.gpt + '" "' + script_path + \
                '" -Pinput="' + file + '"' + file2_part + ' -Poutput="' + output_file + \
                '" -Pangle="' + normalisation_angle + '" ' + area_part + '-c 2G -x'
+        pdb.set_trace()
         return_code = subprocess.call(call, shell=True)
         logging.info(return_code)
 
@@ -428,11 +430,12 @@ class SARPreProcessor(PreProcessor):
             date = datetime.strptime(file_short_name[17:32], '%Y%m%dT%H%M%S')
 
             data_set = Dataset(file, 'r+', format="NETCDF4")
-            try:
-                data_set.delncattr('start_date', str(date))
-                data_set.delncattr('stop_date', str(date))
-            except RuntimeError:
-                logging.warning('A runtime error has occurred')
+
+            # try:
+            #     data_set.delncattr('start_date', str(date))
+            #     data_set.delncattr('stop_date', str(date))
+            # except RuntimeError:
+            #     logging.warning('A runtime error has occurred')
 
             data_set.setncattr_string('date', str(date))
             # extract orbit direction from metadata
@@ -484,13 +487,13 @@ if __name__ == "__main__":
     processing = SARPreProcessor(config='sample_config_file.yml')
     processing.create_processing_file_list()
     processing.pre_process_step1()
-    processing.pre_process_step2()
-    processing.pre_process_step3()
-    subprocess.call(os.path.join(os.getcwd(),'projection_problem.sh ' + processing.config.output_folder_step3),
-    shell=True)
-    processing.netcdf_information()
-    NetcdfStack(input_folder=processing.config.output_folder_step3,
-    output_path=processing.config.output_folder_step3.rsplit('/', 1)[0] ,
-    output_filename=processing.config.output_folder_step3.rsplit('/', 2)[1])
+    # processing.pre_process_step2()
+    # processing.pre_process_step3()
+    # subprocess.call(os.path.join(os.getcwd(),'projection_problem.sh ' + processing.config.output_folder_step3),
+    # shell=True)
+    # processing.netcdf_information()
+    # NetcdfStack(input_folder=processing.config.output_folder_step3,
+    # output_path=processing.config.output_folder_step3.rsplit('/', 1)[0] ,
+    # output_filename=processing.config.output_folder_step3.rsplit('/', 2)[1])
     logging.info('finished')
 
