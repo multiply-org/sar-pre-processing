@@ -8,12 +8,13 @@ import pkg_resources
 import yaml
 import fnmatch
 import xml.etree.ElementTree as ETree
-from datetime import datetime
+from .datetime import datetime
 from .attribute_dict import AttributeDict
-from .file_list_sar_pre_processing import SARList
+from file_list_sar_pre_processing import SARList
 import subprocess
 from netCDF4 import Dataset
 from typing import List
+import math
 
 logging.getLogger().setLevel(logging.INFO)
 
@@ -328,18 +329,17 @@ class SARPreProcessor(PreProcessor):
                 assert self.config.xml_graph_pre_process_step3 is not None, \
                     'ERROR: path of XML file for pre-processing step 3 is not not specified'
                 # loop to apply multi-temporal filtering
-                # right now 15 scenes if possible 7 before and 7 after multi-temporal filtered scene,
                 # vv and vh polarisation are separated
                 # use the speckle filter algorithm metadata? metadata for date might be wrong!!!
                 for i, file in enumerate(file_list):
-                    # apply speckle filter on 15 scenes if possible 7 before and 7 after the scene of interest
-                    # what happens if there are less then 15 scenes available
-                    if i < 2:
-                        processing_file_list = file_list[0:5]
-                    elif i <= len(file_list) - 3:
-                        processing_file_list = file_list[i - 2:i + 3]
+                    # what happens if there are less then in config file specified scenes available ???
+                    files_temporal_filter = int(self.config.speckle_filter.multi_temporal.files)
+                    if i < math.floor(files_temporal_filter/2):
+                        processing_file_list = file_list[0:files_temporal_filter]
+                    elif i <= len(file_list) - math.ceil(files_temporal_filter/2):
+                        processing_file_list = file_list[i - math.floor(files_temporal_filter/2):i + math.ceil(files_temporal_filter/2)]
                     else:
-                        processing_file_list = file_list[i - 2 - (3 - (len(file_list) - i)):len(file_list)]
+                        processing_file_list = file_list[i - math.floor(files_temporal_filter/2) - (math.ceil(files_temporal_filter/2) - (len(file_list) - i)):len(file_list)]
                     file_path, filename, file_short_name, extension = self._decompose_filename(file)
                     a, a, b, a = self._decompose_filename(self._create_file_list(
                         os.path.join(file_path, file_short_name + '.data'), '*_slv1_*.img')[0])
@@ -482,9 +482,9 @@ class SARPreProcessor(PreProcessor):
 
 
 if __name__ == "__main__":
-    processing = SARPreProcessor(config='sample_config_file.yml')
-    processing.create_processing_file_list()
-    processing.pre_process_step1()
+    # processing = SARPreProcessor(config='sample_config_file.yml')
+    # processing.create_processing_file_list()
+    # processing.pre_process_step1()
     # processing.pre_process_step2()
     # processing.pre_process_step3()
     # subprocess.call(os.path.join(os.getcwd(),'projection_problem.sh ' + processing.config.output_folder_step3),
