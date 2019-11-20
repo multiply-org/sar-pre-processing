@@ -11,7 +11,7 @@ import zipfile
 import shutil
 import xml.etree.ElementTree as etree
 from osgeo import ogr
-from attribute_dict import AttributeDict
+from .attribute_dict import AttributeDict
 
 
 class SARList(object):
