@@ -8,7 +8,7 @@ import pkg_resources
 import yaml
 import fnmatch
 import xml.etree.ElementTree as ETree
-from .datetime import datetime
+from datetime import datetime
 from .attribute_dict import AttributeDict
 from .file_list_sar_pre_processing import SARList
 import subprocess
@@ -102,7 +102,7 @@ class SARPreProcessor(PreProcessor):
                 else:
                     raise UserWarning(f'Could not determine location of {self.config[key_name]}.')
         else:
-            default_graph = pkg_resources.resource_filename('default_graphs', default_name)
+            default_graph = pkg_resources.resource_filename('sar_pre_processing.default_graphs', default_name)
             self.config.add_entry(key_name, default_graph)
 
     def set_file_list(self, file_list: List[str]):
