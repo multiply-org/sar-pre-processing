@@ -10,7 +10,7 @@ import fnmatch
 import xml.etree.ElementTree as ETree
 from .datetime import datetime
 from .attribute_dict import AttributeDict
-from file_list_sar_pre_processing import SARList
+from .file_list_sar_pre_processing import SARList
 import subprocess
 from netCDF4 import Dataset
 from typing import List
