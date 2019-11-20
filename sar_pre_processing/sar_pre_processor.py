@@ -14,7 +14,6 @@ from .file_list_sar_pre_processing import SARList
 import subprocess
 from netCDF4 import Dataset
 from typing import List
-import pdb
 
 logging.getLogger().setLevel(logging.INFO)
 
@@ -220,7 +219,6 @@ class SARPreProcessor(PreProcessor):
         call = '"' + self.config.gpt + '" "' + script_path + \
                '" -Pinput="' + file + '"' + file2_part + ' -Poutput="' + output_file + \
                '" -Pangle="' + normalisation_angle + '" ' + area_part + '-c 2G -x'
-        pdb.set_trace()
         return_code = subprocess.call(call, shell=True)
         logging.info(return_code)
 
