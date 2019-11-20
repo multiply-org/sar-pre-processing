@@ -70,7 +70,8 @@ class SARList(object):
             else:
                 pass
 
-        logging.info('Number of found files for year %s:' %year, len(filelist_new))
+        logging.info('Number of found files for year %s: %s' %(year, len(filelist_new)))
+        # logging.info(f'Number of found files for year {year}: {len(filelist_new)}')
         return filelist_new
 
     def _check_location(self, file, location, output_folder):
