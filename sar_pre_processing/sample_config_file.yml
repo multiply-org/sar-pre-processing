@@ -63,7 +63,7 @@ region:
 speckle_filter:
   multi_temporal:
     apply: 'yes'
-    files: 5
+    files: '5'
   single_filter:
     apply: 'yes'
 
