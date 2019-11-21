@@ -20,6 +20,6 @@ setup(name='multiply-sar-pre-processing',
       author='MULTIPLY Team',
       packages=['sar_pre_processing'],
       install_requires=requirements,
-      package_data={'sar_pre_processing.default_graphs': ['pre_process_step1.xml', 'pre_process_step1_border.xml', 'pre_process_step2.xml', 'pre_process_step3.xml'],
+      package_data={'sar_pre_processing.default_graphs': ['pre_process_step1.xml', 'pre_process_step1_border.xml', 'pre_process_step2.xml', 'pre_process_step3.xml'],'sar_pre_processing': ['projection_problem.sh']
     },
 )
