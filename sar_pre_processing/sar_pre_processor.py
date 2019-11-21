@@ -481,6 +481,8 @@ class SARPreProcessor(PreProcessor):
         sh_file = pkg_resources.resource_filename('sar_pre_processing','projection_problem.sh')
         subprocess.call(sh_file + ' ' + self.config.output_folder_step3, shell=True)
 
+    def run_NetcdfStack(self):
+        NetcdfStack(input_folder=self.config.output_folder_step3, output_path=self.config.output_folder_step3.rsplit('/', 1)[0], output_filename=self.config.output_folder_step3.rsplit('/', 2)[1])
 
 
 """run script"""
@@ -494,8 +496,6 @@ if __name__ == "__main__":
     # processing.pre_process_step3()
     # processing.projection_problem()
     # processing.netcdf_information()
-    # NetcdfStack(input_folder=processing.config.output_folder_step3,
-    # output_path=processing.config.output_folder_step3.rsplit('/', 1)[0] ,
-    # output_filename=processing.config.output_folder_step3.rsplit('/', 2)[1])
-    logging.info('finished')
+    # processing.run_NetcdfStack()
+    # logging.info('finished')
 
