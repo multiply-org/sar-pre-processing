@@ -7,8 +7,6 @@ import xml.etree.ElementTree as etree
 from datetime import datetime, date
 from dateutil import parser
 
-import pdb
-
 class NetcdfStack(object):
 
     def __init__(self, **kwargs):
@@ -167,25 +165,3 @@ class NetcdfStack(object):
             self.sigma0_vh_tempspeckl[index,:,:] = data.variables['sigma0_vh_norm_multi'][:]
 
         self.dataset.close()
-
-
-
-# pdb.set_trace()
-
-
-
-# # create 2-D variables
-# latitude = dataset.createVariable('latitude', np.float32,('lon','lat'), fill_value=-99999)
-# longitude = dataset.createVariable('longitude', np.float32,('lon','lat'), fill_value=-99999)
-# elevation = dataset.createVariable('elevation', np.float32,('lon','lat'), fill_value=-99999)
-# pdb.set_trace()
-# # fill 2-D variables
-# latitude[:,:] = data.variables['latitude_slv6_' + date_file_tag][:]
-# latitude.units = 'degree_north'
-# longitude[:,:] = data.variables['longitude_slv7_' +date_file_tag][:]
-# longitude.units = 'degree_east'
-# elevation[:,:] = data.variables['elevation_slv5_' +date_file_tag][:]
-# elevation.units = 'meters'
-# pdb.set_trace()
-
-
