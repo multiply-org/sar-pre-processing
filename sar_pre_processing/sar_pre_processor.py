@@ -477,6 +477,11 @@ class SARPreProcessor(PreProcessor):
             elif file_short_name[0:3] == 'S1B':
                 data_set.setncattr_string('satellite', 'S1B')
 
+    def projection_problem(self):
+        sh_file = pkg_resources.resource_filename('sar_pre_processing','projection_problem.sh')
+        subprocess.call(sh_file + ' ' + self.config.output_folder_step3, shell=True)
+
+
 
 """run script"""
 
@@ -487,8 +492,7 @@ if __name__ == "__main__":
     # processing.pre_process_step1()
     # processing.pre_process_step2()
     # processing.pre_process_step3()
-    # subprocess.call(os.path.join(os.getcwd(),'projection_problem.sh ' + processing.config.output_folder_step3),
-    # shell=True)
+    # processing.projection_problem()
     # processing.netcdf_information()
     # NetcdfStack(input_folder=processing.config.output_folder_step3,
     # output_path=processing.config.output_folder_step3.rsplit('/', 1)[0] ,
