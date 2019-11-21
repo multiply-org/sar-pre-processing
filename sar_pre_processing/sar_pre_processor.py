@@ -430,11 +430,11 @@ class SARPreProcessor(PreProcessor):
 
             data_set = Dataset(file, 'r+', format="NETCDF4")
 
-            # try:
-            #     data_set.delncattr('start_date', str(date))
-            #     data_set.delncattr('stop_date', str(date))
-            # except RuntimeError:
-            #     logging.warning('A runtime error has occurred')
+            try:
+                data_set.delncattr('start_date')
+                data_set.delncattr('stop_date')
+            except RuntimeError:
+                logging.warning('A runtime error has occurred')
 
             data_set.setncattr_string('date', str(date))
             # extract orbit direction from metadata
