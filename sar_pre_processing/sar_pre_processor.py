@@ -14,6 +14,7 @@ from .file_list_sar_pre_processing import SARList
 import subprocess
 from netCDF4 import Dataset
 from typing import List
+from .netcdf_stack import NetcdfStack
 import math
 
 logging.getLogger().setLevel(logging.INFO)
@@ -482,13 +483,13 @@ class SARPreProcessor(PreProcessor):
         subprocess.call(sh_file + ' ' + self.config.output_folder_step3, shell=True)
 
     def run_NetcdfStack(self):
-        NetcdfStack(input_folder=self.config.output_folder_step3, output_path=self.config.output_folder_step3.rsplit('/', 1)[0], output_filename=self.config.output_folder_step3.rsplit('/', 2)[1])
+        NetcdfStack(input_folder=self.config.output_folder_step3, output_path=self.config.output_folder_step3.rsplit('/', 1)[0] , output_filename=self.config.output_folder_step3.rsplit('/', 2)[1])
 
 
 """run script"""
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
     # processing = SARPreProcessor(config='sample_config_file.yml')
     # processing.create_processing_file_list()
     # processing.pre_process_step1()
