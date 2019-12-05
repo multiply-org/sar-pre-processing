@@ -335,12 +335,14 @@ class SARPreProcessor(PreProcessor):
                 for i, file in enumerate(file_list):
                     # what happens if there are less then in config file specified scenes available ???
                     files_temporal_filter = int(self.config.speckle_filter.multi_temporal.files)
-                    if i < math.floor(files_temporal_filter/2):
+                    if i < math.floor(files_temporal_filter / 2):
                         processing_file_list = file_list[0:files_temporal_filter]
-                    elif i <= len(file_list) - math.ceil(files_temporal_filter/2):
-                        processing_file_list = file_list[i - math.floor(files_temporal_filter/2):i + math.ceil(files_temporal_filter/2)]
+                    elif i <= len(file_list) - math.ceil(files_temporal_filter / 2):
+                        processing_file_list = file_list[i - math.floor(files_temporal_filter / 2):i + math.ceil(
+                            files_temporal_filter / 2)]
                     else:
-                        processing_file_list = file_list[i - math.floor(files_temporal_filter/2) - (math.ceil(files_temporal_filter/2) - (len(file_list) - i)):len(file_list)]
+                        processing_file_list = file_list[i - math.floor(files_temporal_filter / 2) - (
+                                    math.ceil(files_temporal_filter / 2) - (len(file_list) - i)):len(file_list)]
                     file_path, filename, file_short_name, extension = self._decompose_filename(file)
                     a, a, b, a = self._decompose_filename(self._create_file_list(
                         os.path.join(file_path, file_short_name + '.data'), '*_slv1_*.img')[0])
@@ -470,7 +472,7 @@ class SARPreProcessor(PreProcessor):
                         for iiii in iii.findall('MDATTR'):
                             r = iiii.get('name')
                             if r == 'radar_frequency':
-                                frequency = float(iiii.text)/1000.
+                                frequency = float(iiii.text) / 1000.
                                 data_set.setncattr_string('frequency', str(frequency))
             # extract satellite name from name tag
             if file_short_name[0:3] == 'S1A':
@@ -479,28 +481,26 @@ class SARPreProcessor(PreProcessor):
                 data_set.setncattr_string('satellite', 'S1B')
 
     def projection_problem(self):
-        sh_file = pkg_resources.resource_filename('sar_pre_processing','projection_problem.sh')
+        sh_file = pkg_resources.resource_filename('sar_pre_processing', 'projection_problem.sh')
         subprocess.call(sh_file + ' ' + self.config.output_folder_step3, shell=True)
 
-    def run_NetcdfStack(self, filename: Optional[str]=None):
+    def run_NetcdfStack(self, filename: Optional[str] = None):
         if filename is None:
-            filename=self.config.output_folder_step3.rsplit('/', 2)[1]
+            filename = self.config.output_folder_step3.rsplit('/', 2)[1]
         NetcdfStack(input_folder=self.config.output_folder_step3,
-                    output_path=self.config.output_folder_step3.rsplit('/', 1)[0] ,
+                    output_path=self.config.output_folder_step3.rsplit('/', 1)[0],
                     output_filename=filename)
 
 
 """run script"""
 
-
 # if __name__ == "__main__":
-    # processing = SARPreProcessor(config='sample_config_file.yml')
-    # processing.create_processing_file_list()
-    # processing.pre_process_step1()
-    # processing.pre_process_step2()
-    # processing.pre_process_step3()
-    # processing.projection_problem()
-    # processing.netcdf_information()
-    # processing.run_NetcdfStack()
-    # logging.info('finished')
-
+# processing = SARPreProcessor(config='sample_config_file.yml')
+# processing.create_processing_file_list()
+# processing.pre_process_step1()
+# processing.pre_process_step2()
+# processing.pre_process_step3()
+# processing.projection_problem()
+# processing.netcdf_information()
+# processing.run_NetcdfStack()
+# logging.info('finished')
