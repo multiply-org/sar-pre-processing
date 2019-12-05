@@ -13,7 +13,7 @@ from .attribute_dict import AttributeDict
 from .file_list_sar_pre_processing import SARList
 import subprocess
 from netCDF4 import Dataset
-from typing import List
+from typing import List, Optional
 from .netcdf_stack import NetcdfStack
 import math
 
@@ -482,8 +482,12 @@ class SARPreProcessor(PreProcessor):
         sh_file = pkg_resources.resource_filename('sar_pre_processing','projection_problem.sh')
         subprocess.call(sh_file + ' ' + self.config.output_folder_step3, shell=True)
 
-    def run_NetcdfStack(self):
-        NetcdfStack(input_folder=self.config.output_folder_step3, output_path=self.config.output_folder_step3.rsplit('/', 1)[0] , output_filename=self.config.output_folder_step3.rsplit('/', 2)[1])
+    def run_NetcdfStack(self, filename: Optional[str]=None):
+        if filename is None:
+            filename=self.config.output_folder_step3.rsplit('/', 2)[1]
+        NetcdfStack(input_folder=self.config.output_folder_step3,
+                    output_path=self.config.output_folder_step3.rsplit('/', 1)[0] ,
+                    output_filename=filename)
 
 
 """run script"""
