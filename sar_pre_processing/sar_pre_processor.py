@@ -207,11 +207,11 @@ class SARPreProcessor(PreProcessor):
         for i, file in enumerate(self.file_list[0]):
             # logging.info(f'Scene {self.file_list[0].index(file) + 1} of {len(self.file_list[0])}')
             logging.info(f'Scene {i + 1} of {len(self.file_list[0])}')
-            component_progress_logger.info(f'{(i / total_num_files) * 100}')
+            component_progress_logger.info(f'{int((i / total_num_files) * 100)}')
             self._gpt_step1(file, None, area, normalisation_angle, self.config.xml_graph_pre_process_step1)
 
         for i, file in enumerate(self.file_list[1][::2]):
-            component_progress_logger.info(f'{((len(self.file_list[0]) + i) / total_num_files) * 100}')
+            component_progress_logger.info(f'{int(((len(self.file_list[0]) + i) / total_num_files) * 100)}')
             file_list2 = self.file_list[1][1::2]
             if i < len(file_list2):
                 file2 = file_list2[i]
@@ -283,7 +283,7 @@ class SARPreProcessor(PreProcessor):
         master = file_list[0]
         # loop to co-register all found images to master image
         for i, file in enumerate(file_list):
-            component_progress_logger.info(f'{(i / len(file_list)) * 100}')
+            component_progress_logger.info(f'{int((i / len(file_list)) * 100)}')
             logging.info(f'Scene {file_list.index(file) + 1} of {len(file_list)}')
             # Divide filename
             filepath, filename, file_short_name, extension = self._decompose_filename(file)
@@ -347,7 +347,7 @@ class SARPreProcessor(PreProcessor):
                 # vv and vh polarisation are separated
                 # use the speckle filter algorithm metadata? metadata for date might be wrong!!!
                 for i, file in enumerate(file_list):
-                    component_progress_logger.info(f'{(index / len(file_list_old)) * 100}')
+                    component_progress_logger.info(f'{int((index / len(file_list_old)) * 100)}')
                     # what happens if there are less then in config file specified scenes available ???
                     files_temporal_filter = int(self.config.speckle_filter.multi_temporal.files)
                     if i < math.floor(files_temporal_filter / 2):
