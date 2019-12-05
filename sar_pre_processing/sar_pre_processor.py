@@ -450,8 +450,8 @@ class SARPreProcessor(PreProcessor):
             data_set = Dataset(file, 'r+', format="NETCDF4")
 
             try:
-                data_set.delncattr('start_date', str(start_date))
-                data_set.delncattr('stop_date', str(stop_date))
+                data_set.delncattr('start_date')
+                data_set.delncattr('stop_date')
             except RuntimeError:
                 logging.warning('A runtime error has occurred')
 
