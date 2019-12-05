@@ -480,8 +480,8 @@ class SARPreProcessor(PreProcessor):
             elif file_short_name[0:3] == 'S1B':
                 data_set.setncattr_string('satellite', 'S1B')
 
-    def projection_problem(self):
-        sh_file = pkg_resources.resource_filename('sar_pre_processing', 'projection_problem.sh')
+    def solve_projection_problem(self):
+        sh_file = pkg_resources.resource_filename('sar_pre_processing', 'solve_projection_problem.sh')
         subprocess.call(sh_file + ' ' + self.config.output_folder_step3, shell=True)
 
     def run_NetcdfStack(self, filename: Optional[str] = None):
