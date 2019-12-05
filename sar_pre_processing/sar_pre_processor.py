@@ -14,7 +14,7 @@ from .file_list_sar_pre_processing import SARList
 import subprocess
 from netCDF4 import Dataset
 from typing import List, Optional
-from .netcdf_stack import NetcdfStack
+from .netcdf_stack import NetcdfStackCreator
 import math
 
 logging.getLogger().setLevel(logging.INFO)
@@ -342,7 +342,7 @@ class SARPreProcessor(PreProcessor):
                             files_temporal_filter / 2)]
                     else:
                         processing_file_list = file_list[i - math.floor(files_temporal_filter / 2) - (
-                                    math.ceil(files_temporal_filter / 2) - (len(file_list) - i)):len(file_list)]
+                                math.ceil(files_temporal_filter / 2) - (len(file_list) - i)):len(file_list)]
                     file_path, filename, file_short_name, extension = self._decompose_filename(file)
                     a, a, b, a = self._decompose_filename(self._create_file_list(
                         os.path.join(file_path, file_short_name + '.data'), '*_slv1_*.img')[0])
@@ -485,12 +485,13 @@ class SARPreProcessor(PreProcessor):
         sh_file = pkg_resources.resource_filename('sar_pre_processing', 'solve_projection_problem.sh')
         subprocess.call(sh_file + ' ' + self.config.output_folder_step3, shell=True)
 
-    def run_NetcdfStack(self, filename: Optional[str] = None):
+    def create_netcdf_stack(self, filename: Optional[str] = None):
         if filename is None:
             filename = self.config.output_folder_step3.rsplit('/', 2)[1]
-        NetcdfStack(input_folder=self.config.output_folder_step3,
-                    output_path=self.config.output_folder_step3.rsplit('/', 1)[0],
-                    output_filename=filename)
+        stack_creator = NetcdfStackCreator(input_folder=self.config.output_folder_step3,
+                                           output_path=self.config.output_folder_step3.rsplit('/', 1)[0],
+                                           output_filename=filename)
+        stack_creator.create_netcdf_stack()
 
 
 """run script"""
@@ -501,7 +502,7 @@ class SARPreProcessor(PreProcessor):
 # processing.pre_process_step1()
 # processing.pre_process_step2()
 # processing.pre_process_step3()
-# processing.projection_problem()
-# processing.netcdf_information()
-# processing.run_NetcdfStack()
+# processing.solve_projection_problem()
+# processing.add_netcdf_information()
+# processing.create_netcdf_stack()
 # logging.info('finished')
