@@ -417,7 +417,7 @@ class SARPreProcessor(PreProcessor):
                     logging.info(return_code)
                     logging.info(datetime.now())
 
-    def netcdf_information(self):
+    def add_netcdf_information(self):
         # input folder
         input_folder = self.config.output_folder_step3
         expression = '*.nc'
