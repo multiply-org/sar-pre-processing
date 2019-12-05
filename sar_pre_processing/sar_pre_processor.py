@@ -428,17 +428,18 @@ class SARPreProcessor(PreProcessor):
             file_path, filename, file_short_name, extension = self._decompose_filename(file)
             file_path2 = self.config.output_folder_step1
             # extract date from filename
-            date = datetime.strptime(file_short_name[17:32], '%Y%m%dT%H%M%S')
+            start_date = datetime.strptime(file_short_name[17:32], '%Y%m%dT%H%M%S')
+            stop_date = datetime.strptime(file_short_name[33:48], '%Y%m%dT%H%M%S')
 
             data_set = Dataset(file, 'r+', format="NETCDF4")
 
             try:
-                data_set.delncattr('start_date')
-                data_set.delncattr('stop_date')
+                data_set.delncattr('start_date', str(start_date))
+                data_set.delncattr('stop_date', str(stop_date))
             except RuntimeError:
                 logging.warning('A runtime error has occurred')
 
-            data_set.setncattr_string('date', str(date))
+            data_set.setncattr_string('date', str(start_date))
             # extract orbit direction from metadata
             metadata = ETree.parse(os.path.join(file_path2, filename[0:79] + '.dim'))
             for i in metadata.findall('Dataset_Sources'):
