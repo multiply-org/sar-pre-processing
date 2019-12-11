@@ -4,26 +4,26 @@ import xarray as xr
 import numpy as np
 import os, fnmatch
 import xml.etree.ElementTree as etree
-from datetime import datetime, date
 from dateutil import parser
 
-import pdb
 
-class NetcdfStack(object):
+class NetcdfStackCreator(object):
 
     def __init__(self, **kwargs):
         self.input_folder = kwargs.get('input_folder', None)
         self.output_path = kwargs.get('output_path', None)
         self.output_filename = kwargs.get('output_filename', None)
         self._check()
-        self._create_filelist()
-        self._create_empty_netcdf_file()
-        self.stacking()
 
     def _check(self):
         assert self.input_folder is not None, 'ERROR: Folder with input files need to be specified'
         assert self.output_path is not None, 'ERROR: Path of output file need to be provided'
         assert self.output_filename is not None, 'ERROR: Name of output file need to be provided'
+
+    def create_netcdf_stack(self):
+        self._create_filelist()
+        self._create_empty_netcdf_file()
+        self.stacking()
 
     def _create_filelist(self):
         """create a list containing all file in specified input folder"""
@@ -167,25 +167,3 @@ class NetcdfStack(object):
             self.sigma0_vh_tempspeckl[index,:,:] = data.variables['sigma0_vh_norm_multi'][:]
 
         self.dataset.close()
-
-
-
-# pdb.set_trace()
-
-
-
-# # create 2-D variables
-# latitude = dataset.createVariable('latitude', np.float32,('lon','lat'), fill_value=-99999)
-# longitude = dataset.createVariable('longitude', np.float32,('lon','lat'), fill_value=-99999)
-# elevation = dataset.createVariable('elevation', np.float32,('lon','lat'), fill_value=-99999)
-# pdb.set_trace()
-# # fill 2-D variables
-# latitude[:,:] = data.variables['latitude_slv6_' + date_file_tag][:]
-# latitude.units = 'degree_north'
-# longitude[:,:] = data.variables['longitude_slv7_' +date_file_tag][:]
-# longitude.units = 'degree_east'
-# elevation[:,:] = data.variables['elevation_slv5_' +date_file_tag][:]
-# elevation.units = 'meters'
-# pdb.set_trace()
-
-

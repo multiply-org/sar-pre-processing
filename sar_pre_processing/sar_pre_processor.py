@@ -13,9 +13,19 @@ from .attribute_dict import AttributeDict
 from .file_list_sar_pre_processing import SARList
 import subprocess
 from netCDF4 import Dataset
-from typing import List
+from typing import List, Optional
+from .netcdf_stack import NetcdfStackCreator
+import math
 
 logging.getLogger().setLevel(logging.INFO)
+# Set up logging
+component_progress_logger = logging.getLogger('ComponentProgress')
+component_progress_logger.setLevel(logging.INFO)
+component_progress_formatter = logging.Formatter('%(levelname)s:%(name)s:%(message)s')
+component_progress_logging_handler = logging.StreamHandler()
+component_progress_logging_handler.setLevel(logging.INFO)
+component_progress_logging_handler.setFormatter(component_progress_formatter)
+component_progress_logger.addHandler(component_progress_logging_handler)
 
 
 class PreProcessor(object):
@@ -193,10 +203,15 @@ class SARPreProcessor(PreProcessor):
         except AttributeError:
             normalisation_angle = '35'
             logging.info('normalisation angle not specified, default value of 35 is used for processing')
-        for file in self.file_list[0]:
-            logging.info(f'Scene {self.file_list[0].index(file) + 1} of {len(self.file_list[0])}')
+        total_num_files = len(self.file_list[0]) + len(self.file_list[1])
+        for i, file in enumerate(self.file_list[0]):
+            # logging.info(f'Scene {self.file_list[0].index(file) + 1} of {len(self.file_list[0])}')
+            logging.info(f'Scene {i + 1} of {len(self.file_list[0])}')
+            component_progress_logger.info(f'{int((i / total_num_files) * 100)}')
             self._gpt_step1(file, None, area, normalisation_angle, self.config.xml_graph_pre_process_step1)
+
         for i, file in enumerate(self.file_list[1][::2]):
+            component_progress_logger.info(f'{int(((len(self.file_list[0]) + i) / total_num_files) * 100)}')
             file_list2 = self.file_list[1][1::2]
             if i < len(file_list2):
                 file2 = file_list2[i]
@@ -267,7 +282,8 @@ class SARPreProcessor(PreProcessor):
         # Set Master image for co-registration
         master = file_list[0]
         # loop to co-register all found images to master image
-        for file in file_list:
+        for i, file in enumerate(file_list):
+            component_progress_logger.info(f'{int((i / len(file_list)) * 100)}')
             logging.info(f'Scene {file_list.index(file) + 1} of {len(file_list)}')
             # Divide filename
             filepath, filename, file_short_name, extension = self._decompose_filename(file)
@@ -320,6 +336,7 @@ class SARPreProcessor(PreProcessor):
         file_path, filename, file_short_name, extension = self._decompose_filename(file_list[0])
         file_list.sort(key=lambda x: x[len(file_path) + 18:len(file_path) + 33])
         file_list_old = file_list
+        index = 0
         for sensor in ['S1A', 'S1B']:
             file_list = [k for k in file_list_old if sensor in k]
             if self.config.speckle_filter.multi_temporal.apply == 'yes':
@@ -327,18 +344,20 @@ class SARPreProcessor(PreProcessor):
                 assert self.config.xml_graph_pre_process_step3 is not None, \
                     'ERROR: path of XML file for pre-processing step 3 is not not specified'
                 # loop to apply multi-temporal filtering
-                # right now 15 scenes if possible 7 before and 7 after multi-temporal filtered scene,
                 # vv and vh polarisation are separated
                 # use the speckle filter algorithm metadata? metadata for date might be wrong!!!
                 for i, file in enumerate(file_list):
-                    # apply speckle filter on 15 scenes if possible 7 before and 7 after the scene of interest
-                    # what happens if there are less then 15 scenes available
-                    if i < 2:
-                        processing_file_list = file_list[0:5]
-                    elif i <= len(file_list) - 3:
-                        processing_file_list = file_list[i - 2:i + 3]
+                    component_progress_logger.info(f'{int((index / len(file_list_old)) * 100)}')
+                    # what happens if there are less then in config file specified scenes available ???
+                    files_temporal_filter = int(self.config.speckle_filter.multi_temporal.files)
+                    if i < math.floor(files_temporal_filter / 2):
+                        processing_file_list = file_list[0:files_temporal_filter]
+                    elif i <= len(file_list) - math.ceil(files_temporal_filter / 2):
+                        processing_file_list = file_list[i - math.floor(files_temporal_filter / 2):i + math.ceil(
+                            files_temporal_filter / 2)]
                     else:
-                        processing_file_list = file_list[i - 2 - (3 - (len(file_list) - i)):len(file_list)]
+                        processing_file_list = file_list[i - math.floor(files_temporal_filter / 2) - (
+                                math.ceil(files_temporal_filter / 2) - (len(file_list) - i)):len(file_list)]
                     file_path, filename, file_short_name, extension = self._decompose_filename(file)
                     a, a, b, a = self._decompose_filename(self._create_file_list(
                         os.path.join(file_path, file_short_name + '.data'), '*_slv1_*.img')[0])
@@ -412,8 +431,9 @@ class SARPreProcessor(PreProcessor):
                     return_code = subprocess.call(call, shell=True)
                     logging.info(return_code)
                     logging.info(datetime.now())
+                    index += 1
 
-    def netcdf_information(self):
+    def add_netcdf_information(self):
         # input folder
         input_folder = self.config.output_folder_step3
         expression = '*.nc'
@@ -424,16 +444,18 @@ class SARPreProcessor(PreProcessor):
             file_path, filename, file_short_name, extension = self._decompose_filename(file)
             file_path2 = self.config.output_folder_step1
             # extract date from filename
-            date = datetime.strptime(file_short_name[17:32], '%Y%m%dT%H%M%S')
+            start_date = datetime.strptime(file_short_name[17:32], '%Y%m%dT%H%M%S')
+            stop_date = datetime.strptime(file_short_name[33:48], '%Y%m%dT%H%M%S')
 
             data_set = Dataset(file, 'r+', format="NETCDF4")
+
             try:
-                data_set.delncattr('start_date', str(date))
-                data_set.delncattr('stop_date', str(date))
+                data_set.delncattr('start_date')
+                data_set.delncattr('stop_date')
             except RuntimeError:
                 logging.warning('A runtime error has occurred')
 
-            data_set.setncattr_string('date', str(date))
+            data_set.setncattr_string('date', str(start_date))
             # extract orbit direction from metadata
             metadata = ETree.parse(os.path.join(file_path2, filename[0:79] + '.dim'))
             for i in metadata.findall('Dataset_Sources'):
@@ -467,7 +489,7 @@ class SARPreProcessor(PreProcessor):
                         for iiii in iii.findall('MDATTR'):
                             r = iiii.get('name')
                             if r == 'radar_frequency':
-                                frequency = float(iiii.text)/1000.
+                                frequency = float(iiii.text) / 1000.
                                 data_set.setncattr_string('frequency', str(frequency))
             # extract satellite name from name tag
             if file_short_name[0:3] == 'S1A':
@@ -475,20 +497,28 @@ class SARPreProcessor(PreProcessor):
             elif file_short_name[0:3] == 'S1B':
                 data_set.setncattr_string('satellite', 'S1B')
 
+    def solve_projection_problem(self):
+        sh_file = pkg_resources.resource_filename('sar_pre_processing', 'solve_projection_problem.sh')
+        subprocess.call(sh_file + ' ' + self.config.output_folder_step3, shell=True)
+
+    def create_netcdf_stack(self, filename: Optional[str] = None):
+        if filename is None:
+            filename = self.config.output_folder_step3.rsplit('/', 2)[1]
+        stack_creator = NetcdfStackCreator(input_folder=self.config.output_folder_step3,
+                                           output_path=self.config.output_folder_step3.rsplit('/', 1)[0],
+                                           output_filename=filename)
+        stack_creator.create_netcdf_stack()
+
 
 """run script"""
 
-
-if __name__ == "__main__":
-    processing = SARPreProcessor(config='sample_config_file.yml')
-    processing.create_processing_file_list()
-    # processing.pre_process_step1()
-    # processing.pre_process_step2()
-    # processing.pre_process_step3()
-    # subprocess.call(os.path.join(os.getcwd(),'projection_problem.sh ' + processing.config.output_folder_step3),
-    # shell=True)
-    # processing.netcdf_information()
-    # NetcdfStack(input_folder=processing.config.output_folder_step3,
-    # output_path=processing.config.output_folder_step3.rsplit('/', 1)[0] ,
-    # output_filename=processing.config.output_folder_step3.rsplit('/', 2)[1])
-    logging.info('finished')
+# if __name__ == "__main__":
+# processing = SARPreProcessor(config='sample_config_file.yml')
+# processing.create_processing_file_list()
+# processing.pre_process_step1()
+# processing.pre_process_step2()
+# processing.pre_process_step3()
+# processing.solve_projection_problem()
+# processing.add_netcdf_information()
+# processing.create_netcdf_stack()
+# logging.info('finished')
