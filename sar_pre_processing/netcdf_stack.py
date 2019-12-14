@@ -14,6 +14,7 @@ class NetcdfStack(object):
     def __init__(self, **kwargs):
         self.input_folder = kwargs.get('input_folder', None)
         self.output_path = kwargs.get('output_path', None)
+        self.step1_folder = kwargs.get('step1_folder', None)
         self.output_filename = kwargs.get('output_filename', None)
         self._check()
         self._create_filelist()
@@ -107,7 +108,10 @@ class NetcdfStack(object):
             date_file_tag = date.strftime('%d%b%Y')
 
             # extract orbitdirection from metadata
-            metadata = etree.parse(sarfilepath[0:-1]+'1/'+sarfilename[0:-14]+'.dim')
+            if self.step1_folder is None:
+                metadata = etree.parse(sarfilepath[0:-1]+'1/'+sarfilename[0:-14]+'.dim')
+            else:
+                metadata = etree.parse(os.path.join(self.step1_folder), f'{sarfilename[0:-14]}.dim')
             for i in metadata.findall('Dataset_Sources'):
                 for ii in i.findall('MDElem'):
                     for iii in ii.findall('MDElem'):
@@ -124,7 +128,10 @@ class NetcdfStack(object):
                             continue
 
             # extract orbit from metadata
-            metadata = etree.parse(sarfilepath[0:-1]+'1/'+sarfilename[0:-14]+'.dim')
+            if self.step1_folder is None:
+                metadata = etree.parse(sarfilepath[0:-1] + '1/' + sarfilename[0:-14] + '.dim')
+            else:
+                metadata = etree.parse(os.path.join(self.step1_folder), f'{sarfilename[0:-14]}.dim')
             for i in metadata.findall('Dataset_Sources'):
                 for ii in i.findall('MDElem'):
                     for iii in ii.findall('MDElem'):
