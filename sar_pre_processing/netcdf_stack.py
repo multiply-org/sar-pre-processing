@@ -111,7 +111,7 @@ class NetcdfStackCreator(object):
             if self.step1_folder is None:
                 metadata = etree.parse(sarfilepath[0:-1]+'1/'+sarfilename[0:-14]+'.dim')
             else:
-                metadata = etree.parse(os.path.join(self.step1_folder), f'{sarfilename[0:-14]}.dim')
+                metadata = etree.parse(os.path.join(self.step1_folder, f'{sarfilename[0:-14]}.dim'))
             for i in metadata.findall('Dataset_Sources'):
                 for ii in i.findall('MDElem'):
                     for iii in ii.findall('MDElem'):
@@ -131,7 +131,7 @@ class NetcdfStackCreator(object):
             if self.step1_folder is None:
                 metadata = etree.parse(sarfilepath[0:-1] + '1/' + sarfilename[0:-14] + '.dim')
             else:
-                metadata = etree.parse(os.path.join(self.step1_folder), f'{sarfilename[0:-14]}.dim')
+                metadata = etree.parse(os.path.join(self.step1_folder, f'{sarfilename[0:-14]}.dim'))
             for i in metadata.findall('Dataset_Sources'):
                 for ii in i.findall('MDElem'):
                     for iii in ii.findall('MDElem'):
