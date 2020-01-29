@@ -7,10 +7,27 @@
       <file>$input</file>
     </parameters>
   </node>
+  <node id="Read(2)">
+    <operator>Read</operator>
+    <sources/>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>$input2</file>
+    </parameters>
+  </node>
+  <node id="SliceAssembly">
+    <operator>SliceAssembly</operator>
+    <sources>
+      <sourceProduct refid="Read"/>
+      <sourceProduct.1 refid="Read(2)"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <selectedPolarisations/>
+    </parameters>
+  </node>
   <node id="Apply-Orbit-File">
     <operator>Apply-Orbit-File</operator>
     <sources>
-      <sourceProduct refid="Read"/>
+      <sourceProduct refid="SliceAssembly"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <orbitType>Sentinel Precise (Auto Download)</orbitType>
@@ -48,136 +65,10 @@
       <outputBetaBand>false</outputBetaBand>
     </parameters>
   </node>
-  <node id="Read(2)">
-    <operator>Read</operator>
-    <sources/>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <file>$input2</file>
-    </parameters>
-  </node>
-  <node id="Apply-Orbit-File(2)">
-    <operator>Apply-Orbit-File</operator>
-    <sources>
-      <sourceProduct refid="Read(2)"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <orbitType>Sentinel Precise (Auto Download)</orbitType>
-      <polyDegree>2</polyDegree>
-      <continueOnFail>false</continueOnFail>
-    </parameters>
-  </node>
-  <node id="ThermalNoiseRemoval(2)">
-    <operator>ThermalNoiseRemoval</operator>
-    <sources>
-      <sourceProduct refid="Apply-Orbit-File(2)"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <selectedPolarisations/>
-      <removeThermalNoise>true</removeThermalNoise>
-      <reIntroduceThermalNoise>false</reIntroduceThermalNoise>
-    </parameters>
-  </node>
-  <node id="Calibration(2)">
-    <operator>Calibration</operator>
-    <sources>
-      <sourceProduct refid="ThermalNoiseRemoval(2)"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <sourceBands/>
-      <auxFile>Latest Auxiliary File</auxFile>
-      <externalAuxFile/>
-      <outputImageInComplex>false</outputImageInComplex>
-      <outputImageScaleInDb>false</outputImageScaleInDb>
-      <createGammaBand>false</createGammaBand>
-      <createBetaBand>false</createBetaBand>
-      <selectedPolarisations/>
-      <outputSigmaBand>true</outputSigmaBand>
-      <outputGammaBand>false</outputGammaBand>
-      <outputBetaBand>false</outputBetaBand>
-    </parameters>
-  </node>
-  <node id="SliceAssembly">
-    <operator>SliceAssembly</operator>
-    <sources>
-      <sourceProduct refid="Calibration"/>
-      <sourceProduct.1 refid="Calibration(2)"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <selectedPolarisations/>
-    </parameters>
-  </node>
-  <node id="TOPSAR-Split">
-    <operator>TOPSAR-Split</operator>
-    <sources>
-      <sourceProduct refid="SliceAssembly"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <subswath>IW1</subswath>
-      <selectedPolarisations/>
-      <firstBurstIndex>1</firstBurstIndex>
-      <lastBurstIndex>18</lastBurstIndex>
-      <wktAoi/>
-    </parameters>
-  </node>
-  <node id="TOPSAR-Split(2)">
-    <operator>TOPSAR-Split</operator>
-    <sources>
-      <sourceProduct refid="SliceAssembly"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <subswath>IW2</subswath>
-      <selectedPolarisations/>
-      <firstBurstIndex>1</firstBurstIndex>
-      <lastBurstIndex>18</lastBurstIndex>
-      <wktAoi/>
-    </parameters>
-  </node>
-  <node id="TOPSAR-Split(3)">
-    <operator>TOPSAR-Split</operator>
-    <sources>
-      <sourceProduct refid="SliceAssembly"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <subswath>IW3</subswath>
-      <selectedPolarisations/>
-      <firstBurstIndex>1</firstBurstIndex>
-      <lastBurstIndex>18</lastBurstIndex>
-      <wktAoi/>
-    </parameters>
-  </node>
   <node id="TOPSAR-Deburst">
     <operator>TOPSAR-Deburst</operator>
     <sources>
-      <sourceProduct refid="TOPSAR-Split"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <selectedPolarisations/>
-    </parameters>
-  </node>
-  <node id="TOPSAR-Deburst(2)">
-    <operator>TOPSAR-Deburst</operator>
-    <sources>
-      <sourceProduct refid="TOPSAR-Split(2)"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <selectedPolarisations/>
-    </parameters>
-  </node>
-  <node id="TOPSAR-Deburst(3)">
-    <operator>TOPSAR-Deburst</operator>
-    <sources>
-      <sourceProduct refid="TOPSAR-Split(3)"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <selectedPolarisations/>
-    </parameters>
-  </node>
-  <node id="TOPSAR-Merge">
-    <operator>TOPSAR-Merge</operator>
-    <sources>
-      <sourceProduct refid="TOPSAR-Deburst"/>
-      <sourceProduct.1 refid="TOPSAR-Deburst(2)"/>
-      <sourceProduct.2 refid="TOPSAR-Deburst(3)"/>
+      <sourceProduct refid="Calibration"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <selectedPolarisations/>
@@ -186,7 +77,7 @@
   <node id="Terrain-Correction">
     <operator>Terrain-Correction</operator>
     <sources>
-      <sourceProduct refid="TOPSAR-Merge"/>
+      <sourceProduct refid="TOPSAR-Deburst"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <sourceBands/>
