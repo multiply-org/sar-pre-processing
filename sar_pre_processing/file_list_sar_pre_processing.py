@@ -15,6 +15,9 @@ from sar_pre_processing.attribute_dict import AttributeDict
 
 
 class SARList(object):
+    """
+    Object for creation of file list for preprocessing of Sentinel-1 data based on configuration file
+    """
 
     def __init__(self, **kwargs):
         self.config = kwargs.get('config', None)
@@ -43,7 +46,7 @@ class SARList(object):
             for filename in fnmatch.filter(filenames, expression):
                 filelist.append(os.path.join(root, filename))
             break
-        # print('Number of found files:', len(filelist))
+        logging.info('Found files within input folder: %s' % (len(filelist)))
         return filelist
 
     def _decomposition_filename(self, file):
@@ -71,7 +74,6 @@ class SARList(object):
                 pass
 
         logging.info('Number of found files for year %s: %s' %(year, len(filelist_new)))
-        # logging.info(f'Number of found files for year {year}: {len(filelist_new)}')
         return filelist_new
 
     def _check_location(self, file, location, output_folder):
@@ -84,10 +86,6 @@ class SARList(object):
         """
 
         filepath, filename, fileshortname, extension = self._decomposition_filename(file)
-
-        # # Various file paths and names:
-        # (sarfilepath, sarfilename) = os.path.split(sarfile)
-        # (sarfileshortname, extension) = os.path.splitext(sarfilename)
 
         # Get metadata
         # Path to product.xml-file within zipped S1 image
@@ -102,7 +100,7 @@ class SARList(object):
             zfile.extract(xml_file, output_folder)
             zfile.close()
         except:
-            print('zipfile cannot open')
+            print('zipfile cannot open: '+file)
             contained = False
             return contained
 
@@ -136,7 +134,6 @@ class SARList(object):
         poly_location = ogr.CreateGeometryFromWkt(wkt_location)
         poly_image = ogr.CreateGeometryFromWkt(wkt_image)
         contained = poly_location.Intersect(poly_image)
-        # print contained
         shutil.rmtree(os.path.join(output_folder, fileshortname + '.SAFE'))
         return contained
 
@@ -150,7 +147,7 @@ class SARList(object):
             if contained is False:
                 continue
             filelist_new.append(file)
-        print('Number of found files containing area of interest: %s' % (len(filelist_new)))
+        logging.info('Number of found files containing area of interest: %s' % (len(filelist_new)))
         return filelist_new
 
     def _double_processed(self, filelist):
@@ -187,7 +184,7 @@ class SARList(object):
                 filelist_double_processed.append(file)
             else:
                 filelist_new.append(file)
-        print('Number of found files that were double processed: %s' % (len(filelist_double_processed)/2.))
+        logging.info('Number of found files that were double processed: %s' % (len(filelist_double_processed)/2.))
 
         filelist_end = self._check_timestamp(filelist_double_processed)
         filelist_end = filelist_end + filelist_new
@@ -274,7 +271,7 @@ class SARList(object):
 
     def _border_control(self, filelist):
         """
-        ?????
+        Area of interest contained in two tiles of same swath
         """
         filelist.sort()
         filelist_new = []
@@ -303,16 +300,22 @@ class SARList(object):
                 filelist_border_control.append(file)
             else:
                 filelist_new.append(file)
-        print('Number of found files with border issues: %s' % (len(filelist_border_control)))
-
-        # pdb.set_trace()
-        # filelist_end = self._check_timestamp(filelist_double_processed)
-        # filelist_end = filelist_end + filelist_new
-        # filelist_end.sort()
+        logging.info('Number of found files with border issues: %s' % (len(filelist_border_control)))
 
         return filelist_new, filelist_border_control
 
     def create_list(self, **kwargs):
+        """
+        Create file list for further processing
+
+        Filter option via config file
+        - year
+        - area of interest
+
+        Checking for
+            - double processed data by ESA
+            - area of interest contained in two tiles of same swath
+        """
         # list with all zip files found in input_folder
         filelist = self._create_filelist(self.config.input_folder, '*.zip')
 
@@ -340,10 +343,8 @@ class SARList(object):
         # check for double processed data by ESA and choose newest one
         filelist = self._double_processed(filelist)
 
+        # check if area of interest contained in two tiles of same swath
         filelist = self._border_control(filelist)
-
-        # print('Number of files that will be processed: %s' % len(filelist[0]+len(filelist[1])))
-
 
         return filelist
 
