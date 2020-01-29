@@ -3,11 +3,12 @@ from netCDF4 import Dataset, date2num
 import xarray as xr
 import numpy as np
 import os, fnmatch
-import xml.etree.ElementTree as etree
-from dateutil import parser
-
+import datetime
 
 class NetcdfStackCreator(object):
+    """
+    Create NetCDF stack
+    """
 
     def __init__(self, **kwargs):
         self.input_folder = kwargs.get('input_folder', None)
@@ -47,8 +48,6 @@ class NetcdfStackCreator(object):
 
         # load example data for dummy creation
         data = Dataset(self.filelist[0])
-        (sarfilenamepath, sarfilename) = os.path.split(self.filelist[0])
-        (sarfileshortname, extension)  = os.path.splitext(sarfilename)
 
         # create dimensions
         self.lat = self.dataset.createDimension('lat', len(data.variables['lat'][:]))
@@ -65,13 +64,9 @@ class NetcdfStackCreator(object):
         self.latitude = self.dataset.createVariable('lat', np.float32, ('lat'))
         self.longitude = self.dataset.createVariable('lon', np.float32, ('lon'))
 
-        # create 3-D variables (localIncidenceangle, projectedLocalIncidenceAngle, incidenceAngleFromEllipsoid, ... )
+        # create 3-D variables (localIncidenceangle ... )
         self.localIncidenceAngle = self.dataset.createVariable('localIncidenceAngle', np.float32,('time','lat','lon'), fill_value=-99999)
         self.localIncidenceAngle.units = 'degree'
-        # self.projectedLocalIncidenceAngle = self.dataset.createVariable('projectedLocalIncidenceAngle', np.float32,('time','lat','lon'), fill_value=-99999)
-        # self.projectedLocalIncidenceAngle.units = 'degree'
-        # self.incidenceAngleFromEllipsoid = self.dataset.createVariable('incidenceAngleFromEllipsoid', np.float32,('time','lat','lon'), fill_value=-99999)
-        # self.incidenceAngleFromEllipsoid.units = 'degree'
 
         self.sigma0_vv = self.dataset.createVariable('sigma0_vv_multi', np.float32,('time','lat','lon'), fill_value=-99999)
         self.sigma0_vv.units = 'linear'
@@ -99,67 +94,32 @@ class NetcdfStackCreator(object):
             print()
             print("Scene", self.filelist.index(sarfile) + 1, "of", len(self.filelist))
             print(sarfile)
-            (sarfilepath, sarfilename) = os.path.split(sarfile)
-            (sarfileshortname, extension) = os.path.splitext(sarfilename)
-
-            # extract date from name tag
-            date = parser.parse(sarfileshortname.split('_')[5])
-            date_file_tag = date.strftime('%d%b%Y')
-
-            # extract orbitdirection from metadata
-            metadata = etree.parse(sarfilepath[0:-1]+'1/'+sarfilename[0:-14]+'.dim')
-            for i in metadata.findall('Dataset_Sources'):
-                for ii in i.findall('MDElem'):
-                    for iii in ii.findall('MDElem'):
-                        for iiii in iii.findall('MDATTR'):
-                            r = iiii.get('name')
-                            if r == 'PASS':
-                                orbitdir = iiii.text
-                                if orbitdir == 'ASCENDING':
-                                    orbitdir = 0
-                                elif orbitdir =='DESCENDING':
-                                    orbitdir = 1
-                                else:
-                                    pass
-                            continue
-
-            # extract orbit from metadata
-            metadata = etree.parse(sarfilepath[0:-1]+'1/'+sarfilename[0:-14]+'.dim')
-            for i in metadata.findall('Dataset_Sources'):
-                for ii in i.findall('MDElem'):
-                    for iii in ii.findall('MDElem'):
-                        for iiii in iii.findall('MDATTR'):
-                            r = iiii.get('name')
-                            if r == 'REL_ORBIT':
-                                relorbit = iiii.text
-
-            # extract satellite name from name tag
-            if sarfileshortname[0:3] == 'S1A':
-                sat = 0
-            elif sarfileshortname[0:3] == 'S1B':
-                sat = 1
-            else:
-                pass
 
             # load sarfile
             data = xr.open_dataset(sarfile)
 
-            # get time stamp
-            timestamp = (parser.parse(sarfileshortname.split('_')[5]))
+            # encoding of satellite
+            if data.satellite == 'S1A':
+                sat = 0
+            elif data.satellite == 'S1B':
+                sat = 1
+
+            # encoding of orbitdirection
+            if data.orbitdirection == 'ASCENDING':
+                orbitdir = 0
+            elif data.orbitdirection =='DESCENDING':
+                orbitdir = 1
 
             # fill 1-D variable
-            self.times[index] = date2num(timestamp, units ='days since ' + '1970-01-01 00:00:00', calendar='gregorian')
+            self.times[index] = date2num(datetime.datetime.strptime(data.date, '%Y-%m-%d %H:%M:%S'), units ='days since ' + '1970-01-01 00:00:00', calendar='gregorian')
             self.orbitdirection[index] = orbitdir
             self.orbitdirection.description = '0 = Ascending, 1 = Descending'
-            self.relativeorbit[index] = relorbit
+            self.relativeorbit[index] = int(data.relativeorbit)
             self.satellite[index] = sat
             self.satellite.description = '0 = Sentinel 1A, 1 = Sentinel 1B'
 
             # fill 3-D variables
             self.localIncidenceAngle[index,:,:] = data.variables['theta'][:]
-            # self.projectedLocalIncidenceAngle[index,:,:] = data.variables['projectedLocalIncidenceAngle_slv9_' + date_file_tag][:]
-            # self.incidenceAngleFromEllipsoid[index,:,:] = data.variables['incidenceAngleFromEllipsoid_slv10_' + date_file_tag][:]
-
             self.sigma0_vv[index,:,:] = data.variables['sigma0_vv_multi'][:]
             self.sigma0_vh[index,:,:] = data.variables['sigma0_vh_multi'][:]
 
