@@ -179,7 +179,7 @@ class SARPreProcessor(PreProcessor):
             os.makedirs(self.config.output_folder_step1)
 
         # Check if XML file for pre-processing is specified
-        assert self.config.xml_graph_pre_process_step1 is not None, \
+        assert self.config.pre_process_step1 is not None, \
             'ERROR: path of XML file for pre-processing step 1 is not not specified'
 
         area = None
@@ -204,14 +204,14 @@ class SARPreProcessor(PreProcessor):
         total_num_files = len(self.file_list[0]) + len(self.file_list[1])
         for i, file in enumerate(self.file_list[0]):
             component_progress_logger.info(f'{int((i / total_num_files) * 100)}')
-            self._gpt_step1(file, None, area, normalisation_angle, self.config.xml_graph_pre_process_step1)
+            self._gpt_step1(file, None, area, normalisation_angle, self.config.pre_process_step1)
 
         for i, file in enumerate(self.file_list[1][::2]):
             component_progress_logger.info(f'{int(((len(self.file_list[0]) + i) / total_num_files) * 100)}')
             file_list2 = self.file_list[1][1::2]
             if i < len(file_list2):
                 file2 = file_list2[i]
-                self._gpt_step1(file, file2, area, normalisation_angle, self.config.xml_graph_pre_process_step1_border)
+                self._gpt_step1(file, file2, area, normalisation_angle, self.config.pre_process_step1_border)
 
     def _gpt_step1(self, file: str, file2: str, area: str, normalisation_angle: str, script_path: str):
         """
@@ -247,7 +247,7 @@ class SARPreProcessor(PreProcessor):
         !!! all files will get metadata of the master image !!! That is how SNAP does it! Metadata will be corrected produces netcdf files at the end of the preprocessing chain (def add_netcdf_information)
         """
         # Check if XML file for pre-processing step 2 is specified
-        assert self.config.xml_graph_pre_process_step2 is not None, \
+        assert self.config.pre_process_step2 is not None, \
             'ERROR: path of XML file for pre-processing step 2 is not not specified'
 
         # Check if output folder of pre_process_step1 exists
@@ -296,7 +296,7 @@ class SARPreProcessor(PreProcessor):
             logging.info(f'Process {filename} with SNAP.')
             output_file = os.path.join(
                 self.config.output_folder_step2, file_short_name + self.name_addition_step2 + '.dim')
-            call = '"' + self.config.gpt + '" "' + self.config.xml_graph_pre_process_step2 + \
+            call = '"' + self.config.gpt + '" "' + self.config.pre_process_step2 + \
                    '" -Pinput="' + master + '" -Pinput2="' + file + '" -Poutput="' + output_file + '" -c 2G -x'
             return_code = subprocess.call(call, shell=True)
             logging.info(return_code)
@@ -344,7 +344,7 @@ class SARPreProcessor(PreProcessor):
         for sensor in ['S1A', 'S1B']:
             if self.config.speckle_filter.multi_temporal.apply == 'yes':
                 # Check if XML file for pre-processing step 3 is specified
-                assert self.config.xml_graph_pre_process_step3 is not None, \
+                assert self.config.pre_process_step3 is not None, \
                     'ERROR: path of XML file for pre-processing step 3 is not not specified'
 
                 # loop to apply multi-temporal filtering
@@ -418,7 +418,7 @@ class SARPreProcessor(PreProcessor):
                     list_bands_vv_norm_multi = ','.join(list_bands_vv_norm_multi)
                     list_bands_vh_norm_multi = ','.join(list_bands_vh_norm_multi)
 
-                    call = '"' + self.config.gpt + '" "' + self.config.xml_graph_pre_process_step3 + \
+                    call = '"' + self.config.gpt + '" "' + self.config.pre_process_step3 + \
                            '" -Pinput="' + processing_file_list + '" -Pinput2="' + file + \
                            '" -Poutput="' + output_file + '" -Ptheta="' + theta + \
                            '" -Plist_bands_vv_multi="' + list_bands_vv_multi + \
