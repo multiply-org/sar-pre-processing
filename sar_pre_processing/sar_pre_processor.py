@@ -50,8 +50,7 @@ class PreProcessor(object):
 
     def _load_config(self):
         """
-        Load configuration from self.config.bb.pre_process()
-           writes to self.config.
+        Load configuration and writes to self.config.
         """
         with open(self.config_file, 'r') as cfg:
             self.config = yaml.safe_load(cfg)
@@ -189,8 +188,6 @@ class SARPreProcessor(PreProcessor):
             upper_left_y = self.config.region['ul']['lat']
             upper_left_x = self.config.region['ul']['lon']
             lower_right_x = self.config.region['lr']['lon']
-            # todo: how is it with coordinates that go across dates
-            # Coordinates for subset area
             area = self._get_area(lower_right_y, upper_left_y, upper_left_x, lower_right_x)
         except AttributeError:
             logging.info('area of interest not specified, whole images will be processed')
@@ -222,6 +219,7 @@ class SARPreProcessor(PreProcessor):
         """
         # Divide filename
         filepath, filename, fileshortname, extension = self._decompose_filename(file)
+
         # Call SNAP routine, xml file
         logging.info(f'Process {filename} with SNAP.')
         output_file = os.path.join(self.config.output_folder_step1,
@@ -246,7 +244,7 @@ class SARPreProcessor(PreProcessor):
 
         1) co-register pre-processed data
 
-        !!! all files will get metadata of the master image !!! Problem?
+        !!! all files will get metadata of the master image !!! That is how SNAP does it! Metadata will be corrected produces netcdf files at the end of the preprocessing chain (def add_netcdf_information)
         """
         # Check if XML file for pre-processing step 2 is specified
         assert self.config.xml_graph_pre_process_step2 is not None, \
@@ -290,8 +288,10 @@ class SARPreProcessor(PreProcessor):
         for i, file in enumerate(file_list):
             component_progress_logger.info(f'{int((i / len(file_list)) * 100)}')
             logging.info(f'Scene {file_list.index(file) + 1} of {len(file_list)}')
+
             # Divide filename
             filepath, filename, file_short_name, extension = self._decompose_filename(file)
+
             # Call SNAP routine, xml file
             logging.info(f'Process {filename} with SNAP.')
             output_file = os.path.join(
@@ -335,14 +335,13 @@ class SARPreProcessor(PreProcessor):
                     else:
                         logging.info(f'skip processing for {file}. File {new_file_name} does not exist.')
 
-        # Sort file list by date (hard coded position in filename!!!)
+        # Sort file list by date (hard coded position in filename!)
         file_path, filename, file_short_name, extension = self._decompose_filename(file_list[0])
         file_list.sort(key=lambda x: x[len(file_path) + 18:len(file_path) + 33])
         file_list_old = file_list
 
         index = 0
         for sensor in ['S1A', 'S1B']:
-            # file_list = [k for k in file_list_old if sensor in k]
             if self.config.speckle_filter.multi_temporal.apply == 'yes':
                 # Check if XML file for pre-processing step 3 is specified
                 assert self.config.xml_graph_pre_process_step3 is not None, \
@@ -350,11 +349,9 @@ class SARPreProcessor(PreProcessor):
 
                 # loop to apply multi-temporal filtering
                 # vv and vh polarisation are separated
-                # use the speckle filter algorithm metadata? metadata for date might be wrong!!!
-
                 for i, file in enumerate(file_list):
                     component_progress_logger.info(f'{int((index / len(file_list_old)) * 100)}')
-                    # what happens if there are less then in config file specified scenes available ???
+
                     files_temporal_filter = int(self.config.speckle_filter.multi_temporal.files)
                     if i < math.floor(files_temporal_filter / 2):
                         processing_file_list = file_list[0:files_temporal_filter]
@@ -388,8 +385,8 @@ class SARPreProcessor(PreProcessor):
 
                     for processing_file in processing_file_list:
                         file_path, filename, file_short_name, extension = self._decompose_filename(processing_file)
-                        # get filename from folder
-                        # think about better way !!!!
+
+                        # get filename from folder (think about better way!)
                         a, a, band_vv_name_multi, a = self._decompose_filename(self._create_file_list(
                             os.path.join(file_path, file_short_name + '.data'), '*_slv3_*.img')[0])
                         a, a, band_vh_name_multi, a = self._decompose_filename(self._create_file_list(
@@ -458,11 +455,13 @@ class SARPreProcessor(PreProcessor):
         input_folder = self.config.output_folder_step3
         expression = '*.nc'
         file_list = self._create_file_list(input_folder, expression)
-        # for loop though all measurement points
+
+        # for loop through all measurement points
         for file in file_list:
             # Divide filename
             file_path, filename, file_short_name, extension = self._decompose_filename(file)
             file_path2 = self.config.output_folder_step1
+
             # extract date from filename
             start_date = datetime.strptime(file_short_name[17:32], '%Y%m%dT%H%M%S')
             stop_date = datetime.strptime(file_short_name[33:48], '%Y%m%dT%H%M%S')
