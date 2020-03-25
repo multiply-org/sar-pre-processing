@@ -16,6 +16,7 @@ from netCDF4 import Dataset
 from typing import List, Optional
 from .netcdf_stack import NetcdfStackCreator
 import math
+import pdb
 
 logging.getLogger().setLevel(logging.INFO)
 # Set up logging
@@ -41,7 +42,6 @@ class PreProcessor(object):
             self.config.output_folder = kwargs.get('output', None)
 
     def _check(self):
-
         assert self.config_file is not None, 'ERROR: Configuration file needs to be provided'
 
     @staticmethod
@@ -69,20 +69,18 @@ class SARPreProcessor(PreProcessor):
         # Check if output folder is specified
         assert self.config.output_folder is not None, 'ERROR: output folder needs to be specified'
 
-        # Initialise output folder for different preprocessing steps
-        # (can be put in the YAML config file if needed)
+        # Initialize output folder for different preprocessing steps
         self.config.output_folder_step1 = os.path.join(self.config.output_folder, 'step1')
         self.config.output_folder_step2 = os.path.join(self.config.output_folder, 'step2')
         self.config.output_folder_step3 = os.path.join(self.config.output_folder, 'step3')
 
-        # Initialise name of necessary xml-graphs for preprocessing
-        # (can be put in the YAML config file if needed)
-        self._configure_config_graph('xml_graph_pre_process_step1', 'pre_process_step1.xml')
-        self._configure_config_graph('xml_graph_pre_process_step1_border', 'pre_process_step1_border.xml')
-        self._configure_config_graph('xml_graph_pre_process_step2', 'pre_process_step2.xml')
-        self._configure_config_graph('xml_graph_pre_process_step3', 'pre_process_step3.xml')
+        # Initialize name of necessary xml-graphs for preprocessing
+        self._configure_config_graph('pre_process_step1', 'pre_process_step1.xml')
+        self._configure_config_graph('pre_process_step1_border', 'pre_process_step1_border.xml')
+        self._configure_config_graph('pre_process_step2', 'pre_process_step2.xml')
+        self._configure_config_graph('pre_process_step3', 'pre_process_step3.xml')
 
-        # Initialise name addition for output files
+        # Initialize name addition for output files
         self.name_addition_step1 = '_GC_RC_No_Su'
         self.name_addition_step2 = '_Co'
         self.name_addition_step3 = '_speckle'
@@ -97,19 +95,17 @@ class SARPreProcessor(PreProcessor):
             except FileNotFoundError:
                 raise UserWarning('ERROR: path for SNAPs graph-processing-tool is not specified correctly')
 
-        # TODO DISCUSS PUT THE GRAPH DIRECTORIES AND NAMES IN A SEPARATE CONFIG !!!
-        # todo discuss if input/output specification part of processing or part of initialization of the object itself
-
     def _configure_config_graph(self, key_name: str, default_name: str):
         """
         put location of processing xml graphs within config
+        check if user has specified personal xml graphs otherwise use default ones
         """
         if self.config.has_entry(key_name):
             if not os.path.exists(self.config[key_name]):
                 if self.config.has_entry('xml_graph_path'):
                     graph_path = os.path.join(self.config.xml_graph_path, self.config[key_name])
                     if not os.path.exists(graph_path):
-                        raise UserWarning(f'Could not determine location of {self.config[key_name]}.')
+                        raise UserWarning(f'Could not determine location of user defined {self.config[key_name]}.')
                     self.config.add_entry(key_name, graph_path)
                 else:
                     raise UserWarning(f'Could not determine location of {self.config[key_name]}.')

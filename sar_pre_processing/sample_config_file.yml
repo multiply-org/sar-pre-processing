@@ -2,13 +2,13 @@
 # Input folder with SAR data (zip format)
 # input_folder: /media/nas_data/Thomas/Sentinel_1_data/biebrza_poland
 # input_folder: /media/nas_data/Thomas/Sentinel_1_data/foggia_italy
-input_folder: /media/nas_data/Thomas/S1/data/Wallerfing_MNI
-# input_folder: /media/tweiss/Daten/try_preprocessing/data
+# input_folder: /media/nas_data/Thomas/S1/data/Wallerfing_MNI
+input_folder: /media/tweiss/Daten/try_preprocessing/data
 
 # Folder to store the pre-processed data
 # output_folder: /media/nas_data/Thomas/S1/processed/MNI_2017_new_final
-output_folder: /media/nas_data/Thomas/S1/processed/MNI_2018_new_final
-# output_folder: /media/tweiss/Daten/try_preprocessing
+# output_folder: /media/nas_data/Thomas/S1/processed/MNI_2018_new_final
+output_folder: /media/tweiss/Daten/try_preprocessing
 # output_folder: /media/nas_data/Thomas/poland_processed
 # output_folder: /media/nas_data/Thomas/foggia_italy_processed
 
@@ -17,6 +17,12 @@ gpt: /home/tweiss/snap/bin/gpt
 
 # Location of xml files which are needed for processing
 xml_graph_path: /media/tweiss/Work/GIT/GitHub/multiply-org/sar-pre-processing/sar_pre_processing/default_graphs
+
+# file names of xml graphs (not needed if default version is used)
+pre_process_step1: test_pre_process_step1.xml
+pre_process_step1_border: test_pre_process_step1_border.xml
+pre_process_step2: test_pre_process_step2.xml
+pre_process_step3: test_pre_process_step3.xml
 
 subset: 'yes'
 
@@ -63,7 +69,7 @@ speckle_filter:
   single_filter:
     apply: 'yes'
 
-year: 2018
+year: 2017
 
 # normalisation_angle:
 
