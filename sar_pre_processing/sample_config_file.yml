@@ -1,30 +1,26 @@
 
 # Input folder with SAR data (zip format)
-# input_folder: /media/nas_data/Thomas/S1/data/MNI
-# input_folder: /media/tweiss/Daten/test_preprocessing/data
 # input_folder: /media/nas_data/Thomas/Sentinel_1_data/biebrza_poland
 # input_folder: /media/nas_data/Thomas/Sentinel_1_data/foggia_italy
-# input_folder: /media/nas_data/Thomas/S1/data/Wallerfing
-input_folder: /media/tweiss/Daten/try_preprocessing/data
+input_folder: /media/nas_data/Thomas/S1/data/Wallerfing_MNI
+# input_folder: /media/tweiss/Daten/try_preprocessing/data
 
 # Folder to store the pre-processed data
-# output_folder: /media/nas_data/Thomas/S1/processed/MNI_2017
-output_folder: /media/tweiss/Daten/try_preprocessing
+# output_folder: /media/nas_data/Thomas/S1/processed/MNI_2017_new_final
+output_folder: /media/nas_data/Thomas/S1/processed/MNI_2018_new_final
+# output_folder: /media/tweiss/Daten/try_preprocessing
 # output_folder: /media/nas_data/Thomas/poland_processed
 # output_folder: /media/nas_data/Thomas/foggia_italy_processed
 
 # Location of SNAP's graph-processing-tool
 gpt: /home/tweiss/snap/bin/gpt
-# gpt: /home/wodan/snap/bin/gpt
 
 # Location of xml files which are needed for processing
-xml_graph_path: /media/tweiss/Work/GIT/GitHub/multiply-org/sar-pre-processing/sar_pre_processing/xml_files
-# xml_graph_path: /media/wodan/data/Arbeit/GitHub/multiply-org/sar-pre-processing/xml_files
-
+xml_graph_path: /media/tweiss/Work/GIT/GitHub/multiply-org/sar-pre-processing/sar_pre_processing/default_graphs
 
 subset: 'yes'
 
-# if subset = 'yes', region must be specified
+# # if subset = 'yes', region must be specified
 # region:
 #   ul:
 #     lat: 47.8782
@@ -35,11 +31,11 @@ subset: 'yes'
 
 region:
   ul:
-    lat: 48.33
-    lon: 11.65
+    lat: 48.40
+    lon: 11.60
   lr:
-    lat: 48.23
-    lon: 11.78
+    lat: 48.10
+    lon: 11.90
 
 
 # foggia
@@ -67,7 +63,7 @@ speckle_filter:
   single_filter:
     apply: 'yes'
 
-year: 2017
+year: 2018
 
 # normalisation_angle:
 

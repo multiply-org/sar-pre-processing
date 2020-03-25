@@ -97,10 +97,13 @@ class SARPreProcessor(PreProcessor):
             except FileNotFoundError:
                 raise UserWarning('ERROR: path for SNAPs graph-processing-tool is not specified correctly')
 
-        # TODO PUT THE GRAPH DIRECTORIES AND NAMES IN A SEPARATE CONFIG !!!
+        # TODO DISCUSS PUT THE GRAPH DIRECTORIES AND NAMES IN A SEPARATE CONFIG !!!
         # todo discuss if input/output specification part of processing or part of initialization of the object itself
 
     def _configure_config_graph(self, key_name: str, default_name: str):
+        """
+        put location of processing xml graphs within config
+        """
         if self.config.has_entry(key_name):
             if not os.path.exists(self.config[key_name]):
                 if self.config.has_entry('xml_graph_path'):
@@ -114,8 +117,8 @@ class SARPreProcessor(PreProcessor):
             default_graph = pkg_resources.resource_filename('sar_pre_processing.default_graphs', default_name)
             self.config.add_entry(key_name, default_graph)
 
-    def set_file_list(self, file_list: List[str]):
-        self.file_list = file_list
+    # def set_file_list(self, file_list: List[str]):
+    #     self.file_list = file_list
 
     @staticmethod
     def _create_file_list(input_folder, expression):
@@ -151,7 +154,9 @@ class SARPreProcessor(PreProcessor):
                (lon_min, lat_min, lon_min, lat_max, lon_max, lat_max, lon_max, lat_min, lon_min, lat_min)
 
     def create_processing_file_list(self):
-        # create filelist
+        """
+        create a list with all to be processed file names
+        """
         self.file_list = SARList(config=self.config).create_list()
         return self.file_list
 
@@ -173,8 +178,7 @@ class SARPreProcessor(PreProcessor):
         assert self.config.input_folder is not None, 'ERROR: input folder not specified'
         assert os.path.exists(self.config.input_folder)
 
-        # Check if output folder for step1 is specified, if not existing create
-        # new folder
+        # Check if output folder for step1 is specified, create one if non existing
         assert self.config.output_folder_step1 is not None, 'ERROR: output folder for step1 needs to be specified'
         if not os.path.exists(self.config.output_folder_step1):
             os.makedirs(self.config.output_folder_step1)
@@ -189,11 +193,12 @@ class SARPreProcessor(PreProcessor):
             upper_left_y = self.config.region['ul']['lat']
             upper_left_x = self.config.region['ul']['lon']
             lower_right_x = self.config.region['lr']['lon']
-            # todo: how is it with coordinates that go across the datum
+            # todo: how is it with coordinates that go across dates
             # Coordinates for subset area
             area = self._get_area(lower_right_y, upper_left_y, upper_left_x, lower_right_x)
         except AttributeError:
             logging.info('area of interest not specified, whole images will be processed')
+
         # loop to process all files stored in input directory
         try:
             normalisation_angle = self.config.normalisation_angle
@@ -205,8 +210,6 @@ class SARPreProcessor(PreProcessor):
             logging.info('normalisation angle not specified, default value of 35 is used for processing')
         total_num_files = len(self.file_list[0]) + len(self.file_list[1])
         for i, file in enumerate(self.file_list[0]):
-            # logging.info(f'Scene {self.file_list[0].index(file) + 1} of {len(self.file_list[0])}')
-            logging.info(f'Scene {i + 1} of {len(self.file_list[0])}')
             component_progress_logger.info(f'{int((i / total_num_files) * 100)}')
             self._gpt_step1(file, None, area, normalisation_angle, self.config.xml_graph_pre_process_step1)
 
@@ -218,6 +221,9 @@ class SARPreProcessor(PreProcessor):
                 self._gpt_step1(file, file2, area, normalisation_angle, self.config.xml_graph_pre_process_step1_border)
 
     def _gpt_step1(self, file: str, file2: str, area: str, normalisation_angle: str, script_path: str):
+        """
+        run preprocessing step1
+        """
         # Divide filename
         filepath, filename, fileshortname, extension = self._decompose_filename(file)
         # Call SNAP routine, xml file
@@ -245,16 +251,16 @@ class SARPreProcessor(PreProcessor):
         1) co-register pre-processed data
 
         !!! all files will get metadata of the master image !!! Problem?
-
         """
         # Check if XML file for pre-processing step 2 is specified
         assert self.config.xml_graph_pre_process_step2 is not None, \
             'ERROR: path of XML file for pre-processing step 2 is not not specified'
+
         # Check if output folder of pre_process_step1 exists
         assert os.path.exists(self.config.output_folder_step1), \
             'ERROR: output folder of pre-processing step1 not found'
-        # Check if output folder for step2 is specified, if not existing create
-        # new folder
+
+        # Check if output folder for step2 is specified, create if non existing
         assert self.config.output_folder_step2 is not None, 'ERROR: output folder for step2 needs to be specified'
         if not os.path.exists(self.config.output_folder_step2):
             os.makedirs(self.config.output_folder_step2)
@@ -276,11 +282,14 @@ class SARPreProcessor(PreProcessor):
                     else:
                         logging.info(f'skip processing for {file}. File does not exist')
             file_list.sort()
+
         if len(file_list) == 0:
             logging.info('No valid files found for pre-processing step 2.')
             return
+
         # Set Master image for co-registration
         master = file_list[0]
+
         # loop to co-register all found images to master image
         for i, file in enumerate(file_list):
             component_progress_logger.info(f'{int((i / len(file_list)) * 100)}')
@@ -309,13 +318,10 @@ class SARPreProcessor(PreProcessor):
         # Check if output folder of pre_process_step1 exists
         assert os.path.exists(self.config.output_folder_step2), 'ERROR: output folder of pre-processing step2 not found'
 
-        # Check if output folder for step3 is specified, if not existing create
-        # new folder
+        # Check if output folder for step3 is specified, create if non existing
         assert self.config.output_folder_step3 is not None, 'ERROR: output folder for step3 needs to be specified'
         if not os.path.exists(self.config.output_folder_step3):
             os.makedirs(self.config.output_folder_step3)
-
-        # list with all dim files found in output-folder of pre_process_step2
 
         # Create filelist with all to be processed images
         if self.file_list is None:
@@ -332,20 +338,24 @@ class SARPreProcessor(PreProcessor):
                         file_list.append(new_file_name)
                     else:
                         logging.info(f'skip processing for {file}. File {new_file_name} does not exist.')
+
         # Sort file list by date (hard coded position in filename!!!)
         file_path, filename, file_short_name, extension = self._decompose_filename(file_list[0])
         file_list.sort(key=lambda x: x[len(file_path) + 18:len(file_path) + 33])
         file_list_old = file_list
+
         index = 0
         for sensor in ['S1A', 'S1B']:
-            file_list = [k for k in file_list_old if sensor in k]
+            # file_list = [k for k in file_list_old if sensor in k]
             if self.config.speckle_filter.multi_temporal.apply == 'yes':
                 # Check if XML file for pre-processing step 3 is specified
                 assert self.config.xml_graph_pre_process_step3 is not None, \
                     'ERROR: path of XML file for pre-processing step 3 is not not specified'
+
                 # loop to apply multi-temporal filtering
                 # vv and vh polarisation are separated
                 # use the speckle filter algorithm metadata? metadata for date might be wrong!!!
+
                 for i, file in enumerate(file_list):
                     component_progress_logger.info(f'{int((index / len(file_list_old)) * 100)}')
                     # what happens if there are less then in config file specified scenes available ???
@@ -392,7 +402,6 @@ class SARPreProcessor(PreProcessor):
                             os.path.join(file_path, file_short_name + '.data'), '*_slv1_*.img')[0])
                         a, a, band_vh_name_norm_multi, a = self._decompose_filename(self._create_file_list(
                             os.path.join(file_path, file_short_name + '.data'), '*_slv2_*.img')[0])
-
                         list_bands_vv_multi.append(band_vv_name_multi)
                         list_bands_vh_multi.append(band_vh_name_multi)
 
@@ -433,7 +442,22 @@ class SARPreProcessor(PreProcessor):
                     logging.info(datetime.now())
                     index += 1
 
+    def solve_projection_problem(self):
+        """
+        solve projection problem of created NetCDF file from SNAP toolbox
+        """
+        sh_file = pkg_resources.resource_filename('sar_pre_processing', 'solve_projection_problem.sh')
+        subprocess.call(sh_file + ' ' + self.config.output_folder_step3, shell=True)
+
     def add_netcdf_information(self):
+        """
+        Add information from original S1 SLC image to processed NetCDF file.
+        - update date information (wrong date information were stored due to coregistration process)
+        - orbitdirection (ASCENDING, DESCENDING)
+        - relative orbit
+        - Satellite (S1A, S1B)
+        - Frequency
+        """
         # input folder
         input_folder = self.config.output_folder_step3
         expression = '*.nc'
@@ -449,13 +473,14 @@ class SARPreProcessor(PreProcessor):
 
             data_set = Dataset(file, 'r+', format="NETCDF4")
 
+            # update date information
             try:
                 data_set.delncattr('start_date')
                 data_set.delncattr('stop_date')
             except RuntimeError:
                 logging.warning('A runtime error has occurred')
-
             data_set.setncattr_string('date', str(start_date))
+
             # extract orbit direction from metadata
             metadata = ETree.parse(os.path.join(file_path2, filename[0:79] + '.dim'))
             for i in metadata.findall('Dataset_Sources'):
@@ -471,6 +496,7 @@ class SARPreProcessor(PreProcessor):
                                     orbit_dir = 'DESCENDING'
                                 data_set.setncattr_string('orbitdirection', orbit_dir)
                             continue
+
             # extract orbit from metadata
             metadata = ETree.parse(os.path.join(file_path2, filename[0:79] + '.dim'))
             for i in metadata.findall('Dataset_Sources'):
@@ -481,6 +507,7 @@ class SARPreProcessor(PreProcessor):
                             if r == 'REL_ORBIT':
                                 relorbit = iiii.text
                                 data_set.setncattr_string('relativeorbit', relorbit)
+
             # extract frequency from metadata
             metadata = ETree.parse(os.path.join(file_path2, filename[0:79] + '.dim'))
             for i in metadata.findall('Dataset_Sources'):
@@ -491,17 +518,21 @@ class SARPreProcessor(PreProcessor):
                             if r == 'radar_frequency':
                                 frequency = float(iiii.text) / 1000.
                                 data_set.setncattr_string('frequency', str(frequency))
+
             # extract satellite name from name tag
             if file_short_name[0:3] == 'S1A':
                 data_set.setncattr_string('satellite', 'S1A')
             elif file_short_name[0:3] == 'S1B':
                 data_set.setncattr_string('satellite', 'S1B')
 
-    def solve_projection_problem(self):
-        sh_file = pkg_resources.resource_filename('sar_pre_processing', 'solve_projection_problem.sh')
-        subprocess.call(sh_file + ' ' + self.config.output_folder_step3, shell=True)
+            data_set.close()
 
     def create_netcdf_stack(self, filename: Optional[str] = None):
+        """
+        create one NetCDF stack file from output of step3
+        Orbitdirection: '0 = Ascending, 1 = Descending'
+        Satellite: '0 = Sentinel 1A, 1 = Sentinel 1B'
+        """
         if filename is None:
             filename = self.config.output_folder_step3.rsplit('/', 2)[1]
         stack_creator = NetcdfStackCreator(input_folder=self.config.output_folder_step3,
