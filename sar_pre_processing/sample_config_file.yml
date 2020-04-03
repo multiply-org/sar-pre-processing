@@ -3,12 +3,14 @@
 # input_folder: /media/nas_data/Thomas/Sentinel_1_data/biebrza_poland
 # input_folder: /media/nas_data/Thomas/Sentinel_1_data/foggia_italy
 # input_folder: /media/nas_data/Thomas/S1/data/Wallerfing_MNI
-input_folder: /media/tweiss/Daten/try_preprocessing/data
+# input_folder: /media/tweiss/Daten/try_preprocessing/data
+input_folder: '/media/tweiss/Daten/test_mysentinelapi'
 
 # Folder to store the pre-processed data
 # output_folder: /media/nas_data/Thomas/S1/processed/MNI_2017_new_final
 # output_folder: /media/nas_data/Thomas/S1/processed/MNI_2018_new_final
-output_folder: /media/tweiss/Daten/try_preprocessing
+# output_folder: /media/tweiss/Daten/try_preprocessing
+output_folder: '/media/tweiss/Daten/test_mysentinelapi'
 # output_folder: /media/nas_data/Thomas/poland_processed
 # output_folder: /media/nas_data/Thomas/foggia_italy_processed
 
@@ -69,7 +71,7 @@ speckle_filter:
   single_filter:
     apply: 'yes'
 
-year: 2017
+year: 2020
 
 # normalisation_angle:
 
