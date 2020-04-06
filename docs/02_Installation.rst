@@ -3,7 +3,12 @@ Installation
 
 The standard python way
 ------------------------
-You can download the source code from the `project website <https://github.com/multiply-org/sar-pre-processing>`_. Unpack the file you obtained and then run::
+The first step is to clone the latest code and step into the check out directory::
+
+    git clone https://github.com/multiply-org/sar-pre-processing.git
+    cd sar-pre-processing
+
+Then you can install it with::
 
     python setup.py install
 
@@ -15,10 +20,4 @@ Using pip
 -------------
 not yet implemented
 
-From code repository for developing
-------------------------------------
-to be continued
-
-Installation from the recent stable code repository can be done by::
-
-    to be continued
+Sar-pre-processing MULTIPLY Data Access has been developed against Python 3.6. It cannot be guaranteed to work with previous Python versions. You can download the source code from the `project website <https://github.com/multiply-org/sar-pre-processing>`_.
