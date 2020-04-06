@@ -10,35 +10,30 @@
 
 import sys
 import os
+from unittest.mock import MagicMock
+
+
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+        return MagicMock()
+
+MOCK_MODULES = ['osgeo']
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-# sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../..'))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "sar_pre_processing")))
+# Determine the absolute path to the directory containing the python modules.
+_pysrc = os.path.abspath(os.path.join(os.path.abspath(__file__), '..', '..', '..'))
 
-# -- Hack for ReadTheDocs ------------------------------------------------------
-# This hack is necessary since RTD does not issue `sphinx-apidoc` before running
-# `sphinx-build -b html . _build/html`. See Issue:
-# https://github.com/rtfd/readthedocs.org/issues/1139
-# DON'T FORGET: Check the box "Install your project inside a virtualenv using
-# setup.py install" in the RTD Advanced Settings.
-
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-if on_rtd:
-    import inspect
-    from sphinx import apidoc
-
-    __location__ = os.path.join(os.getcwd(), os.path.dirname(
-        inspect.getfile(inspect.currentframe())))
-
-    output_dir = os.path.join(__location__, "../docs/api")
-    module_dir = os.path.join(__location__, "../sar_pre_processing")
-    cmd_line_template = "sphinx-apidoc -f -o {outputdir} {moduledir}"
-    cmd_line = cmd_line_template.format(outputdir=output_dir, moduledir=module_dir)
-    apidoc.main(cmd_line.split(" "))
+# Insert it into the path.
+sys.path.insert(0, _pysrc)
+#autodoc_mock_imports = ["_tkinter"]
 
 # -- General configuration -----------------------------------------------------
 
@@ -244,19 +239,6 @@ latex_logo = '_static/logo/Multiply_multicolour_white_background.png'
 
 # If false, no module index is generated.
 # latex_domain_indices = True
-
-# -- External mapping ------------------------------------------------------------
-python_version = '.'.join(map(str, sys.version_info[0:2]))
-intersphinx_mapping = {
-    'sphinx': ('http://sphinx.pocoo.org', None),
-    'python': ('http://docs.python.org/' + python_version, None),
-    'matplotlib': ('http://matplotlib.sourceforge.net', None),
-    'numpy': ('http://docs.scipy.org/doc/numpy', None),
-    'sklearn': ('http://scikit-learn.org/stable', None),
-    'pandas': ('http://pandas.pydata.org/pandas-docs/stable', None),
-    'scipy': ('http://docs.scipy.org/doc/scipy/reference/', None),
-}
-
 
 # add numbered figures
 numfig = True
