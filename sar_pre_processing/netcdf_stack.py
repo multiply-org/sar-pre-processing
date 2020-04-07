@@ -1,4 +1,5 @@
 
+import logging
 from netCDF4 import Dataset, date2num
 import xarray as xr
 import numpy as np
@@ -34,7 +35,7 @@ class NetcdfStackCreator(object):
         for root, dirnames, filenames in os.walk(self.input_folder):
             for filename in fnmatch.filter(filenames, '*.nc'):
                 self.filelist.append(os.path.join(root, filename))
-        print("Number of scenes found for processing:", len(self.filelist))
+        logging.info(f'Number of scenes found for processing: {len(self.filelist)}.')
 
         # sort filelist by time (ascending)
         length = len(self.input_folder)
@@ -91,9 +92,7 @@ class NetcdfStackCreator(object):
 
         for sarfile in self.filelist:
             index = self.filelist.index(sarfile)-y
-            print()
-            print("Scene", self.filelist.index(sarfile) + 1, "of", len(self.filelist))
-            print(sarfile)
+            logging.info(f'Scene {self.filelist.index(sarfile) + 1} of {len(self.filelist)} ({sarfile})')
 
             # load sarfile
             data = xr.open_dataset(sarfile)
