@@ -5,12 +5,15 @@ Installation
 
 The standard python way
 ------------------------
-The first step is to clone the latest code release and step into the check out directory::
+First: Clone the latest code release::
 
     git clone https://github.com/multiply-org/sar-pre-processing.git
+
+Second: Step into the cloned directory::
+
     cd sar-pre-processing
 
-Then you can install it with::
+Third: Install python package::
 
     python setup.py install
 
