@@ -1,9 +1,11 @@
+.. _Installation:
+
 Installation
 =============
 
 The standard python way
 ------------------------
-The first step is to clone the latest code and step into the check out directory::
+The first step is to clone the latest code release and step into the check out directory::
 
     git clone https://github.com/multiply-org/sar-pre-processing.git
     cd sar-pre-processing

@@ -1,30 +1,25 @@
+.. _ProcessingChain:
+
 Processing Chain
 ================
 
-.. code::
-
-    put "Sentinel-1 Level-1 SLC data" in the caption? Depends on other parts!
-    How will the deliverable be organized?
-
 Overview
 --------
-The two Sentinel-1 satellites 1A and 1B are one of the first satellites which are providing microwave data in high temporal and spatial resolution. Within the MULTIPLY project we developed a preprocessing chain to process time-series of Sentinel-1 data for quantitative analysis of vegetation and soil parameters over agricultural fields. Therefore, rigorous geometric and radiometric corrections as well as a multi-temporal speckle filter is applied. The different preprocessing steps are shown in :numref:`work_flow_step_1` and :numref:`work_flow_step_2`. Furthermore, every processing step is explained in more detail in the following subsections. As it can be seen :numref:`work_flow_step_1` and :numref:`work_flow_step_2` the preprocessing work-flow is split in two main parts. The preprocessing methods in :numref:`work_flow_step_1` can be applied separately for every image. Whereas the work-flow shown in :numref:`work_flow_step_2` need several images which were preprocessed by the different steps presented in :numref:`work_flow_step_1`.
-
-The whole preprocessing chain for Sentinel-1 Level-1 Single Look Complex (SLC) data is accomplished by ESA's SNAP S1TBX software (current version 5.0.4). The SNAP toolbox can be downloaded from `<http://step.esa.int/main/download/>`_. However, to automatically apply different preprocessing steps on Sentinel-1 data a python script, which uses the Graph Processing Tool (GPT) of the S1TBX, is provided. All codes, xml-graphs etc are stored in a GitHub repository accessible under `<https://github.com/multiply-org/sar-pre-processing>`_.
+The different preprocessing steps are shown in :numref:`work_flow_step_1` and :numref:`work_flow_step_2`. Additionally, every processing step is explained in more detail in the following subsections. As it can be seen in :numref:`work_flow_step_1` and :numref:`work_flow_step_2` the preprocessing work-flow is split in two main parts. The preprocessing methods in :numref:`work_flow_step_1` can be applied separately for every image. Whereas the work-flow shown in :numref:`work_flow_step_2` need several images which were preprocessed by the different steps presented in :numref:`work_flow_step_1`.
 
 .. _work_flow_step_1:
-.. figure:: images/flow_chard.png
+.. figure:: images/work_flow_01.png
     :align: center
     :width: 80%
 
-    First main part of the used preprocessing chain (rigorous geometric and radiometric correction including preliminary operations)
+    Preprocessing chain showing processing steps to archive geometric and radiometric corrected Sentinel-1 data.
 
 .. _work_flow_step_2:
-.. figure:: images/flow_chard_01.png
+.. figure:: images/work_flow_02.png
     :align: center
     :width: 80%
 
-    Second main part of the used preprocessing chain (Co-registration and multi-temporal speckle filter)
+    Preprocessing chain showing processing steps to archive co-registered images which are multi-temporal speckle filtered
 
 
 Sentinel-1 Level-1 SLC data
