@@ -194,7 +194,7 @@ The backscatter normlisation is applied by coding :eq:`cosine_2` in SNAP's S1TBX
 
 Input:
     - Radiometric and geometric corrected sigma naught calibrated radar backscatter (Map Projection WGS84)
-    - reference angle (default is 37,55°)
+    - reference angle (default is 35°)
     - weighting factor (default is 2)
 
 Output:
@@ -231,7 +231,7 @@ Practical implementation
 For the speckle reduction the "Multi-temporal Speckle Filter" operator within SNAP's S1TBX software is used. Currently 15 temporally consecutive images are used within the "Multi-temporal Speckle Filter" whereby the target image is temporally situated in the middle. The applied filter is a Lee filter with spatial averaging over 3x3 pixel. The spatial averaging over pixel has a significant influence on spatial resolution information loss of the image. Therefore, the averaging pixel size might change during the project. If the image consists of two polarisations the filter is applied on each polarisation separately. The practical implementation in case of filter type, used polarisation, number of used images etc. may change with more experience of applying multi-temporal speckle filters and the occurring results.
 
 Input:
-    - 15 co-registered images
+    - 7 co-registered images
 
 Output:
     - speckle filtered images
