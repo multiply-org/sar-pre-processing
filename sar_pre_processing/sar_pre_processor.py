@@ -155,7 +155,7 @@ class SARPreProcessor(PreProcessor):
         self.file_list = SARList(config=self.config).create_list()
         return self.file_list
 
-    def pre_process_step1(self):
+    def pre_process_step1_new(self):
         """
         Pre-process S1 SLC data with SNAP's GPT
 
@@ -163,10 +163,6 @@ class SARPreProcessor(PreProcessor):
         2) thermal noise removal
         3) calibration
         4) TOPSAR-Deburst
-        5) Geometric Terrain Correction
-        6) Radiometric Correction (after kellndorfer et al.)
-        7) backscatter normalisation on specified angle in config file (based on Lambert's Law)
-
         """
 
         # Check if input folder is specified
@@ -193,27 +189,19 @@ class SARPreProcessor(PreProcessor):
             logging.info('area of interest not specified, whole images will be processed')
 
         # loop to process all files stored in input directory
-        try:
-            normalisation_angle = self.config.normalisation_angle
-            if normalisation_angle is None:
-                normalisation_angle = '35'
-                logging.info('normalisation angle not specified, default value of 35 is used for processing')
-        except AttributeError:
-            normalisation_angle = '35'
-            logging.info('normalisation angle not specified, default value of 35 is used for processing')
         total_num_files = len(self.file_list[0]) + len(self.file_list[1])
         for i, file in enumerate(self.file_list[0]):
             component_progress_logger.info(f'{int((i / total_num_files) * 100)}')
-            self._gpt_step1(file, None, area, normalisation_angle, self.config.pre_process_step1)
+            self._gpt_step1(file, None, area, self.config.pre_process_step1)
 
         for i, file in enumerate(self.file_list[1][::2]):
             component_progress_logger.info(f'{int(((len(self.file_list[0]) + i) / total_num_files) * 100)}')
             file_list2 = self.file_list[1][1::2]
             if i < len(file_list2):
                 file2 = file_list2[i]
-                self._gpt_step1(file, file2, area, normalisation_angle, self.config.pre_process_step1_border)
+                self._gpt_step1(file, file2, area, self.config.pre_process_step1_border)
 
-    def _gpt_step1(self, file: str, file2: str, area: str, normalisation_angle: str, script_path: str):
+    def _gpt_step1(self, file: str, file2: str, area: str, script_path: str):
         """
         run preprocessing step1
         """
@@ -231,18 +219,17 @@ class SARPreProcessor(PreProcessor):
         if file2 is not None:
             file2_part = ' -Pinput2="' + file2 + '"'
         call = '"' + self.config.gpt + '" "' + script_path + \
-               '" -Pinput="' + file + '"' + file2_part + ' -Poutput="' + output_file + \
-               '" -Pangle="' + normalisation_angle + '" ' + area_part + '-c 2G -x'
+               '" -Pinput="' + file + '"' + file2_part + ' -Poutput="' + output_file + '" ' + area_part + '-c 2G -x'
         return_code = subprocess.call(call, shell=True)
         logging.info(return_code)
 
-    def pre_process_step2(self):
+    def pre_process_step2_new(self):
         """
         pre_process_step1 has to be done first
 
         Pre-process S1 SLC data with SNAP's GPT
 
-        1) co-register pre-processed data
+        1) stack
 
         !!! all files will get metadata of the master image !!! That is how SNAP does it! Metadata will be corrected produces netcdf files at the end of the preprocessing chain (def add_netcdf_information)
         """
@@ -263,7 +250,6 @@ class SARPreProcessor(PreProcessor):
         if self.file_list is None:
             logging.info('no file list specified, therefore all images in output folder step1 will be processed')
             file_list = self._create_file_list(self.config.output_folder_step1, '*.dim')
-            file_list.sort()
         else:
             file_list = []
             for list in self.file_list:
@@ -275,46 +261,72 @@ class SARPreProcessor(PreProcessor):
                         file_list.append(new_file_name)
                     else:
                         logging.info(f'skip processing for {file}. File does not exist')
-            file_list.sort()
+
+        # Sort file list by date (hard coded position in filename!)
+        file_path, filename, file_short_name, extension = self._decompose_filename(file_list[0])
+        file_list.sort(key=lambda x: x[len(file_path) + 18:len(file_path) + 33])
 
         if len(file_list) == 0:
             logging.info('No valid files found for pre-processing step 2.')
             return
 
-        # Set Master image for co-registration
-        master = file_list[0]
+        # Sort file list by date (hard coded position in filename!)
+        file_path, filename, file_short_name, extension = self._decompose_filename(file_list[0])
+        file_list.sort(key=lambda x: x[len(file_path) + 18:len(file_path) + 33])
+        file_list_old = file_list
 
-        # loop to co-register all found images to master image
-        for i, file in enumerate(file_list):
-            component_progress_logger.info(f'{int((i / len(file_list)) * 100)}')
-            logging.info(f'Scene {file_list.index(file) + 1} of {len(file_list)}')
+        orbitdirection = self.extract_orbit_information(file_list,self.config.output_folder_step1)
 
-            # Divide filename
-            filepath, filename, file_short_name, extension = self._decompose_filename(file)
+        index = 0
+        for ii in ['ASCENDING', 'DESCENDING']:
+            file_list_orbitdir = [xxx for xxx in orbitdirection.keys() if ii in orbitdirection[xxx]]
 
-            # Call SNAP routine, xml file
-            logging.info(f'Process {filename} with SNAP.')
-            output_file = os.path.join(
-                self.config.output_folder_step2, file_short_name + self.name_addition_step2 + '.dim')
-            call = '"' + self.config.gpt + '" "' + self.config.pre_process_step2 + \
-                   '" -Pinput="' + master + '" -Pinput2="' + file + '" -Poutput="' + output_file + '" -c 2G -x'
-            return_code = subprocess.call(call, shell=True)
-            logging.info(return_code)
-            logging.info(datetime.now())
+            # loop to apply multi-temporal filtering
+            # vv and vh polarisation are separated
+            for i, file in enumerate(file_list_orbitdir):
+                component_progress_logger.info(f'{int((index / len(file_list_old)) * 100)}')
 
-    def pre_process_step3(self):
+                files_temporal_filter = int(self.config.speckle_filter.multi_temporal.files)
+                if i < math.floor(files_temporal_filter / 2):
+                    processing_file_list = file_list_orbitdir[0:files_temporal_filter]
+                elif i <= len(file_list_orbitdir) - math.ceil(files_temporal_filter / 2):
+                    processing_file_list = file_list_orbitdir[i - math.floor(files_temporal_filter / 2):i + math.ceil(
+                        files_temporal_filter / 2)]
+                else:
+                    processing_file_list = file_list_orbitdir[i - math.floor(files_temporal_filter / 2) - (
+                            math.ceil(files_temporal_filter / 2) - (len(file_list_orbitdir) - i)):len(file_list_orbitdir)]
+
+                # Divide filename of file of interest
+                file_path, filename, file_short_name, extension = self._decompose_filename(file)
+
+                output_file = os.path.join(
+                    self.config.output_folder_step2, file_short_name + self.name_addition_step2 + '.dim')
+
+                processing_file_list.remove(file)
+                processing_file_list = [file,*processing_file_list]
+
+                processing_file_list = ','.join(processing_file_list)
+
+                call = '"' + self.config.gpt + '" "' + self.config.pre_process_step2 + \
+                       '" -Pinput="' + processing_file_list + \
+                       '" -Poutput="' + output_file + \
+                       '" -c 2G -x'
+                return_code = subprocess.call(call, shell=True)
+                logging.info(return_code)
+                logging.info(datetime.now())
+                index += 1
+
+    def pre_process_step3(self, **kwargs):
         """
-        pre_process_step1 and 2 has to be done first
-
-        Pre-process S1 SLC data with SNAP's GPT
-
-        1) apply multi-temporal speckle filter
 
         """
+
         # Check if output folder of pre_process_step1 exists
-        assert os.path.exists(self.config.output_folder_step2), 'ERROR: output folder of pre-processing step2 not found'
+        assert os.path.exists(
+            self.config.output_folder_step2), 'ERROR: output folder of pre-processing step2 not found'
 
-        # Check if output folder for step3 is specified, create if non existing
+        # Check if output folder for step3 is specified, if not existing create
+        # new folder
         assert self.config.output_folder_step3 is not None, 'ERROR: output folder for step3 needs to be specified'
         if not os.path.exists(self.config.output_folder_step3):
             os.makedirs(self.config.output_folder_step3)
@@ -335,105 +347,57 @@ class SARPreProcessor(PreProcessor):
                     else:
                         logging.info(f'skip processing for {file}. File {new_file_name} does not exist.')
 
-        # Sort file list by date (hard coded position in filename!)
-        file_path, filename, file_short_name, extension = self._decompose_filename(file_list[0])
-        file_list.sort(key=lambda x: x[len(file_path) + 18:len(file_path) + 33])
-        file_list_old = file_list
+        # Sort filelist by date (hard coded position in filename!!!)
+        filepath, filename, fileshortname, extension = self._decompose_filename(file_list[0])
+        file_list.sort(key=lambda x: x[len(filepath) + 18:len(filepath) + 33])
 
         index = 0
-        for sensor in ['S1A', 'S1B']:
-            if self.config.speckle_filter.multi_temporal.apply == 'yes':
-                # Check if XML file for pre-processing step 3 is specified
-                assert self.config.pre_process_step3 is not None, \
-                    'ERROR: path of XML file for pre-processing step 3 is not not specified'
+        for i, file in enumerate(file_list):
+            component_progress_logger.info(f'{int((index / len(file_list)) * 100)}')
 
-                # loop to apply multi-temporal filtering
-                # vv and vh polarisation are separated
-                for i, file in enumerate(file_list):
-                    component_progress_logger.info(f'{int((index / len(file_list_old)) * 100)}')
+            # Divide filename of file of interest
+            file_path, filename, file_short_name, extension = self._decompose_filename(file)
 
-                    files_temporal_filter = int(self.config.speckle_filter.multi_temporal.files)
-                    if i < math.floor(files_temporal_filter / 2):
-                        processing_file_list = file_list[0:files_temporal_filter]
-                    elif i <= len(file_list) - math.ceil(files_temporal_filter / 2):
-                        processing_file_list = file_list[i - math.floor(files_temporal_filter / 2):i + math.ceil(
-                            files_temporal_filter / 2)]
-                    else:
-                        processing_file_list = file_list[i - math.floor(files_temporal_filter / 2) - (
-                                math.ceil(files_temporal_filter / 2) - (len(file_list) - i)):len(file_list)]
-                    file_path, filename, file_short_name, extension = self._decompose_filename(file)
-                    a, a, b, a = self._decompose_filename(self._create_file_list(
-                        os.path.join(file_path, file_short_name + '.data'), '*_slv1_*.img')[0])
-                    a, a, c, a = self._decompose_filename(self._create_file_list(
-                        os.path.join(file_path, file_short_name + '.data'), '*_slv2_*.img')[0])
-                    a, a, d, a = self._decompose_filename(self._create_file_list(
-                        os.path.join(file_path, file_short_name + '.data'), '*_slv3_*.img')[0])
-                    a, a, e, a = self._decompose_filename(self._create_file_list(
-                        os.path.join(file_path, file_short_name + '.data'), '*_slv4_*.img')[0])
-                    list_bands_single_speckle_filter = ','.join([b, c, d, e])
+            output_file = os.path.join(
+                    self.config.output_folder_step3, file_short_name + self.name_addition_step3 + '.nc')
 
-                    name_change_vv_single = d
-                    name_change_vh_single = e
-                    name_change_vv_norm_single = b
-                    name_change_vh_norm_single = c
+            call = '"' + self.config.gpt + '" "' + self.config.pre_process_step3 + \
+                   '" -Pinput="' + file + '" -Poutput="' + output_file + '" -c 2G -x'
+            return_code = subprocess.call(call, shell=True)
+            logging.info(return_code)
+            logging.info(datetime.now())
+            index += 1
 
-                    list_bands_vv_multi = []
-                    list_bands_vh_multi = []
+    def pre_process_step4(self, **kwargs):
+        assert os.path.exists(
+            self.config.output_folder_step2), 'ERROR: output folder of pre-processing step2 not found'
 
-                    list_bands_vv_norm_multi = []
-                    list_bands_vh_norm_multi = []
+        # Check if output folder for step3 is specified, if not existing create
+        # new folder
+        assert self.config.output_folder_step3 is not None, 'ERROR: output folder for step3 needs to be specified'
+        if not os.path.exists(self.config.output_folder_step3):
+            os.makedirs(self.config.output_folder_step3)
 
-                    for processing_file in processing_file_list:
-                        file_path, filename, file_short_name, extension = self._decompose_filename(processing_file)
+        # Create filelist with all to be processed images
 
-                        # get filename from folder (think about better way!)
-                        a, a, band_vv_name_multi, a = self._decompose_filename(self._create_file_list(
-                            os.path.join(file_path, file_short_name + '.data'), '*_slv3_*.img')[0])
-                        a, a, band_vh_name_multi, a = self._decompose_filename(self._create_file_list(
-                            os.path.join(file_path, file_short_name + '.data'), '*_slv4_*.img')[0])
-                        a, a, band_vv_name_norm_multi, a = self._decompose_filename(self._create_file_list(
-                            os.path.join(file_path, file_short_name + '.data'), '*_slv1_*.img')[0])
-                        a, a, band_vh_name_norm_multi, a = self._decompose_filename(self._create_file_list(
-                            os.path.join(file_path, file_short_name + '.data'), '*_slv2_*.img')[0])
-                        list_bands_vv_multi.append(band_vv_name_multi)
-                        list_bands_vh_multi.append(band_vh_name_multi)
+        file_list = self._create_file_list(self.config.output_folder_step3, '*.nc')
 
-                        list_bands_vv_norm_multi.append(band_vv_name_norm_multi)
-                        list_bands_vh_norm_multi.append(band_vh_name_norm_multi)
+        index = 0
+        for i, file in enumerate(file_list):
+            component_progress_logger.info(f'{int((index / len(file_list)) * 100)}')
 
-                    # Divide filename of file of interest
-                    file_path, filename, file_short_name, extension = self._decompose_filename(file)
+            # Divide filename of file of interest
+            file_path, filename, file_short_name, extension = self._decompose_filename(file)
 
-                    output_file = os.path.join(
-                        self.config.output_folder_step3, file_short_name + self.name_addition_step3 + '.nc')
+            output_file = os.path.join(
+                    self.config.output_folder_step3, filename)
 
-                    date = datetime.strptime(file_short_name[17:25], '%Y%m%d')
-                    date = date.strftime('%d%b%Y')
-
-                    theta = 'localIncidenceAngle_slv10_' + date
-
-                    processing_file_list = ','.join(processing_file_list)
-                    list_bands_vv_multi = ','.join(list_bands_vv_multi)
-                    list_bands_vh_multi = ','.join(list_bands_vh_multi)
-                    list_bands_vv_norm_multi = ','.join(list_bands_vv_norm_multi)
-                    list_bands_vh_norm_multi = ','.join(list_bands_vh_norm_multi)
-
-                    call = '"' + self.config.gpt + '" "' + self.config.pre_process_step3 + \
-                           '" -Pinput="' + processing_file_list + '" -Pinput2="' + file + \
-                           '" -Poutput="' + output_file + '" -Ptheta="' + theta + \
-                           '" -Plist_bands_vv_multi="' + list_bands_vv_multi + \
-                           '" -Plist_bands_vh_multi="' + list_bands_vh_multi + \
-                           '" -Plist_bands_vv_norm_multi="' + list_bands_vv_norm_multi + \
-                           '" -Plist_bands_vh_norm_multi="' + list_bands_vh_norm_multi + '" -Pdate="' + date + \
-                           '" -Pname_change_vv_single="' + name_change_vv_single + \
-                           '" -Pname_change_vh_single="' + name_change_vh_single + \
-                           '" -Pname_change_vv_norm_single="' + name_change_vv_norm_single + \
-                           '" -Pname_change_vh_norm_single="' + name_change_vh_norm_single + \
-                           '" -Plist_bands_single_speckle_filter="' + list_bands_single_speckle_filter + '" -c 2G -x'
-                    return_code = subprocess.call(call, shell=True)
-                    logging.info(return_code)
-                    logging.info(datetime.now())
-                    index += 1
+            call = '"' + self.config.gpt + '" "' + '/media/tweiss/Work/GIT/GitHub/multiply-org/sar-pre-processing/sar_pre_processing/default_graphs/pre_process_step4.xml' + \
+                   '" -Pinput="' + file + '" -Poutput="' + output_file + '" -c 2G -x'
+            return_code = subprocess.call(call, shell=True)
+            logging.info(return_code)
+            logging.info(datetime.now())
+            index += 1
 
     def solve_projection_problem(self):
         """
@@ -441,6 +405,30 @@ class SARPreProcessor(PreProcessor):
         """
         sh_file = pkg_resources.resource_filename('sar_pre_processing', 'solve_projection_problem.sh')
         subprocess.call(sh_file + ' ' + self.config.output_folder_step3, shell=True)
+
+    def extract_orbit_information(self,file_list,file_path_step1):
+        orbitdirection = dict()
+        # extract orbit direction from metadata
+        for file in file_list:
+            file_path, filename, file_short_name, extension = self._decompose_filename(file)
+
+            metadata = ETree.parse(os.path.join(file_path_step1, filename[0:79] + '.dim'))
+            for i in metadata.findall('Dataset_Sources'):
+                for ii in i.findall('MDElem'):
+                    for iii in ii.findall('MDElem'):
+                        for iiii in iii.findall('MDATTR'):
+                            r = iiii.get('name')
+                            if r == 'PASS':
+                                orbit_dir = iiii.text
+                                if orbit_dir == 'ASCENDING':
+                                    orbit_dir = 'ASCENDING'
+                                elif orbit_dir == 'DESCENDING':
+                                    orbit_dir = 'DESCENDING'
+                            continue
+            if orbit_dir == None:
+                orbit_dir = 'not found'
+            orbitdirection[file] = orbit_dir
+        return orbitdirection
 
     def add_netcdf_information(self):
         """
