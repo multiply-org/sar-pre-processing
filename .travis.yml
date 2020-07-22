@@ -1,0 +1,54 @@
+
+
+language: python
+python:
+  - "3.6"
+branches:
+  only:
+    - master
+    - getting_to_release
+install:
+  - sudo apt-get update
+  # We do this conditionally because it saves us some downloading if the
+  # version is the same.
+  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
+      wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh;
+    else
+      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+    fi
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - sudo apt-get install -y gdal-bin
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  # Useful for debugging any issues with conda
+  - conda info -a
+  - conda list
+
+  # nose must be installed explicitly to ensure that the virtual conda-environment is used within the tests
+  # (otherwise import-errors will occur for non-standard packages like scipy sympy and symengine)
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION pytest nose shapely pyyaml numpy shapely netCDF4 scipy python-dateutil gdal matplotlib
+  - source activate test-environment
+  - conda list
+
+  # before the actual installation we test first if existing
+  # installation mechanism using PIP and CONDA work
+  # with the versioned package on PyPi. Please note
+  # that this is not necessarily the same code as in the current development
+  # or master branches
+  - conda install pip
+
+  # test installation from pip
+  #- pip install rt1
+  #- yes | pip uninstall rt1
+
+  # test conda based installation (currently not activated as package still missing)
+  # - conda install -c conda-forge rt1
+  # - conda uninstall -c conda-forge rt1
+  #
+  # now install the MULTIPLY components (could be replaced at a later stage with alternative installation methods)
+  - python setup.py install
+
+script:
+- pytest -vs
