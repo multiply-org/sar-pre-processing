@@ -28,7 +28,7 @@ install:
 
   # nose must be installed explicitly to ensure that the virtual conda-environment is used within the tests
   # (otherwise import-errors will occur for non-standard packages like scipy sympy and symengine)
-  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION pytest nose shapely pyyaml numpy shapely netCDF4 scipy python-dateutil gdal matplotlib
+  - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION pytest nose shapely pyyaml numpy shapely netCDF4 scipy python-dateutil gdal matplotlib pyproj
   - source activate test-environment
   - conda list
 
