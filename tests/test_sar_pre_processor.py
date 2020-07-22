@@ -17,16 +17,16 @@ def test_create_sar_pre_processor_with_input_and_output_folder():
     pre_processor.create_processing_file_list()
 
 
-def test_select_year():
-    SAR = SARPreProcessor(config='./tests/test_config_sar_pre_processor.yml')
-    SAR.create_processing_file_list()
-    print('Start pre-processing step 1 ...')
-    SAR.pre_process_step1()
-    print('Start pre-processing step 2 ...')
-    SAR.pre_process_step2()
-    print('Start pre-processing step 3 ...')
-    SAR.pre_process_step3()
-    # SAR._select_year()
+# def test_select_year():
+#     SAR = SARPreProcessor(config='./tests/test_config_sar_pre_processor.yml')
+#     SAR.create_processing_file_list()
+#     print('Start pre-processing step 1 ...')
+#     SAR.pre_process_step1()
+#     print('Start pre-processing step 2 ...')
+#     SAR.pre_process_step2()
+#     print('Start pre-processing step 3 ...')
+#     SAR.pre_process_step3()
+#     # SAR._select_year()
 
 
 def inc(x):
