@@ -30,6 +30,7 @@ Content
 
     Authors <authors>
     Changelog <changes>
+    License
 
 
 Indices and tables

@@ -11,7 +11,7 @@
 import sys
 import os
 from unittest.mock import MagicMock
-
+import m2r
 
 class Mock(MagicMock):
     @classmethod
@@ -45,13 +45,13 @@ sys.path.insert(0, _pysrc)
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx', 'sphinx.ext.todo',
               'sphinx.ext.autosummary', 'sphinx.ext.viewcode', 'sphinx.ext.coverage',
               'sphinx.ext.doctest', 'sphinx.ext.ifconfig', 'sphinx.ext.mathjax',
-              'sphinx.ext.napoleon', 'sphinxcontrib.bibtex']
+              'sphinx.ext.napoleon', 'sphinxcontrib.bibtex', 'm2r']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
 # The suffix of source filenames.
-source_suffix = '.rst'
+source_suffix = ['.rst', '.md']
 
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
