@@ -115,3 +115,6 @@ docs/api/*
 docs/_build/*
 cover/*
 MANIFEST
+
+# test data
+/notebooks/test_files/
