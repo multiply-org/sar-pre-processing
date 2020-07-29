@@ -2,7 +2,6 @@
 
 Introduction
 ============
-
 The two Sentinel-1 satellites 1A and 1B are one of the first satellites which are providing free microwave
 data in high temporal and spatial resolution. Within the MULTIPLY project we developed a pre-
 processing chain to process time-series of Sentinel-1 data for quantitative analysis of vegetation and
