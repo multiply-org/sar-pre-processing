@@ -14,27 +14,12 @@ apply different pre-processing steps on Sentinel-1 data a python script, which u
 of the S1TBX, was developed provided. All codes, xml-graphs etc are stored in a GitHub repository accessible
 under https://github.com/multiply-org/sar-pre-processing.
 
-This is the documentation of python package Multiply-sar-pre-processing and is structured in following sections:
+Getting Started
+^^^^^^^^^^^^^^^
+Please find instructions on how to download and install the prior engine in the :ref:`Installation` section.
 
-.. toctree::
-   :maxdepth: 1
+Testing and Contribution
+^^^^^^^^^^^^^^^^^^^^^^^^^
+You are welcome to test and contribute to the MULTIPLY SAR pre processing.
 
-* :ref:`Introduction`
-* :ref:`Installation`
-* :ref:`ProcessingChain`
-* :ref:`Technicaldocumantation`
-
-Indices and tables
--------------------
-
-* :ref:`genindex`
-* :ref:`modindex`
-
-Credits
--------------
-The project leading to this application has received funding from the
-European Union’s Horizon 2020 research and innovation program
-under grant agreement No 687320.
-
-
-
+Please find corresponding guidelines and further information on how to do so in the :ref:`Contribution` section and on the `project GitHub page <https://github.com/McWhity/sar-pre-processing>`_.
