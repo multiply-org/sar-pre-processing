@@ -2,7 +2,9 @@
 
 Installation
 =============
-Sar-pre-processing MULTIPLY Data Access has been developed against Python 3.6. It cannot be guaranteed to work with previous Python versions. You can download the source code from the `project website <https://github.com/multiply-org/sar-pre-processing>`_.
+.. note::
+    The MULTIPLY platform has been developed against Python 3.6.
+    It cannot be guaranteed to work with previous Python versions.
 
 The standard python way
 ------------------------
@@ -20,9 +22,16 @@ Third: Install python package::
 
 Using conda
 --------------
-not yet implemented
+.. note::
+   TBD
 
 Using pip
 -------------
-not yet implemented
+.. note::
+   TBD
 
+Module requirements
+-------------------
+from `requirements.txt`:
+
+.. literalinclude:: requirements.txt
