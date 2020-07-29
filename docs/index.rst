@@ -5,7 +5,7 @@ MULTIPLY - SAR Pre Processing
 
 .. htmlonly::
 
-    `View on GitHub <https://github.com/multiply-org/sar-pre-processing>`_
+    `View on GitHub <https://github.com/McWhity/sar-pre-processing>`_
 
 
 Scope of MULTIPLY
@@ -13,22 +13,10 @@ Scope of MULTIPLY
 The MULTIPLY project will “develop a new platform for joint and consistent retrieval of Copernicus
 SENTINEL data and beyond”.
 
-This documentation covers the pre processing steps of the used Sentinel-1 SLC data
+This documentation covers the SAR pre processing steps for the used Sentinel-1 SLC data.
 
-The `SAR pre processing specific documentation <https://multiply-sar-pre-processing.readthedocs.io/en/latest/>`_ is hosted on ReadTheDocs. It is part of the `MULTIPLY core documentation <http://multiply.readthedocs.io/en/latest/>`_.
-Please find the latest pdf version of this documentation `here <https://multiply-sar-pre-processing.readthedocs.io/_/downloads/en/latest/pdf/>`_.
-
-First Steps
------------
-Getting Started
-^^^^^^^^^^^^^^^
-Please find instructions on how to download and install the prior engine in the :ref:`Installation` section.
-
-Testing and Contribution
-^^^^^^^^^^^^^^^^^^^^^^^^^
-You are welcome to test and contribute to the MULTIPLY SAR pre processing.
-
-Please find corresponding guidelines and further information on how to do so in the :ref:`Contribution` section and on the `project GitHub page <https://github.com/multiply-org/sar-pre-processing>`_.
+The `SAR pre processing specific documentation <https://mcwhity-sar-pre-processing.readthedocs.io/en/latest/>`_ is hosted on ReadTheDocs. It is part of the `MULTIPLY core documentation <http://multiply.readthedocs.io/en/latest/>`_.
+Please find the latest pdf version of SAR pre procesing documentation `here <https://mcwhity-sar-pre-processing.readthedocs.io/_/downloads/en/latest/pdf/>`_.
 
 Content
 ---------
@@ -55,12 +43,18 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`search`
 
-.. |logo| image:: https://raw.githubusercontent.com/multiply-org/multiply-core/master/doc/source/_static/logo/Multiply_multicolour.png
+Credits
+-------------
+The project leading to this application has received funding from the
+European Union’s Horizon 2020 research and innovation program
+under grant agreement No 687320.
+
+.. |logo| image:: https://raw.githubusercontent.com/McWhity/sar-pre-processing/getting_to_release/docs/images/multiply_multi_colour_icon.png
    :width: 10%
 
 .. |buildstatus| image:: https://travis-ci.org/McWhity/sar-pre-processing.svg?branch=master
     :target: https://travis-ci.org/McWhity/sar-pre-processing
 
-.. |docstatus| image:: https://readthedocs.org/projects/multiply-sar-pre-processing/badge/?version=latest
-    :target: https://multiply-sar-pre-processing.readthedocs.io/en/latest/?badge=latest
+.. |docstatus| image:: https://readthedocs.org/projects/mcwhity-sar-pre-processing/badge/?version=latest
+    :target: https://mcwhity-sar-pre-processing.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
