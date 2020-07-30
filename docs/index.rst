@@ -22,7 +22,8 @@ Content
 
     01_Introduction
     02_Installation
-    03_Theory
+    03_Usage
+    04_Theory
     annex_technical
 
 .. toctree::
