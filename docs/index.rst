@@ -25,14 +25,9 @@ Content
     03_Usage
     04_Theory
     annex_technical
-
-.. toctree::
-    :maxdepth: 2
-
     Authors <authors>
     Changelog <changes>
     License
-
 
 Indices and tables
 -------------------
