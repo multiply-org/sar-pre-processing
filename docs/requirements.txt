@@ -2,3 +2,4 @@ xarray
 netCDF4
 pyproj
 sphinxcontrib-bibtex
+m2r
