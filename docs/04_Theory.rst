@@ -1,7 +1,7 @@
 .. _ProcessingChain:
 
 SNAP Pre-Processing Chain
-=====================
+==========================
 
 Main goal: Geometric and radiometric corrected Sigma nought backscatter values for usage within radiative transfer models like Water Cloud Model.
 
