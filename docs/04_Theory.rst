@@ -1,7 +1,9 @@
 .. _ProcessingChain:
 
-Processing Chain
-================
+SNAP Pre-Processing Chain
+=====================
+
+Main goal: Geometric and radiometric corrected Sigma nought backscatter values for usage within radiative transfer models like Water Cloud Model.
 
 Overview
 --------
@@ -161,8 +163,8 @@ Input:
 Output:
     - Radiometric and geometric corrected sigma naught calibrated radar backscatter (Map Projection WGS84)
 
-Backscatter normalisation
--------------------------
+Backscatter normalisation (optional)
+------------------------------------
 Theory / Purpose
 ~~~~~~~~~~~~~~~~~
 Beside the previously discussed geometric and radiometric distortions some other specific backscattering coefficient variations within the range direction of the image are caused by the image geometry of the SAR sensor. The backscattered energy of an illuminated area has not only a dependency on the area itself but also on the incidence angle. This means, backscatter values of a specific area with a small incidence angle return higher backscatter values then data of the same area acquired with a higher incidence angle. Incidence angle induced variations not only occur inside one image but also between images form different sensors as well as within one sensor through different acquisition geometries or different tracks or orbits. For a usage of Sentinel-1A and 1B time-series acquired with different orbits and/or different tracks and therefore most likly a high change between the incidence angles a backscatter normalisation is vital. A often and widely used technique to minimize backscatter variations caused by the incidence angle is the cosine correction :cite:`ulaby1982microwave`. The cosine correction is based on the Lambert's law for optics. Therefore, under the assumption that the backscattered energy in the upper hemisphere follows a cosine law and also the radiation variability has a cosine dependency, the received backscatter :math:`\sigma_{\theta_i}^{0}` and its dependency on the incidence angle can be written as
@@ -228,10 +230,10 @@ A characteristic of images acquired by a SAR system is the visibility of random 
 
 Practical implementation
 ~~~~~~~~~~~~~~~~~~~~~~~~~
-For the speckle reduction the "Multi-temporal Speckle Filter" operator within SNAP's S1TBX software is used. Currently 15 temporally consecutive images are used within the "Multi-temporal Speckle Filter" whereby the target image is temporally situated in the middle. The applied filter is a Lee filter with spatial averaging over 3x3 pixel. The spatial averaging over pixel has a significant influence on spatial resolution information loss of the image. Therefore, the averaging pixel size might change during the project. If the image consists of two polarisations the filter is applied on each polarisation separately. The practical implementation in case of filter type, used polarisation, number of used images etc. may change with more experience of applying multi-temporal speckle filters and the occurring results.
+For the speckle reduction the "Multi-temporal Speckle Filter" operator within SNAP's S1TBX software is used. Currently 7 temporally consecutive images are used within the "Multi-temporal Speckle Filter" whereby the target image is temporally situated in the middle. The applied filter is a Lee filter with a spatial window size of 5x5 pixels, a sigma of 0.9, and a target window size of 3x3 pixels. The spatial averaging over pixel has a significant influence on spatial resolution information loss of the image. Therefore, the averaging pixel size might change during the project. If the image consists of two polarisations the filter is applied on each polarisation separately. The practical implementation in case of filter type, used polarisation, number of used images etc. may change with more experience of applying multi-temporal speckle filters and the occurring results.
 
 Input:
-    - 7 co-registered images
+    - 7 co-registered images (can be specified within configuration file)
 
 Output:
     - speckle filtered images
