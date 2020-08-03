@@ -1,11 +1,6 @@
-Changelog sar-pro-processing module
+Changelog sar-pre-processing module
 =====================================
 
-version 0.4
--------------
-
-
-version 0.3
--------------
-Version for presentation at MULTIPLY User Workshop in Frascati 06.02.2018
-
+version 0.1 - 2020-07-30
+-------------------------
+initial version
