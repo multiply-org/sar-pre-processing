@@ -38,7 +38,7 @@ class NetcdfStackCreator(object):
 
         # sort filelist by time (ascending)
         length = len(self.input_folder)
-        self.filelist = sorted(self.filelist, key=lambda x:x[(length+18):104])
+        self.filelist = sorted(self.filelist, key=lambda x:x[(length+18):(length+18+16)])
 
     def _create_empty_netcdf_file(self):
         """ create dummy netcdf file"""
@@ -87,10 +87,7 @@ class NetcdfStackCreator(object):
         self.longitude[:] = data.variables['lon'][:]
 
         # loop over all files in filelist
-        y=0
-
-        for sarfile in self.filelist:
-            index = self.filelist.index(sarfile)-y
+        for index, sarfile in enumerate(self.filelist):
             print()
             print("Scene", self.filelist.index(sarfile) + 1, "of", len(self.filelist))
             print(sarfile)
