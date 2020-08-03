@@ -238,6 +238,28 @@ Input:
 Output:
     - speckle filtered images
 
+Abbreviations and values within preprocessed data (netcdf stack file)
+-----------------------------------------------------------
+
+Abbreviation within variable names
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- vv = VV polarization
+- vh = VH polarization
+- multi = multitemporal speckle filter was applied
+- norm = nomalization angle was applied
+
+Values of specific variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- orbitdirection
+    - 0 = Ascending
+    - 1 = Descending
+
+- relorbit
+    - number of relative orbit
+
+- satellite
+    - 0 = Sentinel-1 A
+    - 1 = Sentinel-1 B
 
 
 .. rubric:: References
