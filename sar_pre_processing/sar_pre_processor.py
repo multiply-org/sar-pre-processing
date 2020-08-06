@@ -539,12 +539,30 @@ class SARPreProcessor(PreProcessor):
 """run script"""
 
 # if __name__ == "__main__":
-# processing = SARPreProcessor(config='sample_config_file.yml')
-# processing.create_processing_file_list()
-# processing.pre_process_step1()
-# processing.pre_process_step2()
-# processing.pre_process_step3()
-# processing.solve_projection_problem()
-# processing.add_netcdf_information()
-# processing.create_netcdf_stack()
-# logging.info('finished')
+    # processing = SARPreProcessor(config='sample_config_file.yml')
+    # processing._create_processing_filelist()
+    # processing.pre_process_step1()
+    # processing.pre_process_step2()
+    # processing.pre_process_step3()
+    # subprocess.call(os.path.join(os.getcwd(),'projection_problem.sh ' + processing.config.output_folder_step3), shell=True)
+    # processing.netcdf_information()
+    # NetcdfStack(input_folder=processing.config.output_folder_step3, output_path=processing.config.output_folder_step3.rsplit('/', 1)[0] , output_filename=processing.config.output_folder_step3.rsplit('/', 2)[1])
+
+    # print('finished')
+
+
+
+
+
+
+
+
+
+
+
+# filtertype = self.config.speckle_filter.multi_temporal.filter
+# filtersizex = self.config.speckle_filter.multi_temporal.filtersizex
+# filtersizey = self.config.speckle_filter.multi_temporal.filtersizey
+# windowsize = self.config.speckle_filter.multi_temporal.windowsize
+# targetwindowsize = self.config.speckle_filter.multi_temporal.targetwindowsize
+>>>>>>> master
