@@ -340,100 +340,96 @@ class SARPreProcessor(PreProcessor):
         file_list.sort(key=lambda x: x[len(file_path) + 18:len(file_path) + 33])
         file_list_old = file_list
 
-        index = 0
-        for sensor in ['S1A', 'S1B']:
-            if self.config.speckle_filter.multi_temporal.apply == 'yes':
-                # Check if XML file for pre-processing step 3 is specified
-                assert self.config.pre_process_step3 is not None, \
-                    'ERROR: path of XML file for pre-processing step 3 is not not specified'
+        if self.config.speckle_filter.multi_temporal.apply == 'yes':
+            # Check if XML file for pre-processing step 3 is specified
+            assert self.config.pre_process_step3 is not None, \
+                'ERROR: path of XML file for pre-processing step 3 is not not specified'
 
-                # loop to apply multi-temporal filtering
-                # vv and vh polarisation are separated
-                for i, file in enumerate(file_list):
-                    component_progress_logger.info(f'{int((index / len(file_list_old)) * 100)}')
+            # loop to apply multi-temporal filtering
+            # vv and vh polarisation are separated
+            for i, file in enumerate(file_list):
+                component_progress_logger.info(f'{int((i / len(file_list)) * 100)}')
+                files_temporal_filter = int(self.config.speckle_filter.multi_temporal.files)
+                if i < math.floor(files_temporal_filter / 2):
+                    processing_file_list = file_list[0:files_temporal_filter]
+                elif i <= len(file_list) - math.ceil(files_temporal_filter / 2):
+                    processing_file_list = file_list[i - math.floor(files_temporal_filter / 2):i + math.ceil(
+                        files_temporal_filter / 2)]
+                else:
+                    processing_file_list = file_list[i - math.floor(files_temporal_filter / 2) - (
+                            math.ceil(files_temporal_filter / 2) - (len(file_list) - i)):len(file_list)]
+                file_path, filename, file_short_name, extension = self._decompose_filename(file)
+                a, a, b, a = self._decompose_filename(self._create_file_list(
+                    os.path.join(file_path, file_short_name + '.data'), '*_slv1_*.img')[0])
+                a, a, c, a = self._decompose_filename(self._create_file_list(
+                    os.path.join(file_path, file_short_name + '.data'), '*_slv2_*.img')[0])
+                a, a, d, a = self._decompose_filename(self._create_file_list(
+                    os.path.join(file_path, file_short_name + '.data'), '*_slv3_*.img')[0])
+                a, a, e, a = self._decompose_filename(self._create_file_list(
+                    os.path.join(file_path, file_short_name + '.data'), '*_slv4_*.img')[0])
+                list_bands_single_speckle_filter = ','.join([b, c, d, e])
 
-                    files_temporal_filter = int(self.config.speckle_filter.multi_temporal.files)
-                    if i < math.floor(files_temporal_filter / 2):
-                        processing_file_list = file_list[0:files_temporal_filter]
-                    elif i <= len(file_list) - math.ceil(files_temporal_filter / 2):
-                        processing_file_list = file_list[i - math.floor(files_temporal_filter / 2):i + math.ceil(
-                            files_temporal_filter / 2)]
-                    else:
-                        processing_file_list = file_list[i - math.floor(files_temporal_filter / 2) - (
-                                math.ceil(files_temporal_filter / 2) - (len(file_list) - i)):len(file_list)]
-                    file_path, filename, file_short_name, extension = self._decompose_filename(file)
-                    a, a, b, a = self._decompose_filename(self._create_file_list(
-                        os.path.join(file_path, file_short_name + '.data'), '*_slv1_*.img')[0])
-                    a, a, c, a = self._decompose_filename(self._create_file_list(
-                        os.path.join(file_path, file_short_name + '.data'), '*_slv2_*.img')[0])
-                    a, a, d, a = self._decompose_filename(self._create_file_list(
+                name_change_vv_single = d
+                name_change_vh_single = e
+                name_change_vv_norm_single = b
+                name_change_vh_norm_single = c
+
+                list_bands_vv_multi = []
+                list_bands_vh_multi = []
+
+                list_bands_vv_norm_multi = []
+                list_bands_vh_norm_multi = []
+
+                for processing_file in processing_file_list:
+                    file_path, filename, file_short_name, extension = self._decompose_filename(processing_file)
+
+                    # get filename from folder (think about better way!)
+                    a, a, band_vv_name_multi, a = self._decompose_filename(self._create_file_list(
                         os.path.join(file_path, file_short_name + '.data'), '*_slv3_*.img')[0])
-                    a, a, e, a = self._decompose_filename(self._create_file_list(
+                    a, a, band_vh_name_multi, a = self._decompose_filename(self._create_file_list(
                         os.path.join(file_path, file_short_name + '.data'), '*_slv4_*.img')[0])
-                    list_bands_single_speckle_filter = ','.join([b, c, d, e])
+                    a, a, band_vv_name_norm_multi, a = self._decompose_filename(self._create_file_list(
+                        os.path.join(file_path, file_short_name + '.data'), '*_slv1_*.img')[0])
+                    a, a, band_vh_name_norm_multi, a = self._decompose_filename(self._create_file_list(
+                        os.path.join(file_path, file_short_name + '.data'), '*_slv2_*.img')[0])
+                    list_bands_vv_multi.append(band_vv_name_multi)
+                    list_bands_vh_multi.append(band_vh_name_multi)
 
-                    name_change_vv_single = d
-                    name_change_vh_single = e
-                    name_change_vv_norm_single = b
-                    name_change_vh_norm_single = c
+                    list_bands_vv_norm_multi.append(band_vv_name_norm_multi)
+                    list_bands_vh_norm_multi.append(band_vh_name_norm_multi)
 
-                    list_bands_vv_multi = []
-                    list_bands_vh_multi = []
+                # Divide filename of file of interest
+                file_path, filename, file_short_name, extension = self._decompose_filename(file)
 
-                    list_bands_vv_norm_multi = []
-                    list_bands_vh_norm_multi = []
+                output_file = os.path.join(
+                    self.config.output_folder_step3, file_short_name + self.name_addition_step3 + '.nc')
 
-                    for processing_file in processing_file_list:
-                        file_path, filename, file_short_name, extension = self._decompose_filename(processing_file)
+                date = datetime.strptime(file_short_name[17:25], '%Y%m%d')
+                date = date.strftime('%d%b%Y')
 
-                        # get filename from folder (think about better way!)
-                        a, a, band_vv_name_multi, a = self._decompose_filename(self._create_file_list(
-                            os.path.join(file_path, file_short_name + '.data'), '*_slv3_*.img')[0])
-                        a, a, band_vh_name_multi, a = self._decompose_filename(self._create_file_list(
-                            os.path.join(file_path, file_short_name + '.data'), '*_slv4_*.img')[0])
-                        a, a, band_vv_name_norm_multi, a = self._decompose_filename(self._create_file_list(
-                            os.path.join(file_path, file_short_name + '.data'), '*_slv1_*.img')[0])
-                        a, a, band_vh_name_norm_multi, a = self._decompose_filename(self._create_file_list(
-                            os.path.join(file_path, file_short_name + '.data'), '*_slv2_*.img')[0])
-                        list_bands_vv_multi.append(band_vv_name_multi)
-                        list_bands_vh_multi.append(band_vh_name_multi)
+                theta = 'localIncidenceAngle_slv10_' + date
 
-                        list_bands_vv_norm_multi.append(band_vv_name_norm_multi)
-                        list_bands_vh_norm_multi.append(band_vh_name_norm_multi)
+                processing_file_list = ','.join(processing_file_list)
+                list_bands_vv_multi = ','.join(list_bands_vv_multi)
+                list_bands_vh_multi = ','.join(list_bands_vh_multi)
+                list_bands_vv_norm_multi = ','.join(list_bands_vv_norm_multi)
+                list_bands_vh_norm_multi = ','.join(list_bands_vh_norm_multi)
 
-                    # Divide filename of file of interest
-                    file_path, filename, file_short_name, extension = self._decompose_filename(file)
-
-                    output_file = os.path.join(
-                        self.config.output_folder_step3, file_short_name + self.name_addition_step3 + '.nc')
-
-                    date = datetime.strptime(file_short_name[17:25], '%Y%m%d')
-                    date = date.strftime('%d%b%Y')
-
-                    theta = 'localIncidenceAngle_slv10_' + date
-
-                    processing_file_list = ','.join(processing_file_list)
-                    list_bands_vv_multi = ','.join(list_bands_vv_multi)
-                    list_bands_vh_multi = ','.join(list_bands_vh_multi)
-                    list_bands_vv_norm_multi = ','.join(list_bands_vv_norm_multi)
-                    list_bands_vh_norm_multi = ','.join(list_bands_vh_norm_multi)
-
-                    call = '"' + self.config.gpt + '" "' + self.config.pre_process_step3 + \
-                           '" -Pinput="' + processing_file_list + '" -Pinput2="' + file + \
-                           '" -Poutput="' + output_file + '" -Ptheta="' + theta + \
-                           '" -Plist_bands_vv_multi="' + list_bands_vv_multi + \
-                           '" -Plist_bands_vh_multi="' + list_bands_vh_multi + \
-                           '" -Plist_bands_vv_norm_multi="' + list_bands_vv_norm_multi + \
-                           '" -Plist_bands_vh_norm_multi="' + list_bands_vh_norm_multi + '" -Pdate="' + date + \
-                           '" -Pname_change_vv_single="' + name_change_vv_single + \
-                           '" -Pname_change_vh_single="' + name_change_vh_single + \
-                           '" -Pname_change_vv_norm_single="' + name_change_vv_norm_single + \
-                           '" -Pname_change_vh_norm_single="' + name_change_vh_norm_single + \
-                           '" -Plist_bands_single_speckle_filter="' + list_bands_single_speckle_filter + '" -c 2G -x'
-                    return_code = subprocess.call(call, shell=True)
-                    logging.info(return_code)
-                    logging.info(datetime.now())
-                    index += 1
+                call = '"' + self.config.gpt + '" "' + self.config.pre_process_step3 + \
+                       '" -Pinput="' + processing_file_list + '" -Pinput2="' + file + \
+                       '" -Poutput="' + output_file + '" -Ptheta="' + theta + \
+                       '" -Plist_bands_vv_multi="' + list_bands_vv_multi + \
+                       '" -Plist_bands_vh_multi="' + list_bands_vh_multi + \
+                       '" -Plist_bands_vv_norm_multi="' + list_bands_vv_norm_multi + \
+                       '" -Plist_bands_vh_norm_multi="' + list_bands_vh_norm_multi + '" -Pdate="' + date + \
+                       '" -Pname_change_vv_single="' + name_change_vv_single + \
+                       '" -Pname_change_vh_single="' + name_change_vh_single + \
+                       '" -Pname_change_vv_norm_single="' + name_change_vv_norm_single + \
+                       '" -Pname_change_vh_norm_single="' + name_change_vh_norm_single + \
+                       '" -Plist_bands_single_speckle_filter="' + list_bands_single_speckle_filter + '" -c 2G -x'
+                return_code = subprocess.call(call, shell=True)
+                logging.info(return_code)
+                logging.info(datetime.now())
 
     def solve_projection_problem(self):
         """
@@ -549,4 +545,3 @@ class SARPreProcessor(PreProcessor):
     # NetcdfStack(input_folder=processing.config.output_folder_step3, output_path=processing.config.output_folder_step3.rsplit('/', 1)[0] , output_filename=processing.config.output_folder_step3.rsplit('/', 2)[1])
 
     # print('finished')
-
