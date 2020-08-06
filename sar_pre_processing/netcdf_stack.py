@@ -13,6 +13,7 @@ class NetcdfStackCreator(object):
     def __init__(self, **kwargs):
         self.input_folder = kwargs.get('input_folder', None)
         self.output_path = kwargs.get('output_path', None)
+        self.step1_folder = kwargs.get('step1_folder', None)
         self.output_filename = kwargs.get('output_filename', None)
         self._check()
 
