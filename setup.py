@@ -6,6 +6,7 @@ from setuptools import setup
 requirements = [
       # 'netCDF4',
       # 'PyYAML',
+      # 'pyproj',
       # 'pytest'
       # 'sphinxcontrib-bibtex'
 ]
