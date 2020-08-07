@@ -80,7 +80,7 @@ class SARList(object):
         """
         Checks of the area of interest defined by location is contained in file
         file is a map projected jpeg, the xml file containing the projection
-        needs to be in the same location as sarfile
+        needs to be in the same location as file
 
         THIS VERSION FINALLY WITH INTERSECT OF POLYGONS OGR
         """
@@ -220,7 +220,7 @@ class SARList(object):
             zfile.extract(xml_file1, filepath)
             zfile.close()
         except:
-            print('zipfile cannot open !!!!')
+            logging.info('cannot open zipfile !!!!')
             contained = False
             return contained
 
@@ -324,7 +324,7 @@ class SARList(object):
             filelist = self._select_year(filelist, self.config.year)
             filelist.sort()
         except AttributeError:
-            print('year not specified')
+            logging.info('year not specified')
             pass
 
         # list with all zip files that contain area of interest
@@ -338,7 +338,7 @@ class SARList(object):
             location = [upper_left_x, upper_left_y, lower_right_x, lower_right_y]
             filelist = self._contain_area_of_interest(filelist, location, self.config.input_folder)
         except AttributeError:
-            print('area of interest not specified')
+            logging.info('area of interest not specified')
 
         # check for double processed data by ESA and choose newest one
         filelist = self._double_processed(filelist)
