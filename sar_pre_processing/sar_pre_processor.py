@@ -112,9 +112,6 @@ class SARPreProcessor(PreProcessor):
             default_graph = pkg_resources.resource_filename('sar_pre_processing.default_graphs', default_name)
             self.config.add_entry(key_name, default_graph)
 
-    # def set_file_list(self, file_list: List[str]):
-    #     self.file_list = file_list
-
     @staticmethod
     def _create_file_list(input_folder, expression):
         """
@@ -165,7 +162,7 @@ class SARPreProcessor(PreProcessor):
         4) TOPSAR-Deburst
         5) Geometric Terrain Correction
         6) Radiometric Correction (after kellndorfer et al.)
-        7) backscatter normalisation on specified angle in config file (based on Lambert's Law)
+        7) backscatter normalisation on specified angle in config file (based on Lambert's Law) (optional)
 
         """
 
@@ -244,7 +241,7 @@ class SARPreProcessor(PreProcessor):
 
         1) co-register pre-processed data
 
-        !!! all files will get metadata of the master image !!! That is how SNAP does it! Metadata will be corrected produces netcdf files at the end of the preprocessing chain (def add_netcdf_information)
+        !!! all files will get metadata of the master image !!! That is how SNAP does it! Metadata will be corrected within netcdf output files at the end of the preprocessing chain (def add_netcdf_information)
         """
         # Check if XML file for pre-processing step 2 is specified
         assert self.config.pre_process_step2 is not None, \
@@ -308,7 +305,7 @@ class SARPreProcessor(PreProcessor):
 
         Pre-process S1 SLC data with SNAP's GPT
 
-        1) apply multi-temporal speckle filter
+        1) apply multi-temporal speckle filter / single speckle filter
 
         """
         # Check if output folder of pre_process_step1 exists
@@ -433,7 +430,7 @@ class SARPreProcessor(PreProcessor):
 
     def solve_projection_problem(self):
         """
-        solve projection problem of created NetCDF file from SNAP toolbox
+        solve projection problem of created NetCDF file
         """
         sh_file = pkg_resources.resource_filename('sar_pre_processing', 'solve_projection_problem.sh')
         subprocess.call(sh_file + ' ' + self.config.output_folder_step3, shell=True)
@@ -517,20 +514,6 @@ class SARPreProcessor(PreProcessor):
                 data_set.setncattr_string('satellite', 'S1B')
 
             data_set.close()
-
-    def create_netcdf_stack(self, filename: Optional[str] = None):
-        """
-        create one NetCDF stack file from output of step3
-        Orbitdirection: '0 = Ascending, 1 = Descending'
-        Satellite: '0 = Sentinel 1A, 1 = Sentinel 1B'
-        """
-        if filename is None:
-            filename = self.config.output_folder_step3.rsplit('/', 2)[1]
-        stack_creator = NetcdfStackCreator(input_folder=self.config.output_folder_step3,
-                                           output_path=self.config.output_folder_step3.rsplit('/', 1)[0],
-                                           output_filename=filename)
-        stack_creator.create_netcdf_stack()
-
 
 """run script"""
 
