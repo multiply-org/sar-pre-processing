@@ -1,18 +1,9 @@
 
 # Input folder with SAR data (zip format)
-# input_folder: /media/nas_data/Thomas/Sentinel_1_data/biebrza_poland
-# input_folder: /media/nas_data/Thomas/Sentinel_1_data/foggia_italy
-# input_folder: /media/nas_data/Thomas/S1/data/Wallerfing_MNI
-# input_folder: /media/tweiss/Daten/try_preprocessing/data
 input_folder: '/media/tweiss/Daten/test_mysentinelapi'
 
 # Folder to store the pre-processed data
-# output_folder: /media/nas_data/Thomas/S1/processed/MNI_2017_new_final
-# output_folder: /media/nas_data/Thomas/S1/processed/MNI_2018_new_final
-# output_folder: /media/tweiss/Daten/try_preprocessing
 output_folder: '/media/tweiss/Daten/test_mysentinelapi'
-# output_folder: /media/nas_data/Thomas/poland_processed
-# output_folder: /media/nas_data/Thomas/foggia_italy_processed
 
 # Location of SNAP's graph-processing-tool
 gpt: /home/tweiss/snap/bin/gpt
@@ -26,17 +17,8 @@ pre_process_step1_border: test_pre_process_step1_border.xml
 pre_process_step2: test_pre_process_step2.xml
 pre_process_step3: test_pre_process_step3.xml
 
+# if subset = 'yes', region must be specified
 subset: 'yes'
-
-# # if subset = 'yes', region must be specified
-# region:
-#   ul:
-#     lat: 47.8782
-#     lon: 10.6168
-#   lr:
-#     lat: 47.8486
-#     lon: 10.6699
-
 region:
   ul:
     lat: 48.40
@@ -45,25 +27,7 @@ region:
     lat: 48.10
     lon: 11.90
 
-
-# foggia
-# region:
-#   ul:
-#     lat: 41.44310092761187
-#     lon: 15.396523233452278
-#   lr:
-#     lat: 41.299146707374895
-#     lon: 15.5871227545953
-
-# poland
-# region:
-#   ul:
-#     lat: 53.51353092761188
-#     lon: 22.526527143706467
-#   lr:
-#     lat: 53.36957669116146
-#     lon: 22.766659589784574
-
+# speckle filter settings
 speckle_filter:
   multi_temporal:
     apply: 'yes'
@@ -71,7 +35,9 @@ speckle_filter:
   single_filter:
     apply: 'yes'
 
+# use to just process one specific year
 year: 2020
 
+# set value for normalisation angle otherwise default value will be used
 # normalisation_angle:
 
