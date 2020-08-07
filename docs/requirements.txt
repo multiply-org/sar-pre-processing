@@ -1,6 +1,11 @@
-xarray
-netCDF4
-pyproj
-sphinxcontrib-bibtex
+netCDF4==1.5.3
+xarray==0.15.1
+numpy==1.18.1
+pyproj==2.6.0
+pytest==4.6
+PyYAML==5.3
+GDAL==2.4.2
+setuptools==49.2.1
 m2r
+sphinxcontrib-bibtex
 nbsphinx
