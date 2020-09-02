@@ -19,4 +19,4 @@ Please find instructions on how to download and install the prior engine in the 
 
 Testing and Contribution
 ^^^^^^^^^^^^^^^^^^^^^^^^^
-You are welcome to test and contribute to the MULTIPLY SAR pre processing. Please use `GitHub <https://github.com/McWhity/sar-pre-processing>`_ for that matter.
+You are welcome to test and contribute to the MULTIPLY SAR pre processing. Please use `GitHub <https://github.com/multiply-org/sar-pre-processing>`_ for that matter.

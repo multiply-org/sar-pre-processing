@@ -61,7 +61,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'MULTIPLY SAR pre-processing'
-copyright = u'2017, Thomas Weiß'
+copyright = u'2020, Thomas Weiß'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
