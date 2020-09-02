@@ -4,6 +4,7 @@ import xarray as xr
 import numpy as np
 import os, fnmatch
 import datetime
+import logging
 
 class NetcdfStackCreator(object):
     """
@@ -28,14 +29,14 @@ class NetcdfStackCreator(object):
         self.stacking()
 
     def _create_filelist(self):
-        """create a list containing all file in specified input folder"""
+        """create a list containing all files in specified input folder"""
 
         # Create list containing all files to be processed
         self.filelist = []
         for root, dirnames, filenames in os.walk(self.input_folder):
             for filename in fnmatch.filter(filenames, '*.nc'):
                 self.filelist.append(os.path.join(root, filename))
-        print("Number of scenes found for processing:", len(self.filelist))
+        logging.info("Number of scenes found for processing:", len(self.filelist))
 
         # sort filelist by time (ascending)
         length = len(self.input_folder)
@@ -80,7 +81,7 @@ class NetcdfStackCreator(object):
         self.sigma0_vh_tempspeckl.units = 'linear'
 
     def stacking(self):
-        """stack all file in one"""
+        """stack all files in one netcdf file"""
 
         # 1-D Elements
         data = Dataset(self.filelist[0])
