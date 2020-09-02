@@ -4,7 +4,6 @@ numpy==1.18.1
 pyproj==2.6.0
 pytest==4.6
 PyYAML==5.3
-GDAL==3.0.2
 setuptools==49.2.1
 m2r
 sphinxcontrib-bibtex
