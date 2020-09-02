@@ -46,5 +46,5 @@ under grant agreement No 687320.
     :target: https://travis-ci.org/multiply-org/sar-pre-processing
 
 .. |docstatus| image:: https://readthedocs.org/projects/multiply-sar-pre-processing/badge/?version=latest
-    :target: https://multiply-sar-pre-processing.readthedocs.io/en/latest/?badge=latest
+    :target: https://multiply-sar-pre-processing.readthedocs.io/en/getting_to_release/
     :alt: Documentation Status
