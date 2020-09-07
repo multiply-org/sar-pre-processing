@@ -1,7 +1,7 @@
 ---
 gpt: /home/tweiss/snap/bin/gpt
-input_folder: /media/wodan/data/Git/Github/multiply-org/sar-pre-processing/notebooks/test_files
-output_folder: /media/wodan/data/Git/Github/multiply-org/sar-pre-processing/notebooks/test_files
+input_folder: /media/tweiss/Work/GIT/GitHub/multiply-org/sar-pre-processing/docs/notebooks/test_files
+output_folder: /media/tweiss/Work/GIT/GitHub/multiply-org/sar-pre-processing/docs/notebooks/test_files
 region:
   lr:
     lat: 48.1
