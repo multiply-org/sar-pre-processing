@@ -1,5 +1,5 @@
 ---
-title: 'sar-pre-processing: A Python package for pre-processing Sentinel-1 SLC data with ESAs SNAP Toolbox'
+title: 'sar-pre-processing: A Python package for pre-processing Sentinel-1 SLC data with ESA\'s SNAP Toolbox'
 tags:
   - Python
   - Sentinel-1
@@ -28,7 +28,7 @@ This python package generates are file list of to be processed Sentinel-1 images
 Based on the generated file list the python packages applies a pre processing chain to Sentinel-1 SLC time series data to generate radiometric and geometric corrected Sigma nought backscatter values. Furthermore, the time series images are co-registered and additional output files of single and/or multi-temporal speckle filtered data are generated. To pre process the images the python packages uses the framework of ESA's SNAP Toolbox (current version 7.0.3). The individual processing steps are defined within default xml-files (user defined xml-files can be generated e.g. with the SNAP Toolbox and used within the python package). After the pre processing the generated radiometric and geometric corrected images are stored for further usage within a NetCDF4 stack file.
 Among other applications the processed images can be and are used for flood risk analysis, monitoring land cover changes, monitoring global food security or estimation of land surface parameters. In the future many more new products and operational third party services based on consistent Sentinel-1 time series might be developed.
 
-This python package was developed within the Horizon 2020 project called MULTIscale SENTINEL land surface information retrieval Platform (MULTIPLY) [noauthor_multiscale_nodate, noauthor_multiply_nodate]. Furthermore, data processed by this package is used within Sentinel-Synergy-Study S3 project [noauthor_sentinel-synergy-study_nodate]. In addition, the python code was used to process Sentinel-1 time series images for analysis on detection of temporary flooded vegetation [tsyganskaya_detection_2018, tsyganskaya_flood_2019].
+This python package was developed within the Horizon 2020 project called MULTIscale SENTINEL land surface information retrieval Platform (MULTIPLY) [@noauthor_multiscale_nodate, @noauthor_multiply_nodate]. Furthermore, data processed by this package is used within Sentinel-Synergy-Study S3 project [@noauthor_sentinel-synergy-study_nodate]. In addition, the python code was used to process Sentinel-1 time series images for analysis on detection of temporary flooded vegetation [@tsyganskaya_detection_2018, @tsyganskaya_flood_2019].
 
 # Acknowledgements
 
