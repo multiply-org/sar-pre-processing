@@ -63,12 +63,11 @@ class SARList(object):
         Select all S1 data in input_folder of a specific year
         """
         # position of year in filename is hard coded!!!
-
         filelist_new = []
         for file in filelist:
             filepath, filename, fileshortname, extension = self._decomposition_filename(
                 file)
-            if filename[17:21] == str(self.config.year):
+            if filename[17:21] == str(year):
                 filelist_new.append(file)
             else:
                 pass

@@ -9,7 +9,7 @@ requirements = [
        'PyYAML',
        'pyproj',
        'pytest',
-       'gdal==3.0.2',
+#       'gdal==3.0.2',
        'xarray',
        'sphinxcontrib-bibtex'
 ]
