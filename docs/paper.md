@@ -1,5 +1,5 @@
 ---
-title: 'sar-pre-processing: A Python package for pre-processing Sentinel-1 SLC data with ESA's SNAP Toolbox'
+title: 'sar-pre-processing: A Python package for pre-processing Sentinel-1 SLC data with ESAs SNAP Toolbox'
 tags:
   - Python
   - Sentinel-1
