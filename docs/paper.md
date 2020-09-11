@@ -23,9 +23,9 @@ bibliography: paper.bib
 # Summary
 
 The Sentinel-1 mission consists of two polar-orbiting satellites acquiring Synthetic Aperture Radar data (SAR) at C-band (frequency of 5.405 GHz) with a revisit time of 6 days.
-The SAR data distributed as Ground Range Detected (GRD) or Single Look Complex (SLC) is distributed free of charge via the Copernicus Open Access Hub by ESA and the European Commission.
-For further analysis or usage within third party applications the provided Sentinel-1 Level 1 SLC data has to be radiometric and geometric corrected.
-Therefore, either a semi-automatic or manual pre processing of Sentinel-1 images is needed.
+The SAR data is distributed free of charge via the Copernicus Open Access Hub by ESA and the European Commission.
+For further analysis or usage within third party applications the provided Sentinel-1 Level 1 data has to be radiometric and geometric corrected.
+Therefore, either an automatic or manual pre processing of Sentinel-1 images is needed.
 
 This python package generates are file list of to be processed Sentinel-1 images (already downloaded and stored in a specific folder) based on different user defined criteria (specific year, area of interest).
 Additionally, specific cases of double processed data (sometimes Sentinel-1 images were initially processed multiple times and stored under similar names within Copernicus Open Access Hub) and border issues due to user defined area of interest (due to storages reasons Sentinel-1 data of the area of interest might be stored within different consecutive images) are handled.
