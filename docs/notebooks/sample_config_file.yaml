@@ -36,5 +36,6 @@ speckle_filter:
 
 year: 2020
 
-# normalisation_angle:
+# not needed if default version is used
+#normalisation_angle: 35
 
