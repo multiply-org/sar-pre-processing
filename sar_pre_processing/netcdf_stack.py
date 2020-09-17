@@ -36,7 +36,8 @@ class NetcdfStackCreator(object):
         for root, dirnames, filenames in os.walk(self.input_folder):
             for filename in fnmatch.filter(filenames, '*.nc'):
                 self.filelist.append(os.path.join(root, filename))
-        logging.info("Number of scenes found for processing:", len(self.filelist))
+        logging.info(f'Number of scenes found for processing: {len(self.filelist)}')
+
 
         # sort filelist by time (ascending)
         length = len(self.input_folder)

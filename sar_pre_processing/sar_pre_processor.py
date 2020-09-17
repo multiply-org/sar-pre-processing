@@ -515,6 +515,18 @@ class SARPreProcessor(PreProcessor):
 
             data_set.close()
 
+
+    def create_netcdf_stack(self, filename: Optional[str] = None):
+        """
+        create one NetCDF stack file from output of step3
+        Orbitdirection: '0 = Ascending, 1 = Descending'
+        Satellite: '0 = Sentinel 1A, 1 = Sentinel 1B'
+        """
+        if filename is None:
+            filename = self.config.output_folder_step3.rsplit('/', 2)[1]
+        stack_creator = NetcdfStackCreator(input_folder=self.config.output_folder_step3, output_path=self.config.output_folder_step3.rsplit('/', 1)[0], output_filename=filename)
+        stack_creator.create_netcdf_stack()
+
 """run script"""
 
 # if __name__ == "__main__":
