@@ -1,5 +1,5 @@
 ---
-title: 'sar-pre-processing: A Python package for pre-processing Sentinel-1 SLC data with ESAs SNAP Toolbox'
+title: 'sar-pre-processing: A Python package for pre-processing Sentinel-1 SLC data with the Sentinel-1 Toolbox
 tags:
   - Python
   - Sentinel-1
@@ -24,22 +24,27 @@ bibliography: paper.bib
 
 The Sentinel-1 mission consists of two polar-orbiting satellites acquiring Synthetic Aperture Radar data (SAR) at C-band (frequency of 5.405 GHz) with a revisit time of 6 days.
 The SAR data is distributed free of charge via the Copernicus Open Access Hub by ESA and the European Commission.
-For further analysis or usage within third party applications the provided Sentinel-1 Level 1 data has to be radiometric and geometric corrected.
-Therefore, either an automatic or manual pre processing of Sentinel-1 images is needed.
+Due to the specific imaging geometry of the radar system the acquired radar data contains different radiometric and geometric distortions.
+The radiometric quality is affected by spreading loss effect, the non-uniform antenna pattern, possible gain changes, saturation and speckle noise.
+Geometric distortions such as foreshortening, layover or shadowing effects are based on the side looking radar acquisition system.
+To account for these radiometric and geometric distortions the Sentinel-1 Level 1 data has to be corrected radiometrically and geometrically before the data can be used for further analysis or within third party applications.
+Therefore, either an automatic or manual pre-processing of Sentinel-1 images is needed.
 
-This python package generates are file list of to be processed Sentinel-1 images (already downloaded and stored in a specific folder) based on different user defined criteria (specific year, area of interest).
-Additionally, specific cases of double processed data (sometimes Sentinel-1 images were initially processed multiple times and stored under similar names within Copernicus Open Access Hub) and border issues due to user defined area of interest (due to storages reasons Sentinel-1 data of the area of interest might be stored within different consecutive images) are handled.
-Based on the generated file list the python packages applies a pre processing chain to Sentinel-1 SLC time series data to generate radiometric and geometric corrected Sigma nought backscatter values.
-Furthermore, the time series images are co-registered and additional output files of single and/or multi-temporal speckle filtered data are generated.
-To pre process the images the python packages uses the framework of ESA's SNAP Toolbox (current version 7.0.3).
-The individual processing steps are defined within default xml-files (user defined xml-files can be generated e.g. with the SNAP Toolbox and used within the python package).
-After the pre processing the generated radiometric and geometric corrected images are stored for further usage within a NetCDF4 stack file.
+This python package generates a file list of to be processed Sentinel-1 images (already downloaded and stored in a specific folder) based on different user defined criteria (specific year, area of interest).
+Additionally, specific cases of repeatedly processed data are handled, as sometimes Sentinel-1 data were initially processed multiple times and stored under similar names on the Copernicus Open Access Hub. Also, cases where Sentinel-1 data within the user-defined area of interest might be stored in consecutive images are considered.
+
+Based on the generated file list the python package applies a pre-processing chain to Sentinel-1 Single Look Complex (SLC) time series data to generate radiometrically and geometrically corrected Sigma nought backscatter values.
+Furthermore, the time series images are co-registered and additional output files of multi-temporal speckle filtered data are generated.
+In addition, a single speckle filter instead of a multi-temporal one can be applied as well and the output will be stored as a separate layer.
+To pre-process the images, the python package uses the GPF (Graph Processing Framework) of the SeNtinel Application Platform (SNAP) and the operators provided by the Sentinel-1 Toolbox (in version 7.0.3). Each of these operators performs a pre-processing step. The operators can be chained together to form a graph, which is used by the python package to run on the Sentinel-1 Data using the GPF. The graphs are stored in xml-files. Users may change the graphs by modifying the files directly or via the Sentinel Toolbox).
+
+After the pre-processing the generated radiometrically and geometrically corrected images are stored for further usage within a NetCDF4 stack file.
 Among other applications the processed images can be and are used for flood risk analysis, monitoring land cover changes, monitoring global food security or estimation of land surface parameters.
 In the future many more new products and operational third party services based on consistent Sentinel-1 time series might be developed.
 
-This python package was developed within the Horizon 2020 project called MULTIscale SENTINEL land surface information retrieval Platform (MULTIPLY) [@noauthor_multiscale_nodate; @noauthor_multiply_nodate].
-Furthermore, data processed by this package is used within Sentinel-Synergy-Study S3 project [@noauthor_sentinel-synergy-study_nodate].
-In addition, the python code was used to process Sentinel-1 time series images for analysis on detection of temporary flooded vegetation [@tsyganskaya_detection_2018; @tsyganskaya_flood_2019].
+This python package was developed within the Horizon 2020 project called MULTIscale SENTINEL land surface information retrieval Platform (MULTIPLY) (http://www.multiply-h2020.eu/, https://cordis.europa.eu/project/id/687320).
+Furthermore, data processed by this package is used within Sentinel-Synergy-Study S3 project (https://www.researchgate.net/project/Sentinel-Synergy-Study-S3).
+In addition, the python code was used to process Sentinel-1 time series images for the detection and analysis of temporary flooded vegetation [@tsyganskaya_detection_2018; @tsyganskaya_flood_2019] and for the evaluation of different radiative transfer models for microwave backscatter estimation of wheat fields [@weis_evaluation_2020].
 
 # Acknowledgements
 
