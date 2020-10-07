@@ -36,10 +36,10 @@ Additionally, specific cases of repeatedly processed data are handled, as someti
 Based on the generated file list the python package applies a pre-processing chain to Sentinel-1 Single Look Complex (SLC) time series data to generate radiometrically and geometrically corrected Sigma nought backscatter values.
 Furthermore, the time series images are co-registered and additional output files of multi-temporal speckle filtered data are generated.
 In addition, a single speckle filter instead of a multi-temporal one can be applied as well and the output will be stored as a separate layer.
-To pre-process the images, the python package uses the GPF (Graph Processing Framework) of the SeNtinel Application Platform (SNAP) and the operators provided by the Sentinel-1 Toolbox (in version 7.0.3). Each of these operators performs a pre-processing step. The operators can be chained together to form a graph, which is used by the python package to run on the Sentinel-1 Data using the GPF. The graphs are stored in xml-files. Users may change the graphs by modifying the files directly or via the Sentinel Toolbox).
+To pre-process the images, the python package uses the GPF (Graph Processing Framework) of the SeNtinel Application Platform (SNAP) and the operators provided by the Sentinel-1 Toolbox (in version 7.0.3). Each of these operators performs a pre-processing step. The operators can be chained together to form a graph, which is used by the python package to run on the Sentinel-1 data using the GPF. The graphs are stored in xml-files. Users may change the graphs by modifying the files directly or via the Sentinel Toolbox.
 
-After the pre-processing the generated radiometrically and geometrically corrected images are stored for further usage within a NetCDF4 stack file.
-Among other applications the processed images can be and are used for flood risk analysis, monitoring land cover changes, monitoring global food security or estimation of land surface parameters.
+After the pre-processing the resulting radiometrically and geometrically corrected images are stored for further usage within a NetCDF4 stack file.
+Among other applications the processed images can be used e.g. for flood risk analysis, monitoring land cover changes, monitoring global food security or estimation of land surface parameters.
 In the future many more new products and operational third party services based on consistent Sentinel-1 time series might be developed.
 
 This python package was developed within the Horizon 2020 project called MULTIscale SENTINEL land surface information retrieval Platform (MULTIPLY) (http://www.multiply-h2020.eu/, https://cordis.europa.eu/project/id/687320).
