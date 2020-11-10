@@ -53,6 +53,9 @@ templates_path = ['_templates']
 # The suffix of source filenames.
 source_suffix = ['.rst', '.md', '.ipynb']
 
+# If True, the build process is continued even if an exception occurs:
+nbsphinx_allow_errors = True
+
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
 
@@ -242,5 +245,3 @@ latex_logo = 'images/multiply_multi_colour.png'
 
 # add numbered figures
 numfig = True
-
-nbsphinx_allow_errors = True
