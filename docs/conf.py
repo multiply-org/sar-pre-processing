@@ -243,3 +243,4 @@ latex_logo = 'images/multiply_multi_colour.png'
 # add numbered figures
 numfig = True
 
+nbsphinx_allow_errors = True
