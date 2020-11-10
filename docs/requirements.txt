@@ -8,3 +8,4 @@ setuptools==49.2.1
 m2r
 sphinxcontrib-bibtex
 nbsphinx
+ipykernel
