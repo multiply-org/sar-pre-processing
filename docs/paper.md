@@ -23,9 +23,10 @@ bibliography: paper.bib
 # Summary
 
 The Sentinel-1 mission consists of two polar-orbiting satellites acquiring Synthetic Aperture Radar data (SAR) at C-band (frequency of 5.405 GHz) with a revisit time of 6 days.
-The SAR data is distributed free of charge via the Copernicus Open Access Hub by ESA and the European Commission.
+The SAR data is distributed free of charge via the Copernicus Open Access Hub (https://scihub.copernicus.eu/) by ESA and the European Commission.
+Large archives are also provided by Data and Information Access Services (DIAS) which serve the purpose to facilitate the access and use of Sentinel Data.
 Due to the specific imaging geometry of the radar system the acquired radar data contains different radiometric and geometric distortions.
-The radiometric quality is affected by spreading loss effect, the non-uniform antenna pattern, possible gain changes, saturation and speckle noise.
+The radiometric quality is affected by spreading loss effect, the non-uniform antenna pattern, possible gain changes, saturation, and speckle noise.
 Geometric distortions such as foreshortening, layover or shadowing effects are based on the side looking radar acquisition system.
 To account for these radiometric and geometric distortions the Sentinel-1 Level 1 data has to be corrected radiometrically and geometrically before the data can be used for further analysis or within third party applications.
 Therefore, either an automatic or manual pre-processing of Sentinel-1 images is needed.
@@ -36,7 +37,10 @@ Additionally, specific cases of repeatedly processed data are handled, as someti
 Based on the generated file list the python package applies a pre-processing chain to Sentinel-1 Single Look Complex (SLC) time series data to generate radiometrically and geometrically corrected Sigma nought backscatter values.
 Furthermore, the time series images are co-registered and additional output files of multi-temporal speckle filtered data are generated.
 In addition, a single speckle filter instead of a multi-temporal one can be applied as well and the output will be stored as a separate layer.
-To pre-process the images, the python package uses the GPF (Graph Processing Framework) of the SeNtinel Application Platform (SNAP) and the operators provided by the Sentinel-1 Toolbox (in version 8.0). Each of these operators performs a pre-processing step. The operators can be chained together to form a graph, which is used by the python package to run on the Sentinel-1 data using the GPF. The graphs are stored in xml-files. Users may change the graphs by modifying the files directly or via the Sentinel Toolbox.
+To pre-process the images, the python package uses the GPF (Graph Processing Framework) of the SeNtinel Application Platform (SNAP) and the operators provided by the Sentinel-1 Toolbox (in version 8.0). 
+The Sentinel Toolbox is available for download at step.esa.int, its source code is available in the senbox-org organization on Github.
+Each of these operators performs a pre-processing step. The operators can be chained together to form a graph, which is used by the python package to run on the Sentinel-1 data using the GPF. The graphs are stored in xml-files. Users may change the graphs by modifying the files directly or via the Sentinel Toolbox.
+User Guides to show how the GPF can be used are provided here: https://senbox.atlassian.net/wiki/spaces/SNAP/pages/70503053/Processing.
 
 After the pre-processing the resulting radiometrically and geometrically corrected images are stored for further usage within a NetCDF4 stack file.
 Among other applications the processed images can be used e.g. for flood risk analysis, monitoring land cover changes, monitoring global food security or estimation of land surface parameters.
