@@ -103,12 +103,16 @@ class NetcdfStackCreator(object):
                 sat = 0
             elif data.satellite == 'S1B':
                 sat = 1
+            else:
+                sat = -9999
 
             # encoding of orbitdirection
             if data.orbitdirection == 'ASCENDING':
                 orbitdir = 0
             elif data.orbitdirection =='DESCENDING':
                 orbitdir = 1
+            else:
+                orbitdir = -9999
 
             # fill 1-D variable
             self.times[index] = date2num(datetime.datetime.strptime(data.date, '%Y-%m-%d %H:%M:%S'), units ='days since ' + '1970-01-01 00:00:00', calendar='gregorian')

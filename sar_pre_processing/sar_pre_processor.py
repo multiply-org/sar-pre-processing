@@ -241,7 +241,10 @@ class SARPreProcessor(PreProcessor):
 
         1) co-register pre-processed data
 
-        !!! all files will get metadata of the master image !!! That is how SNAP does it! Metadata will be corrected within netcdf output files at the end of the preprocessing chain (def add_netcdf_information)
+        !!! all files will get metadata of the master image !!!
+        That is how SNAP does it! Metadata will be corrected within
+        netcdf output files at the end of the preprocessing chain
+        (def add_netcdf_information)
         """
         # Check if XML file for pre-processing step 2 is specified
         assert self.config.pre_process_step2 is not None, \

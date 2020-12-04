@@ -53,7 +53,7 @@ We use [Sphinx](http://www.sphinx-doc.org/en/stable/rest.html) to generate the d
 
 ## Contribution and Development
 
-Once, the package is set up, you are very welcome to contribute to MULTIPLY SAR-Pre-Processing.
+You are very welcome to contribute to MULTIPLY SAR-Pre-Processing. To do so, please first make a fork into your own repository and then create a Pull Request.
 
 ### Reporting issues and feedback
 
@@ -65,4 +65,4 @@ If you encounter any bugs with the tool, please file a [new issue](https://githu
 
 ## License
 
-This project is licensed under the GPLv3 License - see the [LICENSE.md](https://github.com/multiply-org/sar-pre-processing/blob/master/LICENSE.rst) file for details.
+This project is licensed under the GPLv3 License - see the [LICENSE.rst](https://github.com/multiply-org/sar-pre-processing/blob/master/LICENSE.rst) file for details.

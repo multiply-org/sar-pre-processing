@@ -61,8 +61,9 @@ class SARList(object):
     def _select_year(self, filelist, year):
         """
         Select all S1 data in input_folder of a specific year
+        Position of year in filename is hard coded!!!
         """
-        # position of year in filename is hard coded!!!
+
         filelist_new = []
         for file in filelist:
             filepath, filename, fileshortname, extension = self._decomposition_filename(
