@@ -46,7 +46,7 @@ ESA's SNAP Sentinel-1 Toolbox has to be installed prerequisite. The Software can
 
 ## Usage
 
-For usage checkout the [juypter notebook](https://nbviewer.jupyter.org/github/McWhity/sar-pre-processing/tree/getting_to_release/docs/notebooks/)
+For usage checkout the [juypter notebook](https://nbviewer.jupyter.org/github/multiply-org/sar-pre-processing/tree/getting_to_release/docs/notebooks/)
 
 ## Documentation
 
