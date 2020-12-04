@@ -42,6 +42,7 @@ To install for development and for the current user, use
 ## Module requirements
 
 Please see the [requirements file](https://github.com/multiply-org/sar-pre-processing/master/docs/requirements.txt) for a list of dependencies.
+ESA's SNAP Sentinel-1 Toolbox has to be installed prerequisite. The Software can be downloaded [here](http://step.esa.int/main/download/snap-download/)
 
 ## Usage
 
