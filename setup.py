@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from setuptools import setup
-import os
 
 # removed dependencies to prevent multiple installations
 requirements = [
