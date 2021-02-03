@@ -481,10 +481,6 @@ class SARPreProcessor(PreProcessor):
                             r = iiii.get('name')
                             if r == 'PASS':
                                 orbit_dir = iiii.text
-                                if orbit_dir == 'ASCENDING':
-                                    orbit_dir = 'ASCENDING'
-                                elif orbit_dir == 'DESCENDING':
-                                    orbit_dir = 'DESCENDING'
                                 data_set.setncattr_string('orbitdirection', orbit_dir)
                             continue
 
@@ -530,16 +526,3 @@ class SARPreProcessor(PreProcessor):
         stack_creator = NetcdfStackCreator(input_folder=self.config.output_folder_step3, output_path=self.config.output_folder_step3.rsplit('/', 1)[0], output_filename=filename)
         stack_creator.create_netcdf_stack()
 
-"""run script"""
-
-# if __name__ == "__main__":
-    # processing = SARPreProcessor(config='sample_config_file.yml')
-    # processing._create_processing_filelist()
-    # processing.pre_process_step1()
-    # processing.pre_process_step2()
-    # processing.pre_process_step3()
-    # subprocess.call(os.path.join(os.getcwd(),'projection_problem.sh ' + processing.config.output_folder_step3), shell=True)
-    # processing.netcdf_information()
-    # NetcdfStack(input_folder=processing.config.output_folder_step3, output_path=processing.config.output_folder_step3.rsplit('/', 1)[0] , output_filename=processing.config.output_folder_step3.rsplit('/', 2)[1])
-
-    # print('finished')
