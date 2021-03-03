@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-from setuptools import setup
-from setuptools import find_packages
-
 from __future__ import absolute_import
 from __future__ import print_function
+
+from setuptools import setup
+from setuptools import find_packages
 
 import io
 
