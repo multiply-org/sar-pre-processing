@@ -12,7 +12,7 @@ import shutil
 import xml.etree.ElementTree as etree
 from osgeo import ogr
 from sar_pre_processing.attribute_dict import AttributeDict
-
+import pdb
 
 class SARList(object):
     """
@@ -21,8 +21,8 @@ class SARList(object):
 
     def __init__(self, **kwargs):
         self.config = kwargs.get('config', None)
-        if type(self.config) is not AttributeDict:
-            self._load_config()
+        # if type(self.config) is not AttributeDict:
+        #     self._load_config()
         self._check()
 
     def _check(self):
@@ -33,6 +33,7 @@ class SARList(object):
         """
         Load configuration and writes to self.config
         """
+        # pdb.set_trace()
         with open(self.config, 'r') as cfg:
             self.config = yaml.safe_load(cfg)
             self.config = AttributeDict(**self.config)

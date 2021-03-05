@@ -9,12 +9,12 @@ import yaml
 import fnmatch
 import xml.etree.ElementTree as ETree
 from datetime import datetime
-from attribute_dict import AttributeDict
-from file_list_sar_pre_processing import SARList
+from .attribute_dict import AttributeDict
+from .file_list_sar_pre_processing import SARList
 import subprocess
 from netCDF4 import Dataset
 from typing import List, Optional
-from netcdf_stack import NetcdfStackCreator
+from .netcdf_stack import NetcdfStackCreator
 import math
 import pdb
 
@@ -72,21 +72,17 @@ class SARPreProcessor(PreProcessor):
         self.config.output_folder_step1 = os.path.join(self.config.output_folder, 'step1')
         self.config.output_folder_step2 = os.path.join(self.config.output_folder, 'step2')
         self.config.output_folder_step3 = os.path.join(self.config.output_folder, 'step3')
-        self.config.output_folder_pol_decomp = os.path.join(self.config.output_folder, 'pol_decomp')
 
         # Initialize name of necessary xml-graphs for preprocessing
         self._configure_config_graph('pre_process_step1', 'pre_process_step1.xml')
         self._configure_config_graph('pre_process_step1_border', 'pre_process_step1_border.xml')
         self._configure_config_graph('pre_process_step2', 'pre_process_step2.xml')
         self._configure_config_graph('pre_process_step3', 'pre_process_step3.xml')
-        self._configure_config_graph('pre_process_pol_decomp', 'pre_process_pol_decomp.xml')
-        self._configure_config_graph('pre_process_pol_decomp_border', 'pre_process_pol_decomp_border.xml')
 
         # Initialize name addition for output files
         self.name_addition_step1 = '_GC_RC_No_Su'
         self.name_addition_step2 = '_Co'
         self.name_addition_step3 = '_speckle'
-        self.name_addition_pol_decomp = '_pol_decomp'
 
         # Check if path of SNAP's graph-processing-tool is specified
         if not self.config.has_entry('gpt'):
@@ -115,6 +111,9 @@ class SARPreProcessor(PreProcessor):
         else:
             default_graph = pkg_resources.resource_filename('sar_pre_processing.default_graphs', default_name)
             self.config.add_entry(key_name, default_graph)
+
+    # def set_file_list(self, file_list: List[str]):
+    #     self.file_list = file_list
 
     @staticmethod
     def _create_file_list(input_folder, expression):
@@ -166,7 +165,7 @@ class SARPreProcessor(PreProcessor):
         4) TOPSAR-Deburst
         5) Geometric Terrain Correction
         6) Radiometric Correction (after kellndorfer et al.)
-        7) backscatter normalisation on specified angle in config file (based on Lambert's Law) (optional)
+        7) backscatter normalisation on specified angle in config file (based on Lambert's Law)
 
         """
 
@@ -245,7 +244,7 @@ class SARPreProcessor(PreProcessor):
 
         1) co-register pre-processed data
 
-        !!! all files will get metadata of the master image !!! That is how SNAP does it! Metadata will be corrected within netcdf output files at the end of the preprocessing chain (def add_netcdf_information)
+        !!! all files will get metadata of the master image !!! That is how SNAP does it! Metadata will be corrected produces netcdf files at the end of the preprocessing chain (def add_netcdf_information)
         """
         # Check if XML file for pre-processing step 2 is specified
         assert self.config.pre_process_step2 is not None, \
@@ -309,7 +308,7 @@ class SARPreProcessor(PreProcessor):
 
         Pre-process S1 SLC data with SNAP's GPT
 
-        1) apply multi-temporal speckle filter / single speckle filter
+        1) apply multi-temporal speckle filter
 
         """
         # Check if output folder of pre_process_step1 exists
@@ -434,7 +433,7 @@ class SARPreProcessor(PreProcessor):
 
     def solve_projection_problem(self):
         """
-        solve projection problem of created NetCDF file
+        solve projection problem of created NetCDF file from SNAP toolbox
         """
         sh_file = pkg_resources.resource_filename('sar_pre_processing', 'solve_projection_problem.sh')
         subprocess.call(sh_file + ' ' + self.config.output_folder_step3, shell=True)
@@ -519,7 +518,6 @@ class SARPreProcessor(PreProcessor):
 
             data_set.close()
 
-
     def create_netcdf_stack(self, filename: Optional[str] = None):
         """
         create one NetCDF stack file from output of step3
@@ -528,109 +526,17 @@ class SARPreProcessor(PreProcessor):
         """
         if filename is None:
             filename = self.config.output_folder_step3.rsplit('/', 2)[1]
-        stack_creator = NetcdfStackCreator(input_folder=self.config.output_folder_step3, output_path=self.config.output_folder_step3.rsplit('/', 1)[0], output_filename=filename)
+        stack_creator = NetcdfStackCreator(input_folder=self.config.output_folder_step3,
+                                           output_path=self.config.output_folder_step3.rsplit('/', 1)[0],
+                                           output_filename=filename)
         stack_creator.create_netcdf_stack()
 
 
-    def pre_process_pol_decomp(self):
-        """
-
-
-        """
-
-        # Check if input folder is specified
-        assert self.config.input_folder is not None, 'ERROR: input folder not specified'
-        assert os.path.exists(self.config.input_folder)
-
-        # Check if output folder for polarimetric decomposition is specified, create one if non existing
-        assert self.config.output_folder_pol_decomp is not None, 'ERROR: output folder for step1 needs to be specified'
-        if not os.path.exists(self.config.output_folder_pol_decomp):
-            os.makedirs(self.config.output_folder_pol_decomp)
-
-        # Check if XML file for pre-processing is specified
-        assert self.config.pre_process_pol_decomp is not None, \
-            'ERROR: path of XML file for pre-processing polarimetric decomposition is not not specified'
-
-        area = None
-        try:
-            lower_right_y = self.config.region['lr']['lat']
-            upper_left_y = self.config.region['ul']['lat']
-            upper_left_x = self.config.region['ul']['lon']
-            lower_right_x = self.config.region['lr']['lon']
-            area = self._get_area(lower_right_y, upper_left_y, upper_left_x, lower_right_x)
-        except AttributeError:
-            logging.info('area of interest not specified, whole images will be processed')
-
-        # loop to process all files stored in input directory
-
-        total_num_files = len(self.file_list[0]) + len(self.file_list[1])
-        # for i, file in enumerate(self.file_list[0]):
-        #     component_progress_logger.info(f'{int((i / total_num_files) * 100)}')
-        #     self._gpt_pol_decomp(file, None, area, self.config.pre_process_pol_decomp)
-
-        for i, file in enumerate(self.file_list[1][::2]):
-            component_progress_logger.info(f'{int(((len(self.file_list[0]) + i) / total_num_files) * 100)}')
-            file_list2 = self.file_list[1][1::2]
-            if i < len(file_list2):
-                file2 = file_list2[i]
-                self._gpt_pol_decomp(file, file2, area, self.config.pre_process_pol_decomp_border)
-
-    def _gpt_pol_decomp(self, file: str, file2: str, area: str, script_path: str):
-        """
-        run preprocessing step1
-        """
-        # Divide filename
-        filepath, filename, fileshortname, extension = self._decompose_filename(file)
-
-        # Call SNAP routine, xml file
-        logging.info(f'Process {filename} with SNAP.')
-        output_file = os.path.join(self.config.output_folder_pol_decomp,
-                                   fileshortname + self.name_addition_pol_decomp + '.dim')
-        area_part = ''
-        if area is not None:
-            area_part = '-Parea="POLYGON ((' + area + '))" '
-        file2_part = ''
-        if file2 is not None:
-            file2_part = ' -Pinput2="' + file2 + '"'
-        call = '"' + self.config.gpt + '" "' + script_path + \
-               '" -Pinput="' + file + '"' + file2_part + ' -Poutput="' + \
-               output_file + '" ' + area_part + '-c 2G -x'
-        return_code = subprocess.call(call, shell=True)
-        logging.info(return_code)
-
-
-    def _run_read_write(self):
-
-        file_list = self._create_file_list(self.config.output_folder_pol_decomp, '*.dim')
-
-        for file in file_list:
-
-            # Divide filename
-            filepath, filename, fileshortname, extension = self._decompose_filename(file)
-
-            # Call SNAP routine, xml file
-            logging.info(f'Process {filename} with SNAP.')
-            output_file = os.path.join(self.config.output_folder_pol_decomp,
-                                       fileshortname + self.name_addition_pol_decomp + '.nc')
-            script_path2 = '/media/tweiss/Work/GIT/GitHub/multiply-org/sar-pre-processing/sar_pre_processing/default_graphs/read_write.xml'
-            call = '"' + self.config.gpt + '" "' + script_path2 + \
-                   '" -Pinput="' + file + ' -Poutput="' + \
-                   output_file + '-c 2G -x'
-            pdb.set_trace()
-            return_code = subprocess.call(call, shell=True)
-
 """run script"""
 
-processing = SARPreProcessor(config='sample_config_file.yml')
-# processing.create_processing_file_list()
-processing._run_read_write()
-# processing.pre_process_pol_decomp()
-
-
 # if __name__ == "__main__":
-#     processing = SARPreProcessor(config='sample_config_file.yml')
-#     processing._create_processing_filelist()
-#     processing.pre_process_pol_decomp()
+    # processing = SARPreProcessor(config='sample_config_file.yml')
+    # processing._create_processing_filelist()
     # processing.pre_process_step1()
     # processing.pre_process_step2()
     # processing.pre_process_step3()

@@ -1,0 +1,29 @@
+<graph id="Graph">
+  <version>1.0</version>
+  <node id="Read">
+    <operator>Read</operator>
+    <sources/>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>/media/nas_data/Thomas/S1/processed/MNI_2017_new_final/pol_decomp/S1A_IW_SLC__1SDV_20170101T165853_20170101T165920_014641_017CE5_63E5_pol_decomp.dim</file>
+    </parameters>
+  </node>
+  <node id="Write">
+    <operator>Write</operator>
+    <sources>
+      <sourceProduct refid="Read"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>/media/nas_data/Thomas/S1/processed/MNI_2017_new_final/pol_decomp/S1A_IW_SLC__1SDV_20170101T165853_20170101T165920_014641_017CE5_63E5_pol_decomp.nc</file>
+      <formatName>NetCDF-CF</formatName>
+    </parameters>
+  </node>
+  <applicationData id="Presentation">
+    <Description/>
+    <node id="Read">
+            <displayPosition x="37.0" y="134.0"/>
+    </node>
+    <node id="Write">
+            <displayPosition x="455.0" y="135.0"/>
+    </node>
+  </applicationData>
+</graph>
