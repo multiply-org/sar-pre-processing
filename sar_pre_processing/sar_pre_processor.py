@@ -481,10 +481,6 @@ class SARPreProcessor(PreProcessor):
                             r = iiii.get('name')
                             if r == 'PASS':
                                 orbit_dir = iiii.text
-                                if orbit_dir == 'ASCENDING':
-                                    orbit_dir = 'ASCENDING'
-                                elif orbit_dir == 'DESCENDING':
-                                    orbit_dir = 'DESCENDING'
                                 data_set.setncattr_string('orbitdirection', orbit_dir)
                             continue
 
