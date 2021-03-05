@@ -7,7 +7,6 @@ channels:
 
 dependencies:
   - python>=3.6*
-  - numpy
   - netCDF4>=1.5
   - pyyaml>=3.12
   - pyproj>=2.2
@@ -17,3 +16,5 @@ dependencies:
   # For testing
   - pytest>=4.6
   - gdal>=3.0.4
+  - jupyter
+  - sentinelsat==0.13
