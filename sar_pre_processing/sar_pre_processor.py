@@ -16,6 +16,7 @@ from netCDF4 import Dataset
 from typing import List, Optional
 from .netcdf_stack import NetcdfStackCreator
 import math
+import numpy as np
 import pdb
 
 logging.getLogger().setLevel(logging.INFO)
@@ -511,6 +512,17 @@ class SARPreProcessor(PreProcessor):
                 data_set.setncattr_string('satellite', 'S1A')
             elif file_short_name[0:3] == 'S1B':
                 data_set.setncattr_string('satellite', 'S1B')
+
+            crs_var = data_set.createVariable('crs', np.int32, ())
+            crs_var.standard_name = 'crs'
+            crs_var.grid_mapping_name = 'latitude_longitude'
+            crs_var.crs_wkt = 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]'
+
+            for x in data_set.variables.keys():
+                if x == 'lat' or x == 'lon' or x == 'crs':
+                    pass
+                else:
+                    data_set[x].grid_mapping = 'crs'
 
             data_set.close()
 
