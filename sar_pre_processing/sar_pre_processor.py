@@ -351,7 +351,9 @@ class SARPreProcessor(PreProcessor):
             for i, file in enumerate(file_list):
                 component_progress_logger.info(f'{int((i / len(file_list)) * 100)}')
                 files_temporal_filter = int(self.config.speckle_filter.multi_temporal.files)
-                if i < math.floor(files_temporal_filter / 2):
+                if len(file_list) <= files_tmporal_filter:
+                    processing_file_list = file_list[0:files_temporal_filter]
+                elif i < math.floor(files_temporal_filter / 2):
                     processing_file_list = file_list[0:files_temporal_filter]
                 elif i <= len(file_list) - math.ceil(files_temporal_filter / 2):
                     processing_file_list = file_list[i - math.floor(files_temporal_filter / 2):i + math.ceil(

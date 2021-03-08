@@ -32,12 +32,9 @@ setup(name='multiply-sar-pre-processing',
       author='MULTIPLY Team',
       author_email='weiss.thomas@lmu.de',
       url='https://github.com/multiply-org/sar-pre-processing',
-      packages=find_packages('sar_pre_processing'),
-      package_dir={'': 'sar_pre_processing'},
-      # packages=['sar_pre_processing', 'sar_pre_processing.default_graphs'],
+      packages=['sar_pre_processing', 'sar_pre_processing.default_graphs'],
       package_data={'sar_pre_processing.default_graphs': ['pre_process_step1.xml', 'pre_process_step1_border.xml',
-                                                          'pre_process_step2.xml', 'pre_process_step3.xml'],
-                    'sar_pre_processing': ['solve_projection_problem.sh']
+                                                          'pre_process_step2.xml', 'pre_process_step3.xml']
     },
       include_package_data=True,
 )
