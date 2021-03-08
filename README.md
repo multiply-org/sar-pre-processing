@@ -31,6 +31,10 @@ The MULTIPLY platform has been developed against Python 3.6.
 It cannot be guaranteed to work with previous Python versions.
 
 MULTIPLY SAR-pre-processing can be run from sources directly.
+To install all required modules, use
+
+    $ conda env create --prefix ./env --file environment.yml
+
 To install MULTIPLY SAR-pre-processing into an existing Python environment just for the current user, use
 
     $ python setup.py install --user
@@ -43,6 +47,8 @@ To install for development and for the current user, use
 
 Please see the [requirements file](https://github.com/multiply-org/sar-pre-processing/master/docs/requirements.txt) for a list of dependencies.
 ESA's SNAP Sentinel-1 Toolbox has to be installed prerequisite. The Software can be downloaded [here](http://step.esa.int/main/download/snap-download/)
+- SNAP Toolbox need libgfortran for specific operations but currently libgfortran is not installed during the installation process of SNAP therefore you might use
+    $ sudo apt-get install gfortran
 
 ## Usage
 
