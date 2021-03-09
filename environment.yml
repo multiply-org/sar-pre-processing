@@ -11,10 +11,10 @@ dependencies:
   - pyyaml>=3.12
   - pyproj>=2.2
   - xarray
-  # Docs
-  - sphinxcontrib-bibtex>=0.4
-  # For testing
-  - pytest>=4.6
+  - sphinxcontrib-bibtex>=0.4 # docs
+  - pytest>=4.6 # testing
   - gdal>=3.0.4
   - jupyter
-  - sentinelsat==0.13
+  - pip
+  - pip:
+    - sentinelsat==0.13
