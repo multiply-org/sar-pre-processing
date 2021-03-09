@@ -37,8 +37,3 @@ ESA's SNAP Sentinel-1 Toolbox has to be installed prerequisite. The Software can
 - SNAP Toolbox need libgfortran for specific operations but currently libgfortran is not installed during the installation process of SNAP therefore you might use::
 
     sudo apt-get install gfortran
-
-Usage
--------------------
-
-For usage checkout the  `jupyter notebook <https://nbviewer.jupyter.org/github/multiply-org/sar-pre-processing/tree/getting_to_release/docs/notebooks/>`_
