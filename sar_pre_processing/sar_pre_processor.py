@@ -17,7 +17,6 @@ from typing import List, Optional
 from .netcdf_stack import NetcdfStackCreator
 import math
 import numpy as np
-import pdb
 
 logging.getLogger().setLevel(logging.INFO)
 # Set up logging
