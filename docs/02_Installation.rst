@@ -11,13 +11,13 @@ The first step is to clone the latest code and step into the check out directory
     git clone https://github.com/multiply-org/sar-pre-processing.git
     cd sar-pre-processing
 
-MULTIPLY SAR-pre-processing can be run from sources directly.
+SenSARP can be run from sources directly.
 To install all required modules, use::
 
     conda env create --prefix ./env --file environment.yml
     conda activate ./env # activate the environment
 
-To install MULTIPLY SAR-pre-processing into an existing Python environment just for the current user, use::
+To install SenSARP into an existing Python environment just for the current user, use::
 
     python setup.py install --user
 

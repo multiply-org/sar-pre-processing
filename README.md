@@ -1,14 +1,14 @@
 <img alt="MULTIPLY" align="right" src="https://raw.githubusercontent.com/multiply-org/sar-pre-processing/master/docs/images/multiply_multi_colour.png" />
 
-# MULTIPLY SAR-Pre-Processing
+# SenSARP
 
 [![Build Status](https://travis-ci.org/McWhity/sar-pre-processing.svg?branch=getting_to_release)](https://travis-ci.org/McWhity/sar-pre-processing)
 <!-- [![Build Status](https://travis-ci.org/McWhity/sar-pre-processing.svg?branch=master)](https://travis-ci.org/McWhity/sar-pre-processing) -->
 [![Documentation Status](https://readthedocs.org/projects/multiply-sar-pre-processing/badge/?version=getting_to_release)](https://multiply-sar-pre-processing.readthedocs.io/en/getting_to_release/?badge=getting_to_release)
 
 This repository contains the functionality for Sentinel-1 SAR-Pre.Processing of the MULTIPLY main platform.
-The [SAR-Pre-Processing specific documentation](https://multiply-sar-pre-processing.readthedocs.io/en/getting_to_release/) is hosted on ReadTheDocs. It is part of the [MULTIPLY core documentation](http://multiply.readthedocs.io/).
-Please find the pdf version of the SAR-Pre-Processing documentation [here](https://multiply-sar-pre-processing.readthedocs.io/_/downloads/en/getting_to_release/pdf/) and for the MULTIPLY platform [here](https://readthedocs.org/projects/multiply/downloads/pdf/latest/).
+The [SenSARP specific documentation](https://multiply-sar-pre-processing.readthedocs.io/en/getting_to_release/) is hosted on ReadTheDocs. It is part of the [MULTIPLY core documentation](http://multiply.readthedocs.io/).
+Please find the pdf version of the SenSARP documentation [here](https://multiply-sar-pre-processing.readthedocs.io/_/downloads/en/getting_to_release/pdf/) and for the MULTIPLY platform [here](https://readthedocs.org/projects/multiply/downloads/pdf/latest/).
 
 ## Content of this repository
 
@@ -16,9 +16,11 @@ Please find the pdf version of the SAR-Pre-Processing documentation [here](https
 * `recipe/` Conda installation recipe
 * `sar_pre_processing/` - The main sar pre processing software package
 * `test/` - The test package.
-* `setup.py` - main build script, to be run with Python 3.6
+* `AUTHORS.rst` - Author information.
+* `CHANGES.md` - Package change log.
+* `environmental.yml` - Requirements.
 * `LICENSE.rst` - License of software in repository.
-to be updated!!!!
+* `setup.py` - main build script, to be run with Python 3.6
 
 ## How to install
 
