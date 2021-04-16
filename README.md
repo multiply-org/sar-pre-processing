@@ -72,8 +72,7 @@ If you encounter any bugs with the tool, please file a [new issue](https://githu
 
 ## Authors
 
-```{include} AUTHORS.rst
-```
+[Authors](https://github.com/multiply-org/sar-pre-processing/master/AUTHORS.rst)
 
 ## License
 
