@@ -72,7 +72,8 @@ If you encounter any bugs with the tool, please file a [new issue](https://githu
 
 ## Authors
 
-{{AUTHORS.rst}}
+```{include} AUTHORS.rst
+```
 
 ## License
 
