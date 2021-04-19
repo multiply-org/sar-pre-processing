@@ -50,7 +50,7 @@ To install for development and for the current user, use
 
 Please see the [requirements file](https://github.com/multiply-org/sar-pre-processing/master/environment.yml) for a list of dependencies.
 ESA's SNAP Sentinel-1 Toolbox has to be installed prerequisite. The Software can be downloaded [here](http://step.esa.int/main/download/snap-download/)
-- SNAP Toolbox need libgfortran for specific operations but currently libgfortran is not installed during the installation process of SNAP therefore you might use
+- SNAP Toolbox need libgfortran for specific operations but currently libgfortran is not installed during the installation process of SNAP (Linux version) therefore you might use
 
     $ sudo apt-get install gfortran
 
