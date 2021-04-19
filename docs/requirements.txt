@@ -3,7 +3,7 @@ xarray==0.15.1
 numpy==1.18.1
 pyproj==2.6.0
 pytest==4.6
-PyYAML==5.3
+PyYAML==5.4
 setuptools==49.2.1
 m2r
 sphinxcontrib-bibtex
