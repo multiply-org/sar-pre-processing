@@ -18,7 +18,7 @@ Please find the pdf version of the SenSARP documentation [here](https://multiply
 * `AUTHORS.rst` - Author information.
 * `CHANGES.md` - Package change log.
 * `LICENSE.rst` - License of software in repository.
-+ `README.md` - Readme.
+* `README.md` - Readme.
 * `environmental.yml` - Requirements.
 * `sar_pre_processing_CLI.txt` - Renaming package to SenSARP
 * `setup.py` - main build script, to be run with Python 3.6
@@ -49,7 +49,7 @@ To install for development and for the current user, use
 
 ## Module requirements
 
-Please see the [requirements file](https://github.com/multiply-org/sar-pre-processing/master/environment.yml) for a list of dependencies.
+Please see the [environment file](environment.yml) for a list of dependencies.
 ESA's SNAP Sentinel-1 Toolbox has to be installed prerequisite. The Software can be downloaded [here](http://step.esa.int/main/download/snap-download/)
 - SNAP Toolbox need libgfortran for specific operations but currently libgfortran is not installed during the installation process of SNAP (Linux version) therefore you might use
 
