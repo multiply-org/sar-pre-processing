@@ -16,7 +16,7 @@ affiliations:
    index: 1
  - name: Brockmann Consult GmbH, 21029 Hamburg, Germany;
    index: 2
-date: 02 September 2020
+date: 20 April 2021
 bibliography: paper.bib
 ---
 
@@ -37,7 +37,7 @@ Additionally, specific cases of repeatedly processed data are handled, as someti
 Based on the generated file list the python package applies a pre-processing chain to Sentinel-1 Single Look Complex (SLC) time series data to generate radiometrically and geometrically corrected Sigma nought backscatter values.
 Furthermore, the time series images are co-registered and additional output files of multi-temporal speckle filtered data are generated.
 In addition, a single speckle filter instead of a multi-temporal one can be applied as well and the output will be stored as a separate layer.
-To pre-process the images, the python package uses the GPF (Graph Processing Framework) of the SeNtinel Application Platform (SNAP) and the operators provided by the Sentinel-1 Toolbox (in version 8.0). 
+To pre-process the images, the python package uses the GPF (Graph Processing Framework) of the SeNtinel Application Platform (SNAP) and the operators provided by the Sentinel-1 Toolbox (in version 8.0.3).
 The Sentinel Toolbox is available for download at step.esa.int, its source code is available in the senbox-org organization on Github.
 Each of these operators performs a pre-processing step. The operators can be chained together to form a graph, which is used by the python package to run on the Sentinel-1 data using the GPF. The graphs are stored in xml-files. Users may change the graphs by modifying the files directly or via the Sentinel Toolbox.
 User Guides to show how the GPF can be used are provided here: https://senbox.atlassian.net/wiki/spaces/SNAP/pages/70503053/Processing.
