@@ -1,5 +1,5 @@
 ---
-title: 'sar-pre-processing: A Python package for pre-processing Sentinel-1 SLC data with the Sentinel-1 Toolbox'
+title: 'SenSARP: A Python package for pre-processing Sentinel-1 SLC data with the Sentinel-1 Toolbox'
 tags:
   - Python
   - Sentinel-1
