@@ -2,8 +2,8 @@
 
 # SenSARP
 
-[![Build Status](https://travis-ci.org/McWhity/sar-pre-processing.svg?branch=master)](https://travis-ci.org/McWhity/sar-pre-processing)
-[![Documentation Status](https://readthedocs.org/projects/multiply-sar-pre-processing/badge/?version=master)](https://multiply-sar-pre-processing.readthedocs.io/en/getting_to_release/?badge=master)
+[![Build Status](https://www.travis-ci.com/multiply-org/sar-pre-processing.svg?branch=master)](https://travis-ci.com/McWhity/sar-pre-processing)
+[![Documentation Status](https://readthedocs.org/projects/multiply-sar-pre-processing/badge/?version=master)](https://multiply-sar-pre-processing.readthedocs.io/en/master/?badge=master)
 
 This repository contains the functionality for Sentinel-1 SAR-Pre.Processing of the MULTIPLY main platform.
 The [SenSARP specific documentation](https://multiply-sar-pre-processing.readthedocs.io/en/master/) is hosted on ReadTheDocs. It is part of the [MULTIPLY core documentation](http://multiply.readthedocs.io/).
