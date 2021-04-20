@@ -2,13 +2,12 @@
 
 # SenSARP
 
-[![Build Status](https://travis-ci.org/McWhity/sar-pre-processing.svg?branch=getting_to_release)](https://travis-ci.org/McWhity/sar-pre-processing)
-<!-- [![Build Status](https://travis-ci.org/McWhity/sar-pre-processing.svg?branch=master)](https://travis-ci.org/McWhity/sar-pre-processing) -->
-[![Documentation Status](https://readthedocs.org/projects/multiply-sar-pre-processing/badge/?version=getting_to_release)](https://multiply-sar-pre-processing.readthedocs.io/en/getting_to_release/?badge=getting_to_release)
+[![Build Status](https://travis-ci.org/McWhity/sar-pre-processing.svg?branch=master)](https://travis-ci.org/McWhity/sar-pre-processing)
+[![Documentation Status](https://readthedocs.org/projects/multiply-sar-pre-processing/badge/?version=master)](https://multiply-sar-pre-processing.readthedocs.io/en/getting_to_release/?badge=master)
 
 This repository contains the functionality for Sentinel-1 SAR-Pre.Processing of the MULTIPLY main platform.
-The [SenSARP specific documentation](https://multiply-sar-pre-processing.readthedocs.io/en/getting_to_release/) is hosted on ReadTheDocs. It is part of the [MULTIPLY core documentation](http://multiply.readthedocs.io/).
-Please find the pdf version of the SenSARP documentation [here](https://multiply-sar-pre-processing.readthedocs.io/_/downloads/en/getting_to_release/pdf/) and for the MULTIPLY platform [here](https://readthedocs.org/projects/multiply/downloads/pdf/latest/).
+The [SenSARP specific documentation](https://multiply-sar-pre-processing.readthedocs.io/en/master/) is hosted on ReadTheDocs. It is part of the [MULTIPLY core documentation](http://multiply.readthedocs.io/).
+Please find the pdf version of the SenSARP documentation [here](https://multiply-sar-pre-processing.readthedocs.io/_/downloads/en/master/pdf/) and for the MULTIPLY platform [here](https://readthedocs.org/projects/multiply/downloads/pdf/latest/).
 
 ## Content of this repository
 
@@ -18,8 +17,10 @@ Please find the pdf version of the SenSARP documentation [here](https://multiply
 * `test/` - The test package.
 * `AUTHORS.rst` - Author information.
 * `CHANGES.md` - Package change log.
-* `environmental.yml` - Requirements.
 * `LICENSE.rst` - License of software in repository.
++ `README.md` - Readme.
+* `environmental.yml` - Requirements.
+* `sar_pre_processing_CLI.txt` - Renaming package to SenSARP
 * `setup.py` - main build script, to be run with Python 3.6
 
 ## How to install
@@ -56,7 +57,7 @@ ESA's SNAP Sentinel-1 Toolbox has to be installed prerequisite. The Software can
 
 ## Usage
 
-For usage checkout the [juypter notebook](https://nbviewer.jupyter.org/github/multiply-org/sar-pre-processing/tree/getting_to_release/docs/notebooks/)
+For usage checkout the [juypter notebook](https://nbviewer.jupyter.org/github/multiply-org/sar-pre-processing/tree/master/docs/notebooks/)
 
 ## Documentation
 
@@ -76,4 +77,4 @@ If you encounter any bugs with the tool, please file a [new issue](https://githu
 
 ## License
 
-This project is licensed under the GPLv3 License - see the [LICENSE.rst](https://github.com/multiply-org/sar-pre-processing/blob/master/LICENSE.rst) file for details.
+This project is licensed under the GPLv3 License - see the [LICENSE.rst](LICENSE.rst) file for details.
