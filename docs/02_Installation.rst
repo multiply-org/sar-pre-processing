@@ -31,7 +31,7 @@ Module requirements
 
 .. literalinclude:: ./environment.yml
 
-Please see the `environment file <https://github.com/multiply-org/sar-pre-processing/master/environment.yml>`_ for a list of dependencies.
+Please see the `environment file <https://github.com/multiply-org/sar-pre-processing/blob/master/environment.yml>`_ for a list of dependencies.
 ESA's SNAP Sentinel-1 Toolbox has to be installed prerequisite. The Software can be downloaded
 `here <http://step.esa.int/main/download/snap-download/>`_
 - SNAP Toolbox need libgfortran for specific operations but currently libgfortran is not installed during the installation process of SNAP therefore you might use::
