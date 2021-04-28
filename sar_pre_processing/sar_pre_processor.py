@@ -17,6 +17,7 @@ from typing import List, Optional
 from .netcdf_stack import NetcdfStackCreator
 import math
 import numpy as np
+import pdb
 
 logging.getLogger().setLevel(logging.INFO)
 # Set up logging
@@ -466,53 +467,53 @@ class SARPreProcessor(PreProcessor):
 
             data_set = Dataset(file, 'r+', format="NETCDF4")
 
-            # update date information
-            try:
-                data_set.delncattr('start_date')
-                data_set.delncattr('stop_date')
-            except RuntimeError:
-                logging.warning('A runtime error has occurred')
-            data_set.setncattr_string('date', str(start_date))
+            # # update date information
+            # try:
+            #     data_set.delncattr('start_date')
+            #     data_set.delncattr('stop_date')
+            # except RuntimeError:
+            #     logging.warning('A runtime error has occurred')
+            # data_set.setncattr_string('date', str(start_date))
 
-            # extract orbit direction from metadata
-            metadata = ETree.parse(os.path.join(file_path2, filename[0:79] + '.dim'))
-            for i in metadata.findall('Dataset_Sources'):
-                for ii in i.findall('MDElem'):
-                    for iii in ii.findall('MDElem'):
-                        for iiii in iii.findall('MDATTR'):
-                            r = iiii.get('name')
-                            if r == 'PASS':
-                                orbit_dir = iiii.text
-                                data_set.setncattr_string('orbitdirection', orbit_dir)
-                            continue
+            # # extract orbit direction from metadata
+            # metadata = ETree.parse(os.path.join(file_path2, filename[0:79] + '.dim'))
+            # for i in metadata.findall('Dataset_Sources'):
+            #     for ii in i.findall('MDElem'):
+            #         for iii in ii.findall('MDElem'):
+            #             for iiii in iii.findall('MDATTR'):
+            #                 r = iiii.get('name')
+            #                 if r == 'PASS':
+            #                     orbit_dir = iiii.text
+            #                     data_set.setncattr_string('orbitdirection', orbit_dir)
+            #                 continue
 
-            # extract orbit from metadata
-            metadata = ETree.parse(os.path.join(file_path2, filename[0:79] + '.dim'))
-            for i in metadata.findall('Dataset_Sources'):
-                for ii in i.findall('MDElem'):
-                    for iii in ii.findall('MDElem'):
-                        for iiii in iii.findall('MDATTR'):
-                            r = iiii.get('name')
-                            if r == 'REL_ORBIT':
-                                relorbit = iiii.text
-                                data_set.setncattr_string('relativeorbit', relorbit)
+            # # extract orbit from metadata
+            # metadata = ETree.parse(os.path.join(file_path2, filename[0:79] + '.dim'))
+            # for i in metadata.findall('Dataset_Sources'):
+            #     for ii in i.findall('MDElem'):
+            #         for iii in ii.findall('MDElem'):
+            #             for iiii in iii.findall('MDATTR'):
+            #                 r = iiii.get('name')
+            #                 if r == 'REL_ORBIT':
+            #                     relorbit = iiii.text
+            #                     data_set.setncattr_string('relativeorbit', relorbit)
 
-            # extract frequency from metadata
-            metadata = ETree.parse(os.path.join(file_path2, filename[0:79] + '.dim'))
-            for i in metadata.findall('Dataset_Sources'):
-                for ii in i.findall('MDElem'):
-                    for iii in ii.findall('MDElem'):
-                        for iiii in iii.findall('MDATTR'):
-                            r = iiii.get('name')
-                            if r == 'radar_frequency':
-                                frequency = float(iiii.text) / 1000.
-                                data_set.setncattr_string('frequency', str(frequency))
+            # # extract frequency from metadata
+            # metadata = ETree.parse(os.path.join(file_path2, filename[0:79] + '.dim'))
+            # for i in metadata.findall('Dataset_Sources'):
+            #     for ii in i.findall('MDElem'):
+            #         for iii in ii.findall('MDElem'):
+            #             for iiii in iii.findall('MDATTR'):
+            #                 r = iiii.get('name')
+            #                 if r == 'radar_frequency':
+            #                     frequency = float(iiii.text) / 1000.
+            #                     data_set.setncattr_string('frequency', str(frequency))
 
-            # extract satellite name from name tag
-            if file_short_name[0:3] == 'S1A':
-                data_set.setncattr_string('satellite', 'S1A')
-            elif file_short_name[0:3] == 'S1B':
-                data_set.setncattr_string('satellite', 'S1B')
+            # # extract satellite name from name tag
+            # if file_short_name[0:3] == 'S1A':
+            #     data_set.setncattr_string('satellite', 'S1A')
+            # elif file_short_name[0:3] == 'S1B':
+            #     data_set.setncattr_string('satellite', 'S1B')
 
             crs_var = data_set.createVariable('crs', np.int32, ())
             crs_var.standard_name = 'crs'
@@ -524,6 +525,9 @@ class SARPreProcessor(PreProcessor):
                     pass
                 else:
                     data_set[x].grid_mapping = 'crs'
+            print(file)
+            pdb.set_trace()
+            # data_set.to_netcdf(path=filepath+'/puh.nc')
 
             data_set.close()
 
@@ -538,4 +542,57 @@ class SARPreProcessor(PreProcessor):
             filename = self.config.output_folder_step3.rsplit('/', 2)[1]
         stack_creator = NetcdfStackCreator(input_folder=self.config.output_folder_step3, output_path=self.config.output_folder_step3.rsplit('/', 1)[0], output_filename=filename)
         stack_creator.create_netcdf_stack()
+
+
+
+
+    def file_list_new(self):
+        """
+        Add information from original S1 SLC image to processed NetCDF file.
+        - update date information (wrong date information were stored due to coregistration process)
+        - orbitdirection (ASCENDING, DESCENDING)
+        - relative orbit
+        - Satellite (S1A, S1B)
+        - Frequency
+        """
+        # input folder
+        input_folder = self.config.output_folder_step2
+        expression = '*.dim'
+        file_list = self._create_file_list(input_folder, expression)
+
+
+        file_list_1 = []
+        file_list_2 = []
+        file_list_3 = []
+        file_list_4 = []
+
+        # for loop through all measurement points
+        for file in file_list:
+            # Divide filename
+            file_path, filename, file_short_name, extension = self._decompose_filename(file)
+            file_path2 = self.config.output_folder_step1
+
+            # extract orbit from metadata
+            metadata = ETree.parse(os.path.join(file_path2, filename[0:79] + '.dim'))
+            for i in metadata.findall('Dataset_Sources'):
+                for ii in i.findall('MDElem'):
+                    for iii in ii.findall('MDElem'):
+                        for iiii in iii.findall('MDATTR'):
+                            r = iiii.get('name')
+                            if r == 'REL_ORBIT':
+                                relorbit = iiii.text
+                                if relorbit == '44':
+                                    file_list_1.append(file[:-19])
+                                elif relorbit == '117':
+                                    file_list_2.append(file[:-19])
+                                elif relorbit == '95':
+                                    file_list_3.append(file[:-19])
+                                elif relorbit == '168':
+                                    file_list_4.append(file[:-19])
+                                else:
+                                    pass
+        return file_list_1, file_list_2, file_list_3, file_list_4
+
+
+
 
