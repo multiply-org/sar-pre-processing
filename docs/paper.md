@@ -53,7 +53,7 @@ In addition, the python code was used to process Sentinel-1 time series images f
 # Acknowledgements
 
 The project leading to this application has received funding from the European Union’s Horizon 2020 research and innovation program under Grant Agreement No. 687320.
-We would like thank Alexander Löw and Philip Marzahn for guiding discussions that lead to this publication.
+We would like to thank Alexander Löw and Philip Marzahn for guiding discussions that lead to this publication.
 We also would like to thank Thomas Ramsauer for discussions and suggestions.
 <!-- for providing comments on the manuscript -->
 <!-- The author also wishes to thank the reviewers and editors fortheir efforts and for their helpful comments to improve this paper and the software package -->
