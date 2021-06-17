@@ -587,6 +587,6 @@ class SARPreProcessor(PreProcessor):
         """
         if filename is None:
             filename = self.config.output_folder_step3.rsplit('/', 2)[1]
-        stack_creator = NetcdfStackCreator(input_folder=self.config.output_folder_step3, output_path=self.config.output_folder_step3.rsplit('/', 1)[0], output_filename=filename)
+        stack_creator = NetcdfStackCreator(input_folder=self.config.output_folder_step3, output_path=self.config.output_folder_step3.rsplit('/', 1)[0], output_filename=filename, temporal_filter=self.config.speckle_filter.multi_temporal.apply)
         stack_creator.create_netcdf_stack()
 
