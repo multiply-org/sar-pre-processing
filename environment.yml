@@ -17,4 +17,4 @@ dependencies:
   - jupyter
   - pip
   - pip:
-    - sentinelsat==0.13
+    - sentinelsat==1.0.1
