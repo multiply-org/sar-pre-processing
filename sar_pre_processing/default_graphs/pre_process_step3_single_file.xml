@@ -125,10 +125,11 @@
   <node id="BandMerge(2)">
     <operator>BandMerge</operator>
     <sources>
-      <sourceProduct.1 refid="BandMaths(5)"/>
-      <sourceProduct.2 refid="BandMaths(6)"/>
-      <sourceProduct.3 refid="BandMaths(7)"/>
-      <sourceProduct.4 refid="BandMaths(8)"/>
+      <sourceProduct.1 refid="BandMaths(9)"/>
+      <sourceProduct.2 refid="BandMaths(5)"/>
+      <sourceProduct.3 refid="BandMaths(6)"/>
+      <sourceProduct.4 refid="BandMaths(7)"/>
+      <sourceProduct.5 refid="BandMaths(8)"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <sourceBands/>
