@@ -72,7 +72,7 @@ class NetcdfStackCreator(object):
         self.localIncidenceAngle = self.dataset.createVariable('localIncidenceAngle', np.float32,('time','lat','lon'), fill_value=-99999)
         self.localIncidenceAngle.units = 'degree'
 
-        if self.config.speckle_filter.multi_temporal.apply == 'yes':
+        if self.temporal_filter == 'yes':
 
             self.sigma0_vv_multi = self.dataset.createVariable('sigma0_vv_multi', np.float32,('time','lat','lon'), fill_value=-99999)
             self.sigma0_vv_multi.units = 'linear'
@@ -137,7 +137,7 @@ class NetcdfStackCreator(object):
 
             # fill 3-D variables
             self.localIncidenceAngle[index,:,:] = data.variables['theta'][:]
-            if self.config.speckle_filter.multi_temporal.apply == 'yes':
+            if self.temporal_filter == 'yes':
                 self.sigma0_vv_multi[index,:,:] = data.variables['sigma0_vv_multi'][:]
                 self.sigma0_vh_multi[index,:,:] = data.variables['sigma0_vh_multi'][:]
 
