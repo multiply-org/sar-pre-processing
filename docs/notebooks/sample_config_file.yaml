@@ -17,24 +17,21 @@ gpt: /home/tweiss/snap/bin/gpt
 #pre_process_step2: test_pre_process_step2.xml
 #pre_process_step3: test_pre_process_step3.xml
 
-subset: 'yes'
+# subset: 'yes'
 
-region:
-  ul:
-    lat: 48.40
-    lon: 11.60
-  lr:
-    lat: 48.10
-    lon: 11.90
+# region:
+#   ul:
+#     lat: 48.40
+#     lon: 11.60
+#   lr:
+#     lat: 48.10
+#     lon: 11.90
 
 speckle_filter:
   multi_temporal:
     apply: 'yes'
     files: '5'
-  single_filter:
-    apply: 'yes'
 
-year: 2020
 
 # not needed if default version is used
 #normalisation_angle: 35
