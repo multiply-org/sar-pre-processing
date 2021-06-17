@@ -34,7 +34,7 @@ setup(name='multiply-sar-pre-processing',
       url='https://github.com/multiply-org/sar-pre-processing',
       packages=['sar_pre_processing', 'sar_pre_processing.default_graphs'],
       package_data={'sar_pre_processing.default_graphs': ['pre_process_step1.xml', 'pre_process_step1_border.xml',
-                                                          'pre_process_step2.xml', 'pre_process_step3.xml']
+                                                          'pre_process_step2.xml', 'pre_process_step3.xml', 'pre_process_step3_single_file.xml']
     },
       include_package_data=True,
 )
