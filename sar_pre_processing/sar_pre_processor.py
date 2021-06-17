@@ -78,6 +78,7 @@ class SARPreProcessor(PreProcessor):
         self._configure_config_graph('pre_process_step1_border', 'pre_process_step1_border.xml')
         self._configure_config_graph('pre_process_step2', 'pre_process_step2.xml')
         self._configure_config_graph('pre_process_step3', 'pre_process_step3.xml')
+        self._configure_config_graph('pre_process_step3_single_file', 'pre_process_step3_single_file.xml')
 
         # Initialize name addition for output files
         self.name_addition_step1 = '_GC_RC_No_Su'
@@ -432,6 +433,56 @@ class SARPreProcessor(PreProcessor):
                 return_code = subprocess.call(call, shell=True)
                 logging.info(return_code)
                 logging.info(datetime.now())
+
+
+        elif self.config.speckle_filter.multi_temporal.apply == 'no':
+            # Check if XML file for pre-processing step 3 is specified
+            assert self.config.pre_process_step3_single_file is not None, \
+                'ERROR: path of XML file for pre-processing step 3 is not not specified'
+
+            # loop to apply multi-temporal filtering
+            # vv and vh polarisation are separated
+            for i, file in enumerate(file_list):
+                component_progress_logger.info(f'{int((i / len(file_list)) * 100)}')
+
+                a, a, b, a = self._decompose_filename(self._create_file_list(
+                    os.path.join(file_path, file_short_name + '.data'), '*_slv1_*.img')[0])
+                a, a, c, a = self._decompose_filename(self._create_file_list(
+                    os.path.join(file_path, file_short_name + '.data'), '*_slv2_*.img')[0])
+                a, a, d, a = self._decompose_filename(self._create_file_list(
+                    os.path.join(file_path, file_short_name + '.data'), '*_slv3_*.img')[0])
+                a, a, e, a = self._decompose_filename(self._create_file_list(
+                    os.path.join(file_path, file_short_name + '.data'), '*_slv4_*.img')[0])
+                list_bands_single_speckle_filter = ','.join([b, c, d, e])
+
+                name_change_vv_single = d
+                name_change_vh_single = e
+                name_change_vv_norm_single = b
+                name_change_vh_norm_single = c
+
+                # Divide filename of file of interest
+                file_path, filename, file_short_name, extension = self._decompose_filename(file)
+
+                output_file = os.path.join(
+                    self.config.output_folder_step3, file_short_name + self.name_addition_step3 + '.nc')
+
+                date = datetime.strptime(file_short_name[17:25], '%Y%m%d')
+                date = date.strftime('%d%b%Y')
+
+                theta = 'localIncidenceAngle_slv10_' + date
+
+                call = '"' + self.config.gpt + '" "' + self.config.pre_process_step3_single_file + \
+                       '" -Pinput2="' + file + \
+                       '" -Poutput="' + output_file + '" -Ptheta="' + theta + \
+                       '" -Pname_change_vv_single="' + name_change_vv_single + \
+                       '" -Pname_change_vh_single="' + name_change_vh_single + \
+                       '" -Pname_change_vv_norm_single="' + name_change_vv_norm_single + \
+                       '" -Pname_change_vh_norm_single="' + name_change_vh_norm_single + \
+                       '" -Plist_bands_single_speckle_filter="' + list_bands_single_speckle_filter + '" -c 2G -x'
+                return_code = subprocess.call(call, shell=True)
+                logging.info(return_code)
+                logging.info(datetime.now())
+
 
     def solve_projection_problem(self):
         """
