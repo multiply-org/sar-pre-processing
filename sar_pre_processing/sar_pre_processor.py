@@ -182,11 +182,15 @@ class SARPreProcessor(PreProcessor):
 
         area = None
         try:
-            lower_right_y = self.config.region['lr']['lat']
-            upper_left_y = self.config.region['ul']['lat']
-            upper_left_x = self.config.region['ul']['lon']
-            lower_right_x = self.config.region['lr']['lon']
-            area = self._get_area(lower_right_y, upper_left_y, upper_left_x, lower_right_x)
+            if self.config.subset == 'yes'
+                lower_right_y = self.config.region['lr']['lat']
+                upper_left_y = self.config.region['ul']['lat']
+                upper_left_x = self.config.region['ul']['lon']
+                lower_right_x = self.config.region['lr']['lon']
+                area = self._get_area(lower_right_y, upper_left_y, upper_left_x, lower_right_x)
+                logging.info('area of interest specified')
+            else:
+                logging.info('area of interest not specified, whole images will be processed')
         except AttributeError:
             logging.info('area of interest not specified, whole images will be processed')
 
