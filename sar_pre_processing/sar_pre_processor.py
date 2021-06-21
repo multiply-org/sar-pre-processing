@@ -451,6 +451,7 @@ class SARPreProcessor(PreProcessor):
         elif self.config.single_file == 'yes':
             if self.config.speckle_filter.multi_temporal.apply == 'yes':
                 logging.info('multi temporal filter cannot applied to a single image, just single speckle filter is applied')
+                self.config.speckle_filter.multi_temporal.apply == 'no'
 
             # Check if XML file for pre-processing step 3 is specified
             assert self.config.pre_process_step3_single_file is not None, \
