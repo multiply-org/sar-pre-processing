@@ -506,7 +506,7 @@ class SARPreProcessor(PreProcessor):
                 date = datetime.strptime(file_short_name[17:25], '%Y%m%d')
                 date = date.strftime('%d%b%Y')
 
-                theta = 'localIncidenceAngle_slv10_' + date
+                theta = 'localIncidenceAngle'
 
                 call = '"' + self.config.gpt + '" "' + self.config.pre_process_step3_single_file + \
                        '" -Pinput2="' + file + \
