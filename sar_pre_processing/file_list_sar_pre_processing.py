@@ -329,14 +329,16 @@ class SARList(object):
 
         # list with all zip files that contain area of interest
         try:
-            lower_right_y = self.config.region['lr']['lat']
-            upper_left_y = self.config.region['ul']['lat']
-            upper_left_x = self.config.region['ul']['lon']
-            lower_right_x = self.config.region['lr']['lon']
-            # todo: how is it with coordinates that go across the datum line ??
+            if self.config.region.subset == 'yes'
+                lower_right_y = self.config.region['lr']['lat']
+                upper_left_y = self.config.region['ul']['lat']
+                upper_left_x = self.config.region['ul']['lon']
+                lower_right_x = self.config.region['lr']['lon']
+                area = self._get_area(lower_right_y, upper_left_y, upper_left_x, lower_right_x)
+                # todo: how is it with coordinates that go across the datum line ??
 
-            location = [upper_left_x, upper_left_y, lower_right_x, lower_right_y]
-            filelist = self._contain_area_of_interest(filelist, location, self.config.input_folder)
+                location = [upper_left_x, upper_left_y, lower_right_x, lower_right_y]
+                filelist = self._contain_area_of_interest(filelist, location, self.config.input_folder)
         except AttributeError:
             logging.info('area of interest not specified')
 

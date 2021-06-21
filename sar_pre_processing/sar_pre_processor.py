@@ -182,7 +182,7 @@ class SARPreProcessor(PreProcessor):
 
         area = None
         try:
-            if self.config.subset == 'yes'
+            if self.config.region.subset == 'yes':
                 lower_right_y = self.config.region['lr']['lat']
                 upper_left_y = self.config.region['ul']['lat']
                 upper_left_x = self.config.region['ul']['lon']
