@@ -82,7 +82,7 @@ class NetcdfStackCreator(object):
             self.sigma0_vv_norm_multi = self.dataset.createVariable('sigma0_vv_norm_multi', np.float32,('time','lat','lon'), fill_value=-99999)
             self.sigma0_vv_norm_multi.units = 'linear'
             self.sigma0_vh_norm_multi = self.dataset.createVariable('sigma0_vh_norm_multi', np.float32,('time','lat','lon'), fill_value=-99999)
-            self.sigma0_vh_tempspeckl.units = 'linear'
+            self.sigma0_vh_norm_multi.units = 'linear'
 
         self.sigma0_vv_single = self.dataset.createVariable('sigma0_vv_single', np.float32,('time','lat','lon'), fill_value=-99999)
         self.sigma0_vv_single.units = 'linear'
