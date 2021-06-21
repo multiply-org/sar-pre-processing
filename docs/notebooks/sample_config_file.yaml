@@ -30,6 +30,7 @@ speckle_filter:
     apply: 'yes'
     files: '5'
 
+single_file: 'no'
 
 # not needed if default version is used
 #normalisation_angle: 35
