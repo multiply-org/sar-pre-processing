@@ -286,6 +286,14 @@ class SARPreProcessor(PreProcessor):
             logging.info('No valid files found for pre-processing step 2.')
             return
 
+        if len(file_list) == 1:
+            logging.info('Single image, no co-register of images necessary')
+            self.config.single_file = 'yes'
+            return
+
+        if len(file_list) > 1:
+            self.config.single_file = 'no'
+
         # Set Master image for co-registration
         master = file_list[0]
 
@@ -324,31 +332,32 @@ class SARPreProcessor(PreProcessor):
         if not os.path.exists(self.config.output_folder_step3):
             os.makedirs(self.config.output_folder_step3)
 
-        # Create filelist with all to be processed images
-        if self.file_list is None:
-            logging.info('no file list specified, therefore all images in output folder step2 will be processed')
-            file_list = self._create_file_list(self.config.output_folder_step2, '*.dim')
-        else:
-            file_list = []
-            for list in self.file_list:
-                for file in list:
-                    file_path, filename, file_short_name, extension = self._decompose_filename(file)
-                    new_file_name = os.path.join(self.config.output_folder_step2, file_short_name +
-                                                 self.name_addition_step1 + self.name_addition_step2 + '.dim')
-                    if os.path.exists(new_file_name) is True:
-                        file_list.append(new_file_name)
-                    else:
-                        logging.info(f'skip processing for {file}. File {new_file_name} does not exist.')
-
-        # Sort file list by date (hard coded position in filename!)
-        file_path, filename, file_short_name, extension = self._decompose_filename(file_list[0])
-        file_list.sort(key=lambda x: x[len(file_path) + 18:len(file_path) + 33])
-        file_list_old = file_list
-
-        if self.config.speckle_filter.multi_temporal.apply == 'yes':
+        if (self.config.speckle_filter.multi_temporal.apply == 'yes') and (self.config.single_file == 'no'):
             # Check if XML file for pre-processing step 3 is specified
             assert self.config.pre_process_step3 is not None, \
                 'ERROR: path of XML file for pre-processing step 3 is not not specified'
+
+            # Create filelist with all to be processed images
+            if self.file_list is None:
+                logging.info('no file list specified, therefore all images in output folder step2 will be processed')
+                file_list = self._create_file_list(self.config.output_folder_step2, '*.dim')
+            else:
+                file_list = []
+                for list in self.file_list:
+                    for file in list:
+                        file_path, filename, file_short_name, extension = self._decompose_filename(file)
+                        new_file_name = os.path.join(self.config.output_folder_step2, file_short_name +
+                                                     self.name_addition_step1 + self.name_addition_step2 + '.dim')
+                        if os.path.exists(new_file_name) is True:
+                            file_list.append(new_file_name)
+                        else:
+                            logging.info(f'skip processing for {file}. File {new_file_name} does not exist.')
+
+            # Sort file list by date (hard coded position in filename!)
+            file_path, filename, file_short_name, extension = self._decompose_filename(file_list[0])
+            file_list.sort(key=lambda x: x[len(file_path) + 18:len(file_path) + 33])
+            file_list_old = file_list
+
 
             # loop to apply multi-temporal filtering
             # vv and vh polarisation are separated
@@ -439,10 +448,34 @@ class SARPreProcessor(PreProcessor):
                 logging.info(datetime.now())
 
 
-        elif self.config.speckle_filter.multi_temporal.apply == 'no':
+        elif self.config.single_file == 'yes':
+            if self.config.speckle_filter.multi_temporal.apply == 'yes':
+                logging.info('multi temporal filter cannot applied to a single image, just single speckle filter is applied')
+
             # Check if XML file for pre-processing step 3 is specified
             assert self.config.pre_process_step3_single_file is not None, \
                 'ERROR: path of XML file for pre-processing step 3 is not not specified'
+
+            # Create filelist with all to be processed images
+            if self.file_list is None:
+                logging.info('no file list specified, therefore all images in output folder step1 will be processed')
+                file_list = self._create_file_list(self.config.output_folder_step1, '*.dim')
+            else:
+                file_list = []
+                for list in self.file_list:
+                    for file in list:
+                        file_path, filename, file_short_name, extension = self._decompose_filename(file)
+                        new_file_name = os.path.join(self.config.output_folder_step1, file_short_name +
+                                                     self.name_addition_step1 + '.dim')
+                        if os.path.exists(new_file_name) is True:
+                            file_list.append(new_file_name)
+                        else:
+                            logging.info(f'skip processing for {file}. File {new_file_name} does not exist.')
+
+            # Sort file list by date (hard coded position in filename!)
+            file_path, filename, file_short_name, extension = self._decompose_filename(file_list[0])
+            file_list.sort(key=lambda x: x[len(file_path) + 18:len(file_path) + 33])
+            file_list_old = file_list
 
             # loop to apply multi-temporal filtering
             # vv and vh polarisation are separated
@@ -450,13 +483,13 @@ class SARPreProcessor(PreProcessor):
                 component_progress_logger.info(f'{int((i / len(file_list)) * 100)}')
 
                 a, a, b, a = self._decompose_filename(self._create_file_list(
-                    os.path.join(file_path, file_short_name + '.data'), '*_slv1_*.img')[0])
+                    os.path.join(file_path, file_short_name + '.data'), '*vv_kelln_norm*.img')[0])
                 a, a, c, a = self._decompose_filename(self._create_file_list(
-                    os.path.join(file_path, file_short_name + '.data'), '*_slv2_*.img')[0])
+                    os.path.join(file_path, file_short_name + '.data'), '*vh_kelln_norm*.img')[0])
                 a, a, d, a = self._decompose_filename(self._create_file_list(
-                    os.path.join(file_path, file_short_name + '.data'), '*_slv3_*.img')[0])
+                    os.path.join(file_path, file_short_name + '.data'), '*_vv_kelln.img')[0])
                 a, a, e, a = self._decompose_filename(self._create_file_list(
-                    os.path.join(file_path, file_short_name + '.data'), '*_slv4_*.img')[0])
+                    os.path.join(file_path, file_short_name + '.data'), '*_vh_kelln.img')[0])
                 list_bands_single_speckle_filter = ','.join([b, c, d, e])
 
                 name_change_vv_single = d
