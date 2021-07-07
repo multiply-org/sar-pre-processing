@@ -31,6 +31,15 @@ Geometric distortions such as foreshortening, layover or shadowing effects are b
 To account for these radiometric and geometric distortions the Sentinel-1 Level 1 data has to be corrected radiometrically and geometrically before the data can be used for further analysis or within third party applications.
 Therefore, either an automatic or manual pre-processing of Sentinel-1 images is needed.
 
+# Statement of need
+
+Sentinel-1 satellites will provide continuous free available microwave remote sensing data of the entire globe at least until the end of 2030.
+As different pre-processing steps needs to be applied to the Sentinel-1 data the usage of the data is mainly limited to expert users in the field of microwave remote sensing.
+SenSARP was written to easily apply pre-defined pre-processing workflows to Sentinel-1 time series as well as single images.
+Thus, expert and non-expert users in the field of pre-processing microwave data are able to use radiometric and geometric corrected sigma nought backscatter data for their specific applications without much effort.
+
+# Method
+
 This python package generates a file list of to be processed Sentinel-1 images (already downloaded and stored in a specific folder) based on different user defined criteria (specific year, area of interest).
 Additionally, specific cases of repeatedly processed data are handled, as sometimes Sentinel-1 data were initially processed multiple times and stored under similar names on the Copernicus Open Access Hub. Also, cases where Sentinel-1 data within the user-defined area of interest might be stored in consecutive images are considered.
 
@@ -45,6 +54,8 @@ User Guides to show how the GPF can be used are provided here: https://senbox.at
 After the pre-processing the resulting radiometrically and geometrically corrected images are stored for further usage within a NetCDF4 stack file.
 Among other applications the processed images can be used e.g. for flood risk analysis, monitoring land cover changes, monitoring global food security or estimation of land surface parameters.
 In the future many more new products and operational third party services based on consistent Sentinel-1 time series might be developed.
+
+# Applications
 
 This python package was developed within the Horizon 2020 project called MULTIscale SENTINEL land surface information retrieval Platform (MULTIPLY) (http://www.multiply-h2020.eu/, https://cordis.europa.eu/project/id/687320, https://multiply.obs-website.eu-de.otc.t-systems.com).
 Furthermore, data processed by this package is used within Sentinel-Synergy-Study S3 project (https://www.researchgate.net/project/Sentinel-Synergy-Study-S3).
