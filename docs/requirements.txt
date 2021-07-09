@@ -9,3 +9,11 @@ m2r
 sphinxcontrib-bibtex
 nbsphinx
 ipykernel
+sentinelsat
+matplotlib
+
+python:
+  version: 3.6
+  install:
+    - method: sar_pre_processing
+      path: .
