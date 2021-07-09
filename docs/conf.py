@@ -48,7 +48,7 @@ extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx', 'sphinx.ext.todo',
               'sphinx.ext.napoleon', 'sphinxcontrib.bibtex', 'nbsphinx']
 
 # Add bibtex file
-bibtex_bibfiles = ['paper.bib']
+bibtex_bibfiles = ['references.bib']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
