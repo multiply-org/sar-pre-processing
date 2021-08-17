@@ -50,8 +50,12 @@ To install for development and for the current user, use
 ## Module requirements
 
 Please see the [environment file](environment.yml) for a list of dependencies.
-ESA's SNAP Sentinel-1 Toolbox has to be installed prerequisite. The Software can be downloaded [here](http://step.esa.int/main/download/snap-download/)
-- SNAP Toolbox need libgfortran for specific operations but currently libgfortran is not installed during the installation process of SNAP (Linux version) therefore you might use
+ESA's SNAP Sentinel-1 Toolbox has to be installed prerequisite. The Software can be downloaded [here](http://step.esa.int/main/download/snap-download/).
+enSARP uses only functionalities of the Sentinel-1 Toolbox.
+Currently only SNAP version 8.0 can be downloaded from the website. To update SNAP to a version >8.0.3 please start the SNAP software.
+You will be asked if you want to search for update.
+After the updates are installed you need to restart SNAP to initialize the installed updates.
+SNAP Toolbox need libgfortran for specific operations but currently libgfortran is not installed during the installation process of SNAP (Linux version) therefore you might use
 
     $ sudo apt-get install gfortran
 
