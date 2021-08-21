@@ -100,15 +100,16 @@ class SARPreProcessor(PreProcessor):
         put location of processing xml graphs within config
         check if user has specified personal xml graphs otherwise use default ones
         """
-        if self.config.has_entry(key_name):
-            if not os.path.exists(self.config[key_name]):
-                if self.config.has_entry('xml_graph_path'):
-                    graph_path = os.path.join(self.config.xml_graph_path, self.config[key_name])
-                    if not os.path.exists(graph_path):
-                        raise UserWarning(f'Could not determine location of user defined {self.config[key_name]}.')
-                    self.config.add_entry(key_name, graph_path)
-                else:
-                    raise UserWarning(f'Could not determine location of {self.config[key_name]}.')
+        if self.config.use_user_defined_graphs == 'yes':
+            if self.config.has_entry(key_name):
+                if not os.path.exists(self.config[key_name]):
+                    if self.config.has_entry('xml_graph_path'):
+                        graph_path = os.path.join(self.config.xml_graph_path, self.config[key_name])
+                        if not os.path.exists(graph_path):
+                            raise UserWarning(f'Could not determine location of user defined {self.config[key_name]}.')
+                        self.config.add_entry(key_name, graph_path)
+                    else:
+                        raise UserWarning(f'Could not determine location of {self.config[key_name]}.')
         else:
             default_graph = pkg_resources.resource_filename('sar_pre_processing.default_graphs', default_name)
             self.config.add_entry(key_name, default_graph)
@@ -232,7 +233,12 @@ class SARPreProcessor(PreProcessor):
         file2_part = ''
         if file2 is not None:
             file2_part = ' -Pinput2="' + file2 + '"'
-        call = '"' + self.config.gpt + '" "' + script_path + \
+        if self.use_user_defined_graphs == 'yes':
+            call = '"' + self.config.gpt + '" "' + script_path + \
+               '" -Pinput="' + file + '"' + file2_part + ' -Poutput="' + output_file + \
+               '" ' + area_part + '-c 2G -x'
+        else:
+            call = '"' + self.config.gpt + '" "' + script_path + \
                '" -Pinput="' + file + '"' + file2_part + ' -Poutput="' + output_file + \
                '" -Pangle="' + normalisation_angle + '" ' + area_part + '-c 2G -x'
         return_code = subprocess.call(call, shell=True)
@@ -309,8 +315,14 @@ class SARPreProcessor(PreProcessor):
             logging.info(f'Process {filename} with SNAP.')
             output_file = os.path.join(
                 self.config.output_folder_step2, file_short_name + self.name_addition_step2 + '.dim')
+
+            if self.use_user_defined_graphs == 'yes':
+                file_format = 'NetCDF4-CF'
+            else:
+                file_format = 'BEAM-DIMAP'
+
             call = '"' + self.config.gpt + '" "' + self.config.pre_process_step2 + \
-                   '" -Pinput="' + master + '" -Pinput2="' + file + '" -Poutput="' + output_file + '" -c 2G -x'
+                   '" -Pinput="' + master + '" -Pinput2="' + file + '" -Poutput="' + output_file + '" -Pfile_format="' + file_format + '" -c 2G -x'
             return_code = subprocess.call(call, shell=True)
             logging.info(return_code)
             logging.info(datetime.now())
@@ -703,8 +715,14 @@ class SARPreProcessor(PreProcessor):
         Orbitdirection: '0 = Ascending, 1 = Descending'
         Satellite: '0 = Sentinel 1A, 1 = Sentinel 1B'
         """
-        if filename is None:
-            filename = self.config.output_folder_step3.rsplit('/', 2)[1]
-        stack_creator = NetcdfStackCreator(input_folder=self.config.output_folder_step3, output_path=self.config.output_folder_step3.rsplit('/', 1)[0], output_filename=filename, temporal_filter=self.config.speckle_filter.multi_temporal.apply)
+
+        if self.use_user_defined_graphs == 'yes':
+            if filename is None:
+                filename = self.config.output_folder_step2.rsplit('/', 2)[1]
+            stack_creator = NetcdfStackCreator(input_folder=self.config.output_folder_step2, output_path=self.config.output_folder_step2.rsplit('/', 1)[0], output_filename=filename, temporal_filter=self.config.speckle_filter.multi_temporal.apply)
+        else:
+            if filename is None:
+                filename = self.config.output_folder_step3.rsplit('/', 2)[1]
+            stack_creator = NetcdfStackCreator(input_folder=self.config.output_folder_step3, output_path=self.config.output_folder_step3.rsplit('/', 1)[0], output_filename=filename, temporal_filter=self.config.speckle_filter.multi_temporal.apply)
         stack_creator.create_netcdf_stack()
 
