@@ -34,6 +34,7 @@ class PreProcessor(object):
     def __init__(self, **kwargs):
         self.config_file = kwargs.get('config', None)
         self.filelist = kwargs.get('filelist', None)
+        self.use_user_defined_graphs = kwargs.get('use_user_defined_graphs', 'no')
         self._check()
         self._load_config()
         if kwargs.get('input', None) is not None:
@@ -272,9 +273,9 @@ class SARPreProcessor(PreProcessor):
 
         # Create file_list with all to be processed images
         if self.file_list is None:
-            logging.info('no file list specified, therefore all images in output folder step1 will be processed')
             file_list = self._create_file_list(self.config.output_folder_step1, '*.dim')
             file_list.sort()
+            logging.info('no file list specified, therefore all images in output folder step1 will be processed')
         else:
             file_list = []
             for list in self.file_list:
@@ -293,8 +294,8 @@ class SARPreProcessor(PreProcessor):
             return
 
         if len(file_list) == 1:
-            logging.info('Single image, no co-register of images necessary')
             self.config.single_file = 'yes'
+            logging.info('Single image, no co-register of images necessary')
             return
 
         if len(file_list) > 1:
@@ -344,6 +345,10 @@ class SARPreProcessor(PreProcessor):
         if not os.path.exists(self.config.output_folder_step3):
             os.makedirs(self.config.output_folder_step3)
 
+        if self.use_user_defined_graphs == 'yes':
+            logging.info('combination of default multi temporal speckle filter and user defined graphs is not supported yet')
+            return
+
         if (self.config.speckle_filter.multi_temporal.apply == 'yes') and (self.config.single_file == 'no'):
             # Check if XML file for pre-processing step 3 is specified
             assert self.config.pre_process_step3 is not None, \
@@ -351,8 +356,8 @@ class SARPreProcessor(PreProcessor):
 
             # Create filelist with all to be processed images
             if self.file_list is None:
-                logging.info('no file list specified, therefore all images in output folder step2 will be processed')
                 file_list = self._create_file_list(self.config.output_folder_step2, '*.dim')
+                logging.info('no file list specified, therefore all images in output folder step2 will be processed')
             else:
                 file_list = []
                 for list in self.file_list:
@@ -462,8 +467,8 @@ class SARPreProcessor(PreProcessor):
 
         elif self.config.single_file == 'yes':
             if self.config.speckle_filter.multi_temporal.apply == 'yes':
+                self.config.speckle_filter.multi_temporal.apply = 'no'
                 logging.info('multi temporal filter cannot applied to a single image, just single speckle filter is applied')
-                self.config.speckle_filter.multi_temporal.apply == 'no'
 
             # Check if XML file for pre-processing step 3 is specified
             assert self.config.pre_process_step3_single_file is not None, \
@@ -471,8 +476,8 @@ class SARPreProcessor(PreProcessor):
 
             # Create filelist with all to be processed images
             if self.file_list is None:
-                logging.info('no file list specified, therefore all images in output folder step1 will be processed')
                 file_list = self._create_file_list(self.config.output_folder_step1, '*.dim')
+                logging.info('no file list specified, therefore all images in output folder step1 will be processed')
             else:
                 file_list = []
                 for list in self.file_list:
@@ -540,8 +545,8 @@ class SARPreProcessor(PreProcessor):
 
             # Create filelist with all to be processed images
             if self.file_list is None:
-                logging.info('no file list specified, therefore all images in output folder step2 will be processed')
                 file_list = self._create_file_list(self.config.output_folder_step2, '*.dim')
+                logging.info('no file list specified, therefore all images in output folder step2 will be processed')
             else:
                 file_list = []
                 for list in self.file_list:
@@ -652,7 +657,7 @@ class SARPreProcessor(PreProcessor):
                 data_set.delncattr('start_date')
                 data_set.delncattr('stop_date')
             except RuntimeError:
-                logging.warning('A runtime error has occurred')
+                pass
             data_set.setncattr_string('date', str(start_date))
 
             # extract orbit direction from metadata
@@ -695,10 +700,13 @@ class SARPreProcessor(PreProcessor):
             elif file_short_name[0:3] == 'S1B':
                 data_set.setncattr_string('satellite', 'S1B')
 
-            crs_var = data_set.createVariable('crs', np.int32, ())
-            crs_var.standard_name = 'crs'
-            crs_var.grid_mapping_name = 'latitude_longitude'
-            crs_var.crs_wkt = 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]'
+            try:
+                crs_var = data_set.createVariable('crs', np.int32, ())
+                crs_var.standard_name = 'crs'
+                crs_var.grid_mapping_name = 'latitude_longitude'
+                crs_var.crs_wkt = 'GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4326"]]'
+            except RuntimeError:
+                pass
 
             for x in data_set.variables.keys():
                 if x == 'lat' or x == 'lon' or x == 'crs':
