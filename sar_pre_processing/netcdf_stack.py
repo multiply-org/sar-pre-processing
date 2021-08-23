@@ -69,30 +69,43 @@ class NetcdfStackCreator(object):
         self.longitude = self.dataset.createVariable('lon', np.float32, ('lon'))
 
         # create 3-D variables (localIncidenceangle ... )
-        self.localIncidenceAngle = self.dataset.createVariable('localIncidenceAngle', np.float32,('time','lat','lon'), fill_value=-99999)
-        self.localIncidenceAngle.units = 'degree'
+        # self.localIncidenceAngle = self.dataset.createVariable('localIncidenceAngle', np.float32,('time','lat','lon'), fill_value=-99999)
+        # self.localIncidenceAngle.units = 'degree'
 
-        if self.temporal_filter == 'yes':
+        for i in data.variables.keys():
+            if i == 'lat':
+                pass
+            elif I == 'lon':
+                pass
+            elif i == 'crs':
+                pass
+            else:
+                self.dataset.createVariable('i', np.float32,('time','lat','lon'), fill_value=-99999)
+                self.dataset[i].unit = 'linear'
 
-            self.sigma0_vv_multi = self.dataset.createVariable('sigma0_vv_multi', np.float32,('time','lat','lon'), fill_value=-99999)
-            self.sigma0_vv_multi.units = 'linear'
-            self.sigma0_vh_multi = self.dataset.createVariable('sigma0_vh_multi', np.float32,('time','lat','lon'), fill_value=-99999)
-            self.sigma0_vh_multi.units = 'linear'
 
-            self.sigma0_vv_norm_multi = self.dataset.createVariable('sigma0_vv_norm_multi', np.float32,('time','lat','lon'), fill_value=-99999)
-            self.sigma0_vv_norm_multi.units = 'linear'
-            self.sigma0_vh_norm_multi = self.dataset.createVariable('sigma0_vh_norm_multi', np.float32,('time','lat','lon'), fill_value=-99999)
-            self.sigma0_vh_norm_multi.units = 'linear'
 
-        self.sigma0_vv_single = self.dataset.createVariable('sigma0_vv_single', np.float32,('time','lat','lon'), fill_value=-99999)
-        self.sigma0_vv_single.units = 'linear'
-        self.sigma0_vh_single = self.dataset.createVariable('sigma0_vh_single', np.float32,('time','lat','lon'), fill_value=-99999)
-        self.sigma0_vh_single.units = 'linear'
+        # if self.temporal_filter == 'yes':
 
-        self.sigma0_vv_norm_single = self.dataset.createVariable('sigma0_vv_norm_single', np.float32,('time','lat','lon'), fill_value=-99999)
-        self.sigma0_vv_norm_single.units = 'linear'
-        self.sigma0_vh_norm_single = self.dataset.createVariable('sigma0_vh_norm_single', np.float32,('time','lat','lon'), fill_value=-99999)
-        self.sigma0_vh_norm_single.units = 'linear'
+        #     self.sigma0_vv_multi = self.dataset.createVariable('sigma0_vv_multi', np.float32,('time','lat','lon'), fill_value=-99999)
+        #     self.sigma0_vv_multi.units = 'linear'
+        #     self.sigma0_vh_multi = self.dataset.createVariable('sigma0_vh_multi', np.float32,('time','lat','lon'), fill_value=-99999)
+        #     self.sigma0_vh_multi.units = 'linear'
+
+        #     self.sigma0_vv_norm_multi = self.dataset.createVariable('sigma0_vv_norm_multi', np.float32,('time','lat','lon'), fill_value=-99999)
+        #     self.sigma0_vv_norm_multi.units = 'linear'
+        #     self.sigma0_vh_norm_multi = self.dataset.createVariable('sigma0_vh_norm_multi', np.float32,('time','lat','lon'), fill_value=-99999)
+        #     self.sigma0_vh_norm_multi.units = 'linear'
+
+        # self.sigma0_vv_single = self.dataset.createVariable('sigma0_vv_single', np.float32,('time','lat','lon'), fill_value=-99999)
+        # self.sigma0_vv_single.units = 'linear'
+        # self.sigma0_vh_single = self.dataset.createVariable('sigma0_vh_single', np.float32,('time','lat','lon'), fill_value=-99999)
+        # self.sigma0_vh_single.units = 'linear'
+
+        # self.sigma0_vv_norm_single = self.dataset.createVariable('sigma0_vv_norm_single', np.float32,('time','lat','lon'), fill_value=-99999)
+        # self.sigma0_vv_norm_single.units = 'linear'
+        # self.sigma0_vh_norm_single = self.dataset.createVariable('sigma0_vh_norm_single', np.float32,('time','lat','lon'), fill_value=-99999)
+        # self.sigma0_vh_norm_single.units = 'linear'
 
     def stacking(self):
         """stack all files in one netcdf file"""
@@ -136,17 +149,28 @@ class NetcdfStackCreator(object):
             self.satellite.description = '0 = Sentinel 1A, 1 = Sentinel 1B'
 
             # fill 3-D variables
-            self.localIncidenceAngle[index,:,:] = data.variables['theta'][:]
-            if self.temporal_filter == 'yes':
-                self.sigma0_vv_multi[index,:,:] = data.variables['sigma0_vv_multi'][:]
-                self.sigma0_vh_multi[index,:,:] = data.variables['sigma0_vh_multi'][:]
+            for i in data.variables.keys():
+                if i == 'lat':
+                    pass
+                elif I == 'lon':
+                    pass
+                elif i == 'crs':
+                    pass
+                else:
+                    self.dataset[i][index,:,:] = data.variables[i][:]
 
-                self.sigma0_vv_norm_multi[index,:,:] = data.variables['sigma0_vv_norm_multi'][:]
-                self.sigma0_vh_norm_multi[index,:,:] = data.variables['sigma0_vh_norm_multi'][:]
-            self.sigma0_vv_single[index,:,:] = data.variables['sigma0_vv_single'][:]
-            self.sigma0_vh_single[index,:,:] = data.variables['sigma0_vh_single'][:]
 
-            self.sigma0_vv_norm_single[index,:,:] = data.variables['sigma0_vv_norm_single'][:]
-            self.sigma0_vh_norm_single[index,:,:] = data.variables['sigma0_vh_norm_single'][:]
+            # self.localIncidenceAngle[index,:,:] = data.variables['theta'][:]
+            # if self.temporal_filter == 'yes':
+            #     self.sigma0_vv_multi[index,:,:] = data.variables['sigma0_vv_multi'][:]
+            #     self.sigma0_vh_multi[index,:,:] = data.variables['sigma0_vh_multi'][:]
+
+            #     self.sigma0_vv_norm_multi[index,:,:] = data.variables['sigma0_vv_norm_multi'][:]
+            #     self.sigma0_vh_norm_multi[index,:,:] = data.variables['sigma0_vh_norm_multi'][:]
+            # self.sigma0_vv_single[index,:,:] = data.variables['sigma0_vv_single'][:]
+            # self.sigma0_vh_single[index,:,:] = data.variables['sigma0_vh_single'][:]
+
+            # self.sigma0_vv_norm_single[index,:,:] = data.variables['sigma0_vv_norm_single'][:]
+            # self.sigma0_vh_norm_single[index,:,:] = data.variables['sigma0_vh_norm_single'][:]
 
         self.dataset.close()
