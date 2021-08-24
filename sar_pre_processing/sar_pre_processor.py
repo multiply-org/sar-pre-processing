@@ -34,9 +34,9 @@ class PreProcessor(object):
     def __init__(self, **kwargs):
         self.config_file = kwargs.get('config', None)
         self.filelist = kwargs.get('filelist', None)
-        self.config.use_user_defined_graphs = kwargs.get('use_user_defined_graphs', 'no')
         self._check()
         self._load_config()
+        self.config.use_user_defined_graphs = kwargs.get('use_user_defined_graphs', 'no')
         if kwargs.get('input', None) is not None:
             self.config.input_folder = kwargs.get('input', None)
         if kwargs.get('output', None) is not None:
@@ -234,7 +234,7 @@ class SARPreProcessor(PreProcessor):
         file2_part = ''
         if file2 is not None:
             file2_part = ' -Pinput2="' + file2 + '"'
-        if self.use_user_defined_graphs == 'yes':
+        if self.config.use_user_defined_graphs == 'yes':
             call = '"' + self.config.gpt + '" "' + script_path + \
                '" -Pinput="' + file + '"' + file2_part + ' -Poutput="' + output_file + \
                '" ' + area_part + '-c 2G -x'
@@ -317,7 +317,7 @@ class SARPreProcessor(PreProcessor):
             output_file = os.path.join(
                 self.config.output_folder_step2, file_short_name + self.name_addition_step2 + '.dim')
 
-            if self.use_user_defined_graphs == 'yes':
+            if self.config.use_user_defined_graphs == 'yes':
                 file_format = 'NetCDF4-CF'
             else:
                 file_format = 'BEAM-DIMAP'
@@ -345,7 +345,7 @@ class SARPreProcessor(PreProcessor):
         if not os.path.exists(self.config.output_folder_step3):
             os.makedirs(self.config.output_folder_step3)
 
-        if self.use_user_defined_graphs == 'yes':
+        if self.config.use_user_defined_graphs == 'yes':
             logging.info('combination of default multi temporal speckle filter and user defined graphs is not supported yet')
             return
 
@@ -724,7 +724,7 @@ class SARPreProcessor(PreProcessor):
         Satellite: '0 = Sentinel 1A, 1 = Sentinel 1B'
         """
 
-        if self.use_user_defined_graphs == 'yes':
+        if self.config.use_user_defined_graphs == 'yes':
             if filename is None:
                 filename = self.config.output_folder_step2.rsplit('/', 2)[1]
             stack_creator = NetcdfStackCreator(input_folder=self.config.output_folder_step2, output_path=self.config.output_folder_step2.rsplit('/', 1)[0], output_filename=filename, temporal_filter=self.config.speckle_filter.multi_temporal.apply)

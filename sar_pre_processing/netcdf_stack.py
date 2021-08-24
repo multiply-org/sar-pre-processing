@@ -75,7 +75,7 @@ class NetcdfStackCreator(object):
         for i in data.variables.keys():
             if i == 'lat':
                 pass
-            elif I == 'lon':
+            elif i == 'lon':
                 pass
             elif i == 'crs':
                 pass
@@ -152,7 +152,7 @@ class NetcdfStackCreator(object):
             for i in data.variables.keys():
                 if i == 'lat':
                     pass
-                elif I == 'lon':
+                elif i == 'lon':
                     pass
                 elif i == 'crs':
                     pass
