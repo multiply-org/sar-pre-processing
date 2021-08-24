@@ -1,5 +1,5 @@
 ---
-title: 'SenSARP: A Python package for pre-processing Sentinel-1 SLC data with the Sentinel-1 Toolbox'
+title: 'SenSARP: A pipeline to pre-process Sentinel-1 SLC data by using ESA SNAP Sentinel-1 Toolbox'
 tags:
   - Python
   - Sentinel-1
@@ -36,7 +36,8 @@ Therefore, either an automatic or manual pre-processing of Sentinel-1 images is 
 Sentinel-1 satellites will provide continuous free available microwave remote sensing data of the entire globe at least until the end of 2030.
 As different pre-processing steps needs to be applied to the Sentinel-1 data the usage of the data is mainly limited to expert users in the field of microwave remote sensing.
 SenSARP was written to easily apply pre-defined pre-processing workflows to Sentinel-1 time series as well as single images.
-Thus, expert and non-expert users in the field of pre-processing microwave data are able to use radiometric and geometric corrected sigma nought backscatter data for their specific applications without much effort.
+Thus, non-expert users in the field of pre-processing microwave data are able to use radiometric and geometric corrected sigma nought backscatter data for their specific applications without much effort.
+Expert users
 
 # Method
 

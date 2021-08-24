@@ -13,7 +13,7 @@ The first step is to clone the latest code and step into the check out directory
 
 Via Conda
 ----------
-Download and install Anaconda `link <https://www.anaconda.com/products/individual>`_ or Miniconda `link <https://docs.conda.io/en/latest/miniconda.html>`_. Installation instructions can be found `here <https://conda.io/projects/conda/en/latest/user-guide/install/index.html>`_
+Download and install `Anaconda <https://www.anaconda.com/products/individual>`_ or `Miniconda <https://docs.conda.io/en/latest/miniconda.html>`_. Installation instructions can be found `here <https://conda.io/projects/conda/en/latest/user-guide/install/index.html>`_
 
 To install all required modules, use::
 
@@ -30,12 +30,12 @@ To install for development and for the current user, use::
 
 Via virtualenv and python
 --------------------------
-Create a vitural environment
+Create a vitural environment::
 
     python3 -m venv env
     source env/bin/activate
 
-Install GDAL
+Install GDAL::
 
     pip install GDAL==$(gdal-config --version)
 
@@ -53,7 +53,7 @@ Module requirements
 .. literalinclude:: ./environment.yml
 
 Please see the `environment file <https://github.com/multiply-org/sar-pre-processing/blob/master/environment.yml>`_ for a list of dependencies.
-ESA's SNAP Sentinel-1 Toolbox (Version >8.0.3) has to be installed prerequisite. The Software can be downloaded `here <http://step.esa.int/main/download/snap-download/>`_. To install the SNAP toolbox in Linux open a terminal window and use
+ESA's SNAP Sentinel-1 Toolbox (Version >8.0.3) has to be installed prerequisite. The Software can be downloaded `here <http://step.esa.int/main/download/snap-download/>`_. To install the SNAP toolbox in Linux open a terminal window and use::
 
     bash esa-snap_sentinel_unix_8_0.sh
 
