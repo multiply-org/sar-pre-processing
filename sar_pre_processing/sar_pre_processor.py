@@ -34,7 +34,7 @@ class PreProcessor(object):
     def __init__(self, **kwargs):
         self.config_file = kwargs.get('config', None)
         self.filelist = kwargs.get('filelist', None)
-        self.use_user_defined_graphs = kwargs.get('use_user_defined_graphs', 'no')
+        self.config.use_user_defined_graphs = kwargs.get('use_user_defined_graphs', 'no')
         self._check()
         self._load_config()
         if kwargs.get('input', None) is not None:

@@ -80,8 +80,8 @@ class NetcdfStackCreator(object):
             elif i == 'crs':
                 pass
             else:
-                self.dataset.createVariable('i', np.float32,('time','lat','lon'), fill_value=-99999)
-                self.dataset[i].unit = 'linear'
+                self.dataset.createVariable(i, np.float32,('time','lat','lon'), fill_value=-99999)
+                self.dataset[i].units = 'linear'
 
 
 
