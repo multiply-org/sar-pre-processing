@@ -30,14 +30,21 @@ To install for development and for the current user, use::
 
 Via virtualenv and python
 --------------------------
+Install system requirements::
+
+    sudo apt install python3-pip python3-tk python3-virtualenv python3-venv virtualenv
+
 Create a vitural environment::
 
-    python3 -m venv env
+    virtualenv -p /usr/bin/python3 env
     source env/bin/activate
 
 Install GDAL::
 
+    sudo apt install gdal-bin libgdal-dev
+
     pip install GDAL==$(gdal-config --version)
+    python -m pip install pygdal=="`gdal-config --version`.*"
 
 To install SenSARP into an existing Python environment just for the current user, use::
 
