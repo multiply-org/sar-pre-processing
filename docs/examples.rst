@@ -680,3 +680,343 @@ Start pre-processing steps
 
     Scene 7 of 7
     /home/test/Desktop/data/step3/S1A_IW_SLC__1SDV_20210609T165916_20210609T165943_038266_0483FE_CD3F_GC_RC_No_Su_Co_speckle.nc
+
+
+Example 3: Use user defined xml graphs to process Sentinel-1 data
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Set paths for
+    - input_folder (path to stored Sentinel-1 SLC data (zip files) e.g. “~/Downloads”)
+    - output_folder (path where processed data will be stored e.g. “~/output”)
+    - gpt_loction (gpt is located in the bin folder of your SNAP installation)’
+
+.. code:: ipython3
+
+    input_folder = path
+    output_folder = path
+    gpt_location = os.path.expanduser('~/snap/bin/gpt')
+
+Create config file with information about input, output and gpt location
+
+.. code:: ipython3
+
+    import yaml
+
+    with open('sample_config_file.yaml') as stream:
+       data = yaml.safe_load(stream)
+
+    data['input_folder'] = input_folder
+    data['output_folder'] = output_folder
+    data['gpt'] = gpt_location
+
+    with open('test_config_file.yaml', 'wb') as stream:
+       yaml.safe_dump(data, stream, default_flow_style=False,
+                      explicit_start=True, allow_unicode=True, encoding='utf-8')
+
+Expert user might create their own processing chain and use the
+functionally of SenSARP to automate the processing on scale
+1. Create a user defined xml graph via SNAP’s Graph Builder
+    - information how to use SNAP’s Graph Builder can be found at the step forum (https://forum.step.esa.int/t/graph-builder/5403)
+2. Modifiy user defined xml graph to be used by SenSARP - Needed modification
+    - Placeholder for input image within xml graph need to be specified
+    - Placeholder for output image within xml graph need to be specified
+    - If subset operator is used within user defined xml graph a placeholder for subset extent need to be specified
+
+Functionallity of SenSARP that can be used:
+    - Filter option (year, area of interest)
+    - default pre_process_step2 (co-registration of time series images)
+    - creation of netCDF4 stack containing all processed images and information about orbit direction, relative orbit, satellite name
+
+.. code:: ipython3
+
+    # Load xml graph
+    import xml.etree.ElementTree as ETree
+    user_xml_graph = '/home/test/Desktop/sar-pre-processing/sar_pre_processing/user_defined_graphs/expert_user.xml'
+    tree = ETree.parse(user_xml_graph)
+    root = tree.getroot()
+
+    # find Operators Read, Write and Subset
+    read = root.find("./node/[operator='Read']")
+    read2 = read.find("./parameters[@class='com.bc.ceres.binding.dom.XppDomElement']")
+    write = root.find("./node/[operator='Write']")
+    subset = root.find("./node/[operator='Subset']")
+
+.. code:: ipython3
+
+    # Old Version of user defined xml graph
+    print(ETree.tostring(read, encoding='utf8').decode('utf8'))
+    print(ETree.tostring(write, encoding='utf8').decode('utf8'))
+    print(ETree.tostring(subset, encoding='utf8').decode('utf8'))
+
+
+**Output code:**
+
+.. code:: ipython3
+
+    <?xml version='1.0' encoding='utf8'?>
+    <node id="Read">
+        <operator>Read</operator>
+        <sources />
+        <parameters class="com.bc.ceres.binding.dom.XppDomElement" />
+      </node>
+
+    <?xml version='1.0' encoding='utf8'?>
+    <node id="Write">
+        <operator>Write</operator>
+        <sources>
+          <sourceProduct refid="Subset" />
+        </sources>
+        <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+          <file>/home/wodan/target.dim</file>
+          <formatName>BEAM-DIMAP</formatName>
+        </parameters>
+      </node>
+
+    <?xml version='1.0' encoding='utf8'?>
+    <node id="Subset">
+        <operator>Subset</operator>
+        <sources>
+          <sourceProduct refid="Terrain-Correction" />
+        </sources>
+        <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+          <sourceBands />
+          <region>0,0,0,0</region>
+          <referenceBand />
+          <geoRegion />
+          <subSamplingX>1</subSamplingX>
+          <subSamplingY>1</subSamplingY>
+          <fullSwath>false</fullSwath>
+          <tiePointGridNames />
+          <copyMetadata>true</copyMetadata>
+        </parameters>
+      </node>
+
+.. code:: ipython3
+
+    #Apply changes to user defined xml graph
+    ETree.SubElement(read2, "file").text = "$input"
+    for output in write.iter('file'):
+        output_new = '$output'
+        output.text = output_new
+    for area in subset.iter('geoRegion'):
+        area_new = '$area'
+        area.text = area_new
+
+    tree.write('/home/test/Desktop/sar-pre-processing/sar_pre_processing/user_defined_graphs/expert_user_modi.xml')
+
+    # print modified version of operators Read, Write and Subset
+    print(ETree.tostring(read, encoding='utf8').decode('utf8'))
+    print(ETree.tostring(write, encoding='utf8').decode('utf8'))
+    print(ETree.tostring(subset, encoding='utf8').decode('utf8'))
+
+**Output code:**
+
+.. code:: ipython3
+
+    <?xml version='1.0' encoding='utf8'?>
+    <node id="Read">
+        <operator>Read</operator>
+        <sources />
+        <parameters class="com.bc.ceres.binding.dom.XppDomElement"><file>$input</file></parameters>
+      </node>
+
+    <?xml version='1.0' encoding='utf8'?>
+    <node id="Write">
+        <operator>Write</operator>
+        <sources>
+          <sourceProduct refid="Subset" />
+        </sources>
+        <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+          <file>$output</file>
+          <formatName>BEAM-DIMAP</formatName>
+        </parameters>
+      </node>
+
+    <?xml version='1.0' encoding='utf8'?>
+    <node id="Subset">
+        <operator>Subset</operator>
+        <sources>
+          <sourceProduct refid="Terrain-Correction" />
+        </sources>
+        <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+          <sourceBands />
+          <region>0,0,0,0</region>
+          <referenceBand />
+          <geoRegion>$area</geoRegion>
+          <subSamplingX>1</subSamplingX>
+          <subSamplingY>1</subSamplingY>
+          <fullSwath>false</fullSwath>
+          <tiePointGridNames />
+          <copyMetadata>true</copyMetadata>
+        </parameters>
+      </node>
+
+
+Set additional config options
+
+.. code:: ipython3
+
+    with open('test_config_file.yaml') as stream:
+       data = yaml.safe_load(stream)
+
+    # Filter option
+    ## Filter via year of interest
+    data['year'] = '2021'
+
+    ## Define region of interest
+    data['region']['lr']['lat'] = 48.2 # lower right latitude
+    data['region']['lr']['lon'] = 11.9 # lower right longitude
+    data['region']['ul']['lat'] = 48.4 # upper left latitude
+    data['region']['ul']['lon'] = 11.6 # upper left longitude
+    data['region']['subset'] = 'yes'
+
+    ## Set options to use user defined xml graph
+    data['use_user_defined_graphs'] = 'yes'
+    data['xml_graph_path'] = '/home/test/Desktop/sar-pre-processing/sar_pre_processing/user_defined_graphs'
+    data['pre_process_step1'] = 'expert_user_modi.xml'
+
+    with open('test_config_file.yaml', 'wb') as stream:
+       yaml.safe_dump(data, stream, default_flow_style=False,
+                      explicit_start=True, allow_unicode=True, encoding='utf-8')
+
+.. code:: ipython3
+
+    from sar_pre_processing.sar_pre_processor import *
+    import warnings
+    warnings.filterwarnings("ignore")
+
+    processing = SARPreProcessor(config='test_config_file.yaml')
+    processing.create_processing_file_list()
+    print('start step 1')
+    processing.pre_process_step1()
+    print('start step 2')
+    processing.pre_process_step2()
+    print('start add netcdf information')
+    processing.add_netcdf_information()
+    print('start create netcdf stack')
+    processing.create_netcdf_stack()
+
+
+**Output code:**
+
+.. code:: ipython3
+
+    INFO:root:Found files within input folder: 2
+    INFO:root:Number of found files for year 2021: 2
+    INFO:root:area of interest not specified
+    INFO:root:Number of found files that were double processed: 0.0
+    INFO:root:Number of found files with border issues: 0
+    INFO:root:area of interest specified
+    INFO:root:normalisation angle not specified, default value of 35 is used for processing
+    INFO:ComponentProgress:0
+    INFO:ComponentProgress:0
+    INFO:root:Process S1A_IW_GRDH_1SDV_20210601T051820_20210601T051845_038142_048071_1299.zip with SNAP.
+
+    start step 1
+
+    INFO: org.esa.snap.core.gpf.operators.tooladapter.ToolAdapterIO: Initializing external tool adapters
+    INFO: org.esa.s2tbx.dataio.gdal.GDALVersion: Incompatible GDAL 3.3.1 found on system. Internal GDAL 3.0.0 from distribution will be used.
+    INFO: org.esa.s2tbx.dataio.gdal.GDALVersion: Internal GDAL 3.0.0 set to be used by SNAP.
+    INFO: org.esa.snap.core.util.EngineVersionCheckActivator: Please check regularly for new updates for the best SNAP experience.
+    INFO: org.esa.s2tbx.dataio.gdal.GDALVersion: Internal GDAL 3.0.0 set to be used by SNAP.
+
+    Executing processing graph
+
+    INFO: org.hsqldb.persist.Logger: dataFileCache open start
+
+    version = 3.31
+    ...10%....21%....33%....44%...54%....65%....77%....88%. done.
+
+    INFO:root:0
+    INFO:ComponentProgress:50
+    INFO:ComponentProgress:50
+    INFO:root:Process S1A_IW_GRDH_1SDV_20210602T170734_20210602T170759_038164_048116_1FC0.zip with SNAP.
+    INFO: org.esa.snap.core.gpf.operators.tooladapter.ToolAdapterIO: Initializing external tool adapters
+    INFO: org.esa.s2tbx.dataio.gdal.GDALVersion: Incompatible GDAL 3.3.1 found on system. Internal GDAL 3.0.0 from distribution will be used.
+    INFO: org.esa.s2tbx.dataio.gdal.GDALVersion: Internal GDAL 3.0.0 set to be used by SNAP.
+    INFO: org.esa.snap.core.util.EngineVersionCheckActivator: Please check regularly for new updates for the best SNAP experience.
+    INFO: org.esa.s2tbx.dataio.gdal.GDALVersion: Internal GDAL 3.0.0 set to be used by SNAP.
+
+    Executing processing graph
+
+    INFO: org.hsqldb.persist.Logger: dataFileCache open start
+
+    version = 3.31
+    ....11%....23%....34%....46%....57%....69%....80%.... done.
+
+    INFO:root:0
+    INFO:ComponentProgress:0
+    INFO:ComponentProgress:0
+    INFO:root:Scene 1 of 2
+    INFO:root:Process S1A_IW_GRDH_1SDV_20210601T051820_20210601T051845_038142_048071_1299_GC_RC_No_Su.dim with SNAP.
+
+    start step 2
+
+    INFO: org.esa.snap.core.gpf.operators.tooladapter.ToolAdapterIO: Initializing external tool adapters
+    INFO: org.esa.s2tbx.dataio.gdal.GDALVersion: Incompatible GDAL 3.3.1 found on system. Internal GDAL 3.0.0 from distribution will be used.
+    INFO: org.esa.s2tbx.dataio.gdal.GDALVersion: Internal GDAL 3.0.0 set to be used by SNAP.
+    INFO: org.esa.snap.core.util.EngineVersionCheckActivator: Please check regularly for new updates for the best SNAP experience.
+    INFO: org.esa.s2tbx.dataio.gdal.GDALVersion: Internal GDAL 3.0.0 set to be used by SNAP.
+
+    Executing processing graph
+
+    INFO: org.hsqldb.persist.Logger: dataFileCache open start
+
+    8579 [main] INFO serverStartup - Nc4Iosp: NetCDF-4 C library loaded (jna_path='/home/test/.snap/auxdata/netcdf_natives/8.0.5/amd64', libname='netcdf').
+    8591 [main] INFO serverStartup - NetcdfLoader: set log level: old=0 new=0
+    8592 [main] INFO serverStartup - Nc4Iosp: set log level: old=0 new=0
+
+    11%....22%...32%....43%...53%....64%....75%...85%..
+
+    -- org.jblas INFO Deleting /tmp/jblas1527031401138273653/libgfortran-4.so
+    -- org.jblas INFO Deleting /tmp/jblas1527031401138273653/libquadmath-0.so
+    -- org.jblas INFO Deleting /tmp/jblas1527031401138273653/libjblas.so
+    -- org.jblas INFO Deleting /tmp/jblas1527031401138273653/libjblas_arch_flavor.so
+    -- org.jblas INFO Deleting /tmp/jblas1527031401138273653
+    INFO:root:0
+    INFO:root:2021-08-26 15:02:32.769082
+    INFO:ComponentProgress:50
+    INFO:ComponentProgress:50
+    INFO:root:Scene 2 of 2
+    INFO:root:Process S1A_IW_GRDH_1SDV_20210602T170734_20210602T170759_038164_048116_1FC0_GC_RC_No_Su.dim with SNAP.
+
+     done.
+
+    INFO: org.esa.snap.core.gpf.operators.tooladapter.ToolAdapterIO: Initializing external tool adapters
+    INFO: org.esa.s2tbx.dataio.gdal.GDALVersion: Incompatible GDAL 3.3.1 found on system. Internal GDAL 3.0.0 from distribution will be used.
+    INFO: org.esa.s2tbx.dataio.gdal.GDALVersion: Internal GDAL 3.0.0 set to be used by SNAP.
+    INFO: org.esa.snap.core.util.EngineVersionCheckActivator: Please check regularly for new updates for the best SNAP experience.
+    INFO: org.esa.s2tbx.dataio.gdal.GDALVersion: Internal GDAL 3.0.0 set to be used by SNAP.
+
+    Executing processing graph
+
+    INFO: org.hsqldb.persist.Logger: dataFileCache open start
+    INFO: org.esa.snap.core.datamodel.Product: raster height 2228 not equal to 2227
+    INFO: org.esa.snap.core.datamodel.Product: raster height 2228 not equal to 2227
+
+    8407 [main] INFO serverStartup - Nc4Iosp: NetCDF-4 C library loaded (jna_path='/home/test/.snap/auxdata/netcdf_natives/8.0.5/amd64', libname='netcdf').
+    8427 [main] INFO serverStartup - NetcdfLoader: set log level: old=0 new=0
+    8428 [main] INFO serverStartup - Nc4Iosp: set log level: old=0 new=0
+
+    11%....22%...32%....43%...53%....64%....75%...85%.. done.
+
+    -- org.jblas INFO Deleting /tmp/jblas5419624497585784899/libgfortran-4.so
+    -- org.jblas INFO Deleting /tmp/jblas5419624497585784899/libquadmath-0.so
+    -- org.jblas INFO Deleting /tmp/jblas5419624497585784899/libjblas.so
+    -- org.jblas INFO Deleting /tmp/jblas5419624497585784899/libjblas_arch_flavor.so
+    -- org.jblas INFO Deleting /tmp/jblas5419624497585784899
+    INFO:root:0
+    INFO:root:2021-08-26 15:03:03.949791
+
+    start add netcdf information
+
+    INFO:root:Number of scenes found for processing: 2
+
+    start create netcdf stack
+
+    Scene 1 of 2
+    /home/test/Desktop/data3/step2/S1A_IW_GRDH_1SDV_20210601T051820_20210601T051845_038142_048071_1299_GC_RC_No_Su_Co.nc
+
+    Scene 2 of 2
+    /home/test/Desktop/data3/step2/S1A_IW_GRDH_1SDV_20210602T170734_20210602T170759_038164_048116_1FC0_GC_RC_No_Su_Co.nc
+

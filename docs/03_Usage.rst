@@ -7,6 +7,8 @@ Usage
     requirements
     download
     examples
+    visualization
+    config
 
 
 
