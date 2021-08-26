@@ -36,7 +36,6 @@ class PreProcessor(object):
         self.filelist = kwargs.get('filelist', None)
         self._check()
         self._load_config()
-        self.config.use_user_defined_graphs = kwargs.get('use_user_defined_graphs', 'no')
         if kwargs.get('input', None) is not None:
             self.config.input_folder = kwargs.get('input', None)
         if kwargs.get('output', None) is not None:
@@ -101,6 +100,11 @@ class SARPreProcessor(PreProcessor):
         put location of processing xml graphs within config
         check if user has specified personal xml graphs otherwise use default ones
         """
+        try:
+            self.config.use_user_defined_graphs == 'yes'
+        else:
+            self.config.use_user_defined_graphs = 'no'
+
         if self.config.use_user_defined_graphs == 'yes':
             if self.config.has_entry(key_name):
                 if not os.path.exists(self.config[key_name]):
@@ -111,6 +115,9 @@ class SARPreProcessor(PreProcessor):
                         self.config.add_entry(key_name, graph_path)
                     else:
                         raise UserWarning(f'Could not determine location of {self.config[key_name]}.')
+            else:
+                default_graph = pkg_resources.resource_filename('sar_pre_processing.default_graphs', default_name)
+                self.config.add_entry(key_name, default_graph)
         else:
             default_graph = pkg_resources.resource_filename('sar_pre_processing.default_graphs', default_name)
             self.config.add_entry(key_name, default_graph)
@@ -180,7 +187,7 @@ class SARPreProcessor(PreProcessor):
 
         # Check if XML file for pre-processing is specified
         assert self.config.pre_process_step1 is not None, \
-            'ERROR: path of XML file for pre-processing step 1 is not not specified'
+            'ERROR: path of XML file for pre-processing step 1 is not specified'
 
         area = None
         try:
@@ -260,7 +267,7 @@ class SARPreProcessor(PreProcessor):
         """
         # Check if XML file for pre-processing step 2 is specified
         assert self.config.pre_process_step2 is not None, \
-            'ERROR: path of XML file for pre-processing step 2 is not not specified'
+            'ERROR: path of XML file for pre-processing step 2 is not specified'
 
         # Check if output folder of pre_process_step1 exists
         assert os.path.exists(self.config.output_folder_step1), \
@@ -314,13 +321,15 @@ class SARPreProcessor(PreProcessor):
 
             # Call SNAP routine, xml file
             logging.info(f'Process {filename} with SNAP.')
-            output_file = os.path.join(
-                self.config.output_folder_step2, file_short_name + self.name_addition_step2 + '.dim')
 
             if self.config.use_user_defined_graphs == 'yes':
                 file_format = 'NetCDF4-CF'
+                output_file = os.path.join(
+                self.config.output_folder_step2, file_short_name + self.name_addition_step2)
             else:
                 file_format = 'BEAM-DIMAP'
+                output_file = os.path.join(
+                self.config.output_folder_step2, file_short_name + self.name_addition_step2 + '.dim')
 
             call = '"' + self.config.gpt + '" "' + self.config.pre_process_step2 + \
                    '" -Pinput="' + master + '" -Pinput2="' + file + '" -Poutput="' + output_file + '" -Pfile_format="' + file_format + '" -c 2G -x'
@@ -352,7 +361,7 @@ class SARPreProcessor(PreProcessor):
         if (self.config.speckle_filter.multi_temporal.apply == 'yes') and (self.config.single_file == 'no'):
             # Check if XML file for pre-processing step 3 is specified
             assert self.config.pre_process_step3 is not None, \
-                'ERROR: path of XML file for pre-processing step 3 is not not specified'
+                'ERROR: path of XML file for pre-processing step 3 is not specified'
 
             # Create filelist with all to be processed images
             if self.file_list is None:
@@ -472,7 +481,7 @@ class SARPreProcessor(PreProcessor):
 
             # Check if XML file for pre-processing step 3 is specified
             assert self.config.pre_process_step3_single_file is not None, \
-                'ERROR: path of XML file for pre-processing step 3 is not not specified'
+                'ERROR: path of XML file for pre-processing step 3 is not specified'
 
             # Create filelist with all to be processed images
             if self.file_list is None:
@@ -541,7 +550,7 @@ class SARPreProcessor(PreProcessor):
         elif self.config.speckle_filter.multi_temporal.apply == 'no':
             # Check if XML file for pre-processing step 3 is specified
             assert self.config.pre_process_step3_single_file is not None, \
-                'ERROR: path of XML file for pre-processing step 3 is not not specified'
+                'ERROR: path of XML file for pre-processing step 3 is not specified'
 
             # Create filelist with all to be processed images
             if self.file_list is None:
@@ -636,7 +645,10 @@ class SARPreProcessor(PreProcessor):
         - Frequency
         """
         # input folder
-        input_folder = self.config.output_folder_step3
+        if self.config.use_user_defined_graphs == 'yes':
+            input_folder = self.config.output_folder_step2
+        else:
+            input_folder = self.config.output_folder_step3
         expression = '*.nc'
         file_list = self._create_file_list(input_folder, expression)
 
@@ -727,7 +739,7 @@ class SARPreProcessor(PreProcessor):
         if self.config.use_user_defined_graphs == 'yes':
             if filename is None:
                 filename = self.config.output_folder_step2.rsplit('/', 2)[1]
-            stack_creator = NetcdfStackCreator(input_folder=self.config.output_folder_step2, output_path=self.config.output_folder_step2.rsplit('/', 1)[0], output_filename=filename, temporal_filter=self.config.speckle_filter.multi_temporal.apply)
+            stack_creator = NetcdfStackCreator(input_folder=self.config.output_folder_step2, output_path=self.config.output_folder_step2.rsplit('/', 1)[0], output_filename=filename, temporal_filter=self.config.speckle_filter.multi_temporal.apply, user_defined_graphs='yes')
         else:
             if filename is None:
                 filename = self.config.output_folder_step3.rsplit('/', 2)[1]

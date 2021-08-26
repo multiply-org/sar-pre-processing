@@ -17,6 +17,7 @@ class NetcdfStackCreator(object):
         self.step1_folder = kwargs.get('step1_folder', None)
         self.output_filename = kwargs.get('output_filename', None)
         self.temporal_filter = kwargs.get('temporal_filter', None)
+        self.user_defined_graphs = kwargs.get('user_defined_graphs', None)
         self._check()
 
     def _check(self):
@@ -80,8 +81,12 @@ class NetcdfStackCreator(object):
             elif i == 'crs':
                 pass
             else:
-                self.dataset.createVariable(i, np.float32,('time','lat','lon'), fill_value=-99999)
-                self.dataset[i].units = 'linear'
+                if user_defined_graphs == 'yes':
+                    self.dataset.createVariable(i[:-15], np.float32,('time','lat','lon'), fill_value=-99999)
+                    #self.dataset[i[:-15]].units = 'linear'
+                else:
+                    self.dataset.createVariable(i, np.float32,('time','lat','lon'), fill_value=-99999)
+                    self.dataset[i].units = 'linear'
 
 
 
@@ -157,7 +162,10 @@ class NetcdfStackCreator(object):
                 elif i == 'crs':
                     pass
                 else:
-                    self.dataset[i][index,:,:] = data.variables[i][:]
+                    if user_defined_graphs == 'yes':
+                        self.dataset[i[:-15]][index,:,:] = data.variables[i][:]
+                    else:
+                        self.dataset[i][index,:,:] = data.variables[i][:]
 
 
             # self.localIncidenceAngle[index,:,:] = data.variables['theta'][:]
