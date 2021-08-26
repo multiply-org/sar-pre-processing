@@ -100,9 +100,7 @@ class SARPreProcessor(PreProcessor):
         put location of processing xml graphs within config
         check if user has specified personal xml graphs otherwise use default ones
         """
-        try:
-            self.config.use_user_defined_graphs == 'yes'
-        else:
+        if not self.config.has_entry('use_user_defined_graphs'):
             self.config.use_user_defined_graphs = 'no'
 
         if self.config.use_user_defined_graphs == 'yes':
@@ -306,7 +304,8 @@ class SARPreProcessor(PreProcessor):
             return
 
         if len(file_list) > 1:
-            self.config.single_file = 'no'
+            if not self.config.has_entry('single_file'):
+                self.config.single_file = 'no'
 
         # Set Master image for co-registration
         master = file_list[0]
