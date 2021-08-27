@@ -66,7 +66,7 @@ nbsphinx_allow_errors = True
 master_doc = 'index'
 
 # General information about the project.
-project = u'MULTIPLY SAR pre-processing'
+project = u'SenSARP'
 copyright = u'2020, Thomas Weiß'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -222,7 +222,7 @@ latex_elements = { 'classoptions': ',openany,oneside'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'user_guide.tex', u'MULTIPLY SAR pre-processing Documentation',
+  ('index', 'user_guide.tex', u'SenSARP Documentation',
    u'Thomas Weiß', 'manual'),
 ]
 

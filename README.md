@@ -5,9 +5,27 @@
 [![Build Status](https://www.travis-ci.com/multiply-org/sar-pre-processing.svg?branch=master)](https://travis-ci.com/McWhity/sar-pre-processing)
 [![Documentation Status](https://readthedocs.org/projects/multiply-sar-pre-processing/badge/?version=master)](https://multiply-sar-pre-processing.readthedocs.io/en/master/?badge=master)
 
-This repository contains the functionality for Sentinel-1 SAR-Pre.Processing of the MULTIPLY main platform.
+This repository contains the functionality SenSARP used within the MULTIPLY main platform.
 The [SenSARP specific documentation](https://multiply-sar-pre-processing.readthedocs.io/en/master/) is hosted on ReadTheDocs. It is part of the [MULTIPLY core documentation](http://multiply.readthedocs.io/).
 Please find the pdf version of the SenSARP documentation [here](https://multiply-sar-pre-processing.readthedocs.io/_/downloads/en/master/pdf/) and for the MULTIPLY platform [here](https://readthedocs.org/projects/multiply/downloads/pdf/latest/).
+SenSARP is a pipeline to pre-process Sentinel-1 SLC data by using ESA SNAP Sentinel-1 Toolbox.
+
+## Statement of need
+
+Sentinel-1 satellites will provide continuous free available microwave remote sensing data of the entire globe at least until the end of 2030.
+Furthermore, ESA is not only providing Sentinel satellite images (e.g. Sentinel-1, Sentinel-2, Sentinel-3) but they also developed free open source toolboxes (Sentinel-1, 2, 3 toolboxes) for scientific exploitation.
+The toolboxes can be accessed and used via the Sentinel Application Platform (SNAP).
+SNAP offers a graphical interface were expert users can develop different processing schemes and apply them on the satellite images.
+Although, Sentinel-1 satellite data and a processing software are freely available, the usage of the data is mainly limited to expert users in the field of microwave remote sensing as different pre-processing steps need to be applied before using Sentinel-1 images.
+
+SenSARP was developed to provide a push-button option to easily apply a rigid pre-processing pipeline with sensible defaults to a Sentinel-1 Level 1 SLC time series data as well as single Sentinel-1 Level 1 SLC images.
+Thus, non-expert users in the field of pre-processing microwave data are able to use radiometric and geometric corrected sigma nought backscatter data for their specific applications.
+Beside a rigid pre-processing pipeline SenSARP provides filter options to retrieve only images of a specific year or images that contain a specific area of interest from a stack of downloaded Sentinel-1 data.
+Furthermore, the default processing scheme of SenSARP can handle if an area of interest is contained in two tiles of the same swath (due to storage reasons data of one Sentinel-1 satellite swath is provided by ESA within different tiles).
+Additionally, SenSARP checks if within a stack of Sentinel-1 images one specific image was multiple processed by ESA and uses the newest.
+
+For expert users SenSARP provides the possibility to automate their pre-processing on a large scale by either modifying the default pre-processing scheme (modification of xml graph pre_processing_step1.xml) or create their own pre-processing scheme (create a new xml graph) with the graph builder of the SNAP software.
+They can benefit from the filter options, the default pre-processing step 2 (co-registration of images) and the SenSARP functions to stack all processed and co-registered images within a netCDF file with additional image information e.g. satellite name, relative orbit and orbitdirection.
 
 ## Content of this repository
 
@@ -25,39 +43,68 @@ Please find the pdf version of the SenSARP documentation [here](https://multiply
 
 ## How to install
 
-The first step is to clone the latest code and step into the check out directory:
+The first step is to clone the latest code and step into the check out directory::
 
-    $ git clone https://github.com/multiply-org/sar-pre-processing.git
-    $ cd sar-pre-processing
+    git clone https://github.com/multiply-org/sar-pre-processing.git
+    cd sar-pre-processing
 
-The MULTIPLY platform has been developed against Python 3.6.
-It cannot be guaranteed to work with previous Python versions.
+### Installation with Conda
 
-MULTIPLY SAR-pre-processing can be run from sources directly.
+Download and install [Anaconda](https://www.anaconda.com/products/individual) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html). Anaconda/Miniconda installation instructions can be found [Anaconda](https://conda.io/projects/conda/en/latest/user-guide/install/linux.html#install-linux-silent)
+
 To install all required modules, use
 
-    $ conda env create --prefix ./env --file environment.yml
-    $ conda activate ./env # activate the environment
+    conda env create --prefix ./env --file environment.yml
+    conda activate ./env # activate the environment
 
-To install MULTIPLY SAR-pre-processing into an existing Python environment just for the current user, use
+To install SenSARP into an existing Python environment just for the current user, use::
 
-    $ python setup.py install --user
+    python setup.py install --user
 
-To install for development and for the current user, use
+To install for development and for the current user, use::
 
-    $ python setup.py develop --user
+    python setup.py develop --user
 
-## Module requirements
+### Installation with virtualenv and python
+
+Install system requirements
+
+    sudo apt install python3-pip python3-tk python3-virtualenv python3-venv virtualenv
+
+Create a vitural environment
+
+    virtualenv -p /usr/bin/python3 env
+    source ~/env/bin/activate
+
+To install SenSARP into an existing Python environment just for the current user, use::
+
+    python setup.py install --user
+
+To install for development and for the current user, use::
+
+    python setup.py develop --user
+
+GDAL package needs to be installed too
+
+    sudo apt install gdal-bin libgdal-dev
+
+    pip install GDAL==$(gdal-config --version) remove !!!!!
+    python -m pip install pygdal=="`gdal-config --version`.*"
+
+
+### Further information
+-------------------
 
 Please see the [environment file](environment.yml) for a list of dependencies.
-ESA's SNAP Sentinel-1 Toolbox has to be installed prerequisite. The Software can be downloaded [here](http://step.esa.int/main/download/snap-download/).
-enSARP uses only functionalities of the Sentinel-1 Toolbox.
-Currently only SNAP version 8.0 can be downloaded from the website. To update SNAP to a version >8.0.3 please start the SNAP software.
-You will be asked if you want to search for update.
-After the updates are installed you need to restart SNAP to initialize the installed updates.
-SNAP Toolbox need libgfortran for specific operations but currently libgfortran is not installed during the installation process of SNAP (Linux version) therefore you might use
+ESA's SNAP Sentinel-1 Toolbox (Version >8.0.3) has to be installed prerequisite. The Software can be downloaded [here](http://step.esa.int/main/download/snap-download/). To install the SNAP toolbox a terminal window and use
 
-    $ sudo apt-get install gfortran
+    bash esa-snap_sentinel_unix_8_0.sh
+
+SenSARP uses only functionalities of the Sentinel-1 Toolbox.
+Currently only SNAP version 8.0 can be downloaded from the website. To update SNAP to a version >8.0.3 please start the SNAP software. You will be asked if you want to search for update. Please serach for updates and install all updates. After the updates are installed you need to restart SNAP to initialize the updates correctly.
+SNAP Toolbox need libgfortran for specific operations but currently libgfortran is not installed during the installation process of SNAP therefore you might use
+
+    sudo apt-get install gfortran
 
 ## Usage
 
@@ -69,7 +116,7 @@ We use [Sphinx](http://www.sphinx-doc.org/en/stable/rest.html) to generate the d
 
 ## Contribution and Development
 
-You are very welcome to contribute to MULTIPLY SAR-Pre-Processing. To do so, please first make a fork into your own repository and then create a Pull Request.
+You are very welcome to contribute to SenSARP. To do so, please first make a fork into your own repository and then create a Pull Request.
 
 ### Reporting issues and feedback
 

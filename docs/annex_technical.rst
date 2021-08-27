@@ -16,3 +16,10 @@ File list for Sar-Pre-Processing
    :members:
    :undoc-members:
    :show-inheritance:
+
+netcdf-stack
+---------------------------------
+.. automodule:: sar_pre_processing.netcdf_stack
+   :members:
+   :undoc-members:
+   :show-inheritance:

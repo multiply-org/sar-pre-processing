@@ -1,9 +1,9 @@
 .. _Installation:
 
-Installation
-=============
+Installation for Linux (tested with Ubuntu 20.04)
+================================================
 .. note::
-    The MULTIPLY platform has been developed against Python 3.6.
+    The SenSARP has been developed against Python 3.6.
     It cannot be guaranteed to work with previous Python versions.
 
 The first step is to clone the latest code and step into the check out directory::
@@ -11,9 +11,9 @@ The first step is to clone the latest code and step into the check out directory
     git clone https://github.com/multiply-org/sar-pre-processing.git
     cd sar-pre-processing
 
-Via Conda
+Installation with Conda
 ----------
-Download and install `Anaconda <https://www.anaconda.com/products/individual>`_ or `Miniconda <https://docs.conda.io/en/latest/miniconda.html>`_. Installation instructions can be found `here <https://conda.io/projects/conda/en/latest/user-guide/install/index.html>`_
+Download and install `Anaconda <https://www.anaconda.com/products/individual>`_ or `Miniconda <https://docs.conda.io/en/latest/miniconda.html>`_. Anaconda/Miniconda installation instructions can be found `here <https://conda.io/projects/conda/en/latest/user-guide/install/linux.html#install-linux-silent>`_
 
 To install all required modules, use::
 
@@ -28,7 +28,7 @@ To install for development and for the current user, use::
 
     python setup.py develop --user
 
-Via virtualenv and python
+Installation with virtualenv and python
 --------------------------
 Install system requirements::
 
@@ -37,14 +37,7 @@ Install system requirements::
 Create a vitural environment::
 
     virtualenv -p /usr/bin/python3 env
-    source env/bin/activate
-
-Install GDAL::
-
-    sudo apt install gdal-bin libgdal-dev
-
-    pip install GDAL==$(gdal-config --version)
-    python -m pip install pygdal=="`gdal-config --version`.*"
+    source ~/env/bin/activate
 
 To install SenSARP into an existing Python environment just for the current user, use::
 
@@ -54,13 +47,21 @@ To install for development and for the current user, use::
 
     python setup.py develop --user
 
-Module requirements
+GDAL package needs to be installed too::
+
+    sudo apt install gdal-bin libgdal-dev
+
+    pip install GDAL==$(gdal-config --version) remove !!!!!
+    python -m pip install pygdal=="`gdal-config --version`.*"
+
+
+Further information
 -------------------
 
 .. literalinclude:: ./environment.yml
 
 Please see the `environment file <https://github.com/multiply-org/sar-pre-processing/blob/master/environment.yml>`_ for a list of dependencies.
-ESA's SNAP Sentinel-1 Toolbox (Version >8.0.3) has to be installed prerequisite. The Software can be downloaded `here <http://step.esa.int/main/download/snap-download/>`_. To install the SNAP toolbox in Linux open a terminal window and use::
+ESA's SNAP Sentinel-1 Toolbox (Version >8.0.3) has to be installed prerequisite. The Software can be downloaded `here <http://step.esa.int/main/download/snap-download/>`_. To install the SNAP toolbox a terminal window and use::
 
     bash esa-snap_sentinel_unix_8_0.sh
 

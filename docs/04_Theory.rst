@@ -243,10 +243,14 @@ Abbreviations and values within preprocessed data (netcdf stack file)
 
 Abbreviation within variable names
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-- vv = VV polarization
-- vh = VH polarization
-- multi = multitemporal speckle filter was applied
-- norm = nomalization angle was applied
+    - theta = local incidence angle
+    - sigma0 = radiometric and geometric corrected sigma nought backscatter
+    - vv = VV polarization
+    - vh = VH polarization
+    - single = single speckle filter was applied
+    - multi = multitemporal speckle filtered
+    - norm = backscatter was normalized to a specific incidence angle
+
 
 Values of specific variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -261,6 +265,14 @@ Values of specific variables
     - 0 = Sentinel-1 A
     - 1 = Sentinel-1 B
 
+- name tags of processed data
+    - theta (local incidence angle)
+    - sigma0 (radiometric and geometric corrected sigma nought backscatter)
+    - vv (polarization vv)
+    - vh (polarization vh)
+    - single (single speckle filtered)
+    - multi (multi temporal speckle filtered)
+    - norm (backscatter normalized to a specific incidence angle)
 
 .. rubric:: References
 .. bibliography:: references.bib
