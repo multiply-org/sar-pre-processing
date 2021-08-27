@@ -11,4 +11,3 @@ nbsphinx
 ipykernel
 sentinelsat>=1.1.0
 matplotlib
-jupyterlab
