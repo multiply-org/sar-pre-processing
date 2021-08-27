@@ -12,3 +12,4 @@ ipykernel
 sentinelsat>=1.1.0
 matplotlib
 jupyter
+mistune<2
