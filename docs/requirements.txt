@@ -1,9 +1,9 @@
-netCDF4==1.5.3
-xarray==0.15.1
-numpy==1.18.1
-pyproj==2.6.0
-pytest==4.6
-PyYAML==5.4
+netCDF4>=1.5.3
+xarray>=0.15.1
+numpy>=1.18.1
+pyproj>=2.6.0
+pytest>=4.6
+PyYAML>=5.4
 setuptools
 m2r
 sphinxcontrib-bibtex
@@ -11,3 +11,4 @@ nbsphinx
 ipykernel
 sentinelsat>=1.1.0
 matplotlib
+jupyter
