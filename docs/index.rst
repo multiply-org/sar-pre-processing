@@ -1,18 +1,7 @@
-MULTIPLY - SAR Pre Processing
+MULTIPLY - SenSARP
 =============================
 
 |buildstatus| |docstatus|
-
-Scope of MULTIPLY
-------------------
-The MULTIPLY project will “develop a new platform for joint and consistent retrieval of Copernicus
-SENTINEL data and beyond”.
-
-This documentation covers the SAR pre processing steps for pre processing Sentinel-1 SLC data.
-Please find the latest pdf version of this documentation
-`here <https://multiply-sar-pre-processing.readthedocs.io/_/downloads/en/latest/pdf/>`_.
-
-The `SAR pre processing specific documentation <https://multiply-sar-pre-processing.readthedocs.io/en/latest/>`_ is hosted on ReadTheDocs. It is part of the `MULTIPLY core documentation <http://multiply.readthedocs.io/>`_.
 
 Content
 ---------
@@ -28,13 +17,6 @@ Content
     Authors <authors>
     Changelog <changes>
     License
-
-Indices and tables
--------------------
-
-* :ref:`modindex`
-* :ref:`genindex`
-* :ref:`search`
 
 Credits
 -------------

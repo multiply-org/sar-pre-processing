@@ -33,7 +33,7 @@ Getting Started
 ------------------
 Please find instructions on how to download and install SenSARP in the :ref:`Installation` section.
 
-Support, Contributing and testing
+Support, contributing and testing
 ----------------------------------
 Please contribute using `Github Flow <https://guides.github.com/introduction/flow/>`_. Create a branch, add commits, and `open a pull request <https://github.com/multiply-org/sar-pre-processing/issues/new>`_.
 

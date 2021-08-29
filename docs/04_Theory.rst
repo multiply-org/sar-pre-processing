@@ -162,7 +162,7 @@ Input:
 Output:
     - Radiometric and geometric corrected sigma naught calibrated radar backscatter (Map Projection WGS84)
 
-Backscatter normalisation (optional)
+Backscatter normalisation
 ------------------------------------
 Theory / Purpose
 ~~~~~~~~~~~~~~~~~
@@ -232,7 +232,7 @@ Practical implementation
 For the speckle reduction the "Multi-temporal Speckle Filter" operator within SNAP's S1TBX software is used. As default, 7 temporally consecutive images are used within the "Multi-temporal Speckle Filter" whereby the target image is temporally situated in the middle. The applied filter is a Lee filter with a spatial window size of 5x5 pixels, a sigma of 0.9, and a target window size of 3x3 pixels. The spatial averaging over pixel has a significant influence on spatial resolution information loss of the image. Therefore, the averaging pixel size might change during the project. If the image consists of two polarisations the filter is applied on each polarisation separately. The practical implementation in case of filter type, used polarisation, number of used images etc. may change with more experience of applying multi-temporal speckle filters and the occurring results.
 
 Input:
-    - 7 co-registered images (can be specified within configuration file)
+    - x co-registered images (can be specified within configuration file)
 
 Output:
     - speckle filtered images

@@ -1,4 +1,4 @@
-Explanation of configuration file
+Explanation of config file
 ----------------------------------
 
 .. code-block:: yaml

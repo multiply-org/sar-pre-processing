@@ -114,9 +114,9 @@ For usage checkout the [juypter notebook](https://nbviewer.jupyter.org/github/mu
 
 ## Documentation
 
-We use [Sphinx](http://www.sphinx-doc.org/en/stable/rest.html) to generate the documentation of the MULTIPLY platform on [ReadTheDocs](https://multiply.readthedocs.io/). The SAR-Pre-Processing specific documentation is available [here](https://multiply-sar-pre-processing.readthedocs.io/en/latest/)
+We use [Sphinx](http://www.sphinx-doc.org/en/stable/rest.html) to generate the documentation of SenSARP on [ReadTheDocs](https://multiply.readthedocs.io/). The SenSARP documentation is available [here](https://multiply-sar-pre-processing.readthedocs.io/en/latest/)
 
-## Support, Contributing and testing
+## Support, contributing and testing
 Please contribute using [Github Flow](https://guides.github.com/introduction/flow/). Create a branch, add commits, and [open a pull request](https://github.com/multiply-org/sar-pre-processing/issues/new).
 
 ### Reporting bugs
@@ -129,8 +129,6 @@ If you want to suggest a new feature or an improvement of a current feature, you
 
 The package is currently tested for Python >= 3.6 on Unix-like systems.
 To run unit tests, execute the following line from the root of the repository:
-
-.. code:: bash
 
    pytest
 
