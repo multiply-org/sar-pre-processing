@@ -23,3 +23,10 @@ netcdf-stack
    :members:
    :undoc-members:
    :show-inheritance:
+
+Attribute Dict
+---------------------------------
+.. automodule:: sar_pre_processing.attribute_dict
+   :members:
+   :undoc-members:
+   :show-inheritance:

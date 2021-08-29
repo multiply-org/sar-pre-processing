@@ -12,7 +12,7 @@ To account for these radiometric and geometric distortions the Sentinel-1 Level 
 Therefore, either an automatic or manual pre-processing of Sentinel-1 images is needed.
 
 Statement of need
-=================
+------------------
 Sentinel-1 satellites will provide continuous free available microwave remote sensing data of the entire globe at least until the end of 2030.
 Furthermore, ESA is not only providing Sentinel satellite images (e.g. Sentinel-1, Sentinel-2, Sentinel-3) but they also developed free open source toolboxes (Sentinel-1, 2, 3 toolboxes) for scientific exploitation.
 The toolboxes can be accessed and used via the Sentinel Application Platform (SNAP).
@@ -30,9 +30,27 @@ They can benefit from the filter options, the default pre-processing step 2 (co-
 
 
 Getting Started
-================
+------------------
 Please find instructions on how to download and install SenSARP in the :ref:`Installation` section.
 
-Testing and Contribution
-=========================
-You are welcome to test and contribute to SenSARP. Please use `GitHub <https://github.com/multiply-org/sar-pre-processing>`_ for that matter.
+Support, Contributing and testing
+----------------------------------
+Please contribute using `Github Flow <https://guides.github.com/introduction/flow/>`_. Create a branch, add commits, and `open a pull request <https://github.com/multiply-org/sar-pre-processing/issues/new>`_.
+
+Reporting bugs
+~~~~~~~~~~~~~~~
+If you find a bug in SenSARP, please open an new `issue <https://github.com/multiply-org/sar-pre-processing/issues/new>`_ and tag it "bug".
+
+Suggesting enhancements
+~~~~~~~~~~~~~~~
+If you want to suggest a new feature or an improvement of a current feature, you can submit this on the `issue tracker <https://github.com/multiply-org/sar-pre-processing/issues/new>`_ and tag it "enhancement".
+
+Testing
+~~~~~~~~~~~~~~~
+The package is currently tested for Python >= 3.6 on Unix-like systems.
+To run unit tests, execute the following line from the root of the repository:
+
+.. code:: bash
+
+   pytest
+
