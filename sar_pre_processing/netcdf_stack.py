@@ -46,7 +46,7 @@ class NetcdfStackCreator(object):
         self.filelist = sorted(self.filelist, key=lambda x:x[(length+18):(length+18+16)])
 
     def _create_empty_netcdf_file(self):
-        """ create dummy netcdf file"""
+        """ create empty netcdf file"""
 
         # create output netcdf file
         self.dataset = Dataset(os.path.join(self.output_path, self.output_filename + '.nc'), 'w', format='NETCDF4')
@@ -87,7 +87,7 @@ class NetcdfStackCreator(object):
                     self.dataset[i].units = 'linear'
 
     def stacking(self):
-        """stack all files in one netcdf file"""
+        """stack all files into a new netcdf file created by function _create_empty_netcef_file"""
 
         # 1-D Elements
         data = Dataset(self.filelist[0])

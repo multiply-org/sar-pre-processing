@@ -98,7 +98,8 @@ class SARPreProcessor(PreProcessor):
     def _configure_config_graph(self, key_name: str, default_name: str):
         """
         put location of processing xml graphs within config
-        check if user has specified personal xml graphs otherwise use default ones
+        check if user has specified personal xml graph
+        for pre_processing_step1 otherwise use default one
         """
         if not self.config.has_entry('use_user_defined_graphs'):
             self.config.use_user_defined_graphs = 'no'
@@ -162,15 +163,22 @@ class SARPreProcessor(PreProcessor):
 
     def pre_process_step1(self):
         """
-        Pre-process S1 SLC data with SNAP's GPT
+        Pre-process Sentinel-1 data
+        - Default processing chain of SenSARP:
+            Pre-process S1 SLC data with SNAP's GPT
 
-        1) apply precise orbit file
-        2) thermal noise removal
-        3) calibration
-        4) TOPSAR-Deburst
-        5) Geometric Terrain Correction
-        6) Radiometric Correction (after kellndorfer et al.)
-        7) backscatter normalisation on specified angle in config file (based on Lambert's Law) (optional)
+            1) apply precise orbit file
+            2) thermal noise removal
+            3) calibration
+            4) TOPSAR-Deburst
+            5) Geometric Terrain Correction
+            6) Radiometric Correction (after kellndorfer et al.)
+            7) backscatter normalisation on specified angle in config file (based on Lambert's Law)
+
+            Output layers:
+                - local incidence angle
+                -
+        - use processing chain of expert user
 
         """
 
@@ -254,7 +262,7 @@ class SARPreProcessor(PreProcessor):
         """
         pre_process_step1 has to be done first
 
-        Pre-process S1 SLC data with SNAP's GPT
+        pre_process_step2 only useful for processing time series data
 
         1) co-register pre-processed data
 
@@ -263,6 +271,7 @@ class SARPreProcessor(PreProcessor):
         netcdf output files at the end of the preprocessing chain
         (def add_netcdf_information)
         """
+
         # Check if XML file for pre-processing step 2 is specified
         assert self.config.pre_process_step2 is not None, \
             'ERROR: path of XML file for pre-processing step 2 is not specified'
@@ -338,13 +347,16 @@ class SARPreProcessor(PreProcessor):
 
     def pre_process_step3(self):
         """
-        pre_process_step1 and 2 has to be done first
+        pre_process_step1 and/or 2 has to be done first
 
-        Pre-process S1 SLC data with SNAP's GPT
+        processing time series data:
+            - apply multi-temporal speckle filter and single speckle filter
 
-        1) apply multi-temporal speckle filter / single speckle filter
+        processing single image:
+            - apply single speckle filter
 
         """
+
         # Check if output folder of pre_process_step1 exists
         assert os.path.exists(self.config.output_folder_step2), 'ERROR: output folder of pre-processing step2 not found'
 
@@ -627,22 +639,16 @@ class SARPreProcessor(PreProcessor):
                 logging.info(return_code)
                 logging.info(datetime.now())
 
-    def solve_projection_problem(self):
-        """
-        solve projection problem of created NetCDF file
-        """
-        sh_file = pkg_resources.resource_filename('sar_pre_processing', 'solve_projection_problem.sh')
-        subprocess.call(sh_file + ' ' + self.config.output_folder_step3, shell=True)
-
     def add_netcdf_information(self):
         """
-        Add information from original S1 SLC image to processed NetCDF file.
+        Add information from original S1 image to processed NetCDF file.
         - update date information (wrong date information were stored due to coregistration process)
         - orbitdirection (ASCENDING, DESCENDING)
         - relative orbit
         - Satellite (S1A, S1B)
         - Frequency
         """
+
         # input folder
         if self.config.use_user_defined_graphs == 'yes':
             input_folder = self.config.output_folder_step2
@@ -730,7 +736,7 @@ class SARPreProcessor(PreProcessor):
 
     def create_netcdf_stack(self, filename: Optional[str] = None):
         """
-        create one NetCDF stack file from output of step3
+        create one NetCDF stack file of pre-processed data
         Orbitdirection: '0 = Ascending, 1 = Descending'
         Satellite: '0 = Sentinel 1A, 1 = Sentinel 1B'
         """

@@ -18,4 +18,4 @@ dependencies:
   - matplotlib
   - pip
   - pip:
-    - sentinelsat==1.1.0
+    - sentinelsat>=1.1.0
