@@ -9,6 +9,7 @@ This repository contains the functionality SenSARP used within the MULTIPLY main
 The [SenSARP specific documentation](https://multiply-sar-pre-processing.readthedocs.io/en/master/) is hosted on ReadTheDocs. It is part of the [MULTIPLY core documentation](http://multiply.readthedocs.io/).
 Please find the pdf version of the SenSARP documentation [here](https://multiply-sar-pre-processing.readthedocs.io/_/downloads/en/master/pdf/) and for the MULTIPLY platform [here](https://readthedocs.org/projects/multiply/downloads/pdf/latest/).
 SenSARP is a pipeline to pre-process Sentinel-1 SLC data by using ESA SNAP Sentinel-1 Toolbox.
+Expert users can adapt the default pre-processing chain to their needs and benefit from functionalities provided by SenSARP.
 
 ## Statement of need
 
@@ -130,7 +131,7 @@ If you want to suggest a new feature or an improvement of a current feature, you
 The package is currently tested for Python >= 3.6 on Unix-like systems.
 To run unit tests, execute the following line from the root of the repository:
 
-   pytest
+    pytest
 
 ## Authors
 
