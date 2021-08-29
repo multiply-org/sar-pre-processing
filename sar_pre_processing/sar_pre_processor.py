@@ -176,8 +176,19 @@ class SARPreProcessor(PreProcessor):
             7) backscatter normalisation on specified angle in config file (based on Lambert's Law)
 
             Output layers:
-                - local incidence angle
-                -
+                - longitude
+                - latitude
+                - localIncidenceAngle
+                - projectedLocalIncidenceAngle
+                - incidenceAngleFromEllipsoid
+                - elevation
+                - Sigma0_VV (VV-polarized Sigma nought backscatter no radiometric correction applied)
+                - Sigma0_VH (VH-polarized Sigma nought backscatter no radiometric correction applied)
+                - sigma0_vv_kelln (VV-polarized Sigma nought backscatter including radiometric correction after Kellndorfer)
+                - sigma0_vh (VH-polarized Sigma nought backscatter including radiometric correction after Kellndorfer)
+                - sigma0_vv_kelln_normalisation (VV-polarized Sigma nought backscatter including radiometric correction after Kellndorfer and normalization to one specific incidence angle)
+                - sigma0_vh_kelln_normalisation (VH-polarized Sigma nought backscatter including radiometric correction after Kellndorfer and normalization to one specific incidence angle)
+
         - use processing chain of expert user
 
         """
@@ -355,6 +366,16 @@ class SARPreProcessor(PreProcessor):
         processing single image:
             - apply single speckle filter
 
+        Output layers:
+            - theta (local incidence angle)
+            - sigma0_vv_single (single speckle filtered radiometric and geometric corrected sigma nought backscatter)
+            - sigma0_vh_single (single speckle filtered radiometric and geometric corrected sigma nought backscatter)
+            - sigma0_vv_multi (multi speckle filtered radiometric and geometric corrected sigma nought backscatter)
+            - sigma0_vh_multi (multi speckle filtered radiometric and geometric corrected sigma nought backscatter)
+            - sigma0_vv_norm_single (single speckle filtered radiometric and geometric corrected sigma nought backscatter normalized to a specific incidence angle)
+            - sigma0_vh_norm_single (single speckle filtered radiometric and geometric corrected sigma nought backscatter normalized to a specific incidence angle)
+            - sigma0_vv_norm_single (multi speckle filtered radiometric and geometric corrected sigma nought backscatter normalized to a specific incidence angle)
+            - sigma0_vh_norm_single (multi speckle filtered radiometric and geometric corrected sigma nought backscatter normalized to a specific incidence angle)
         """
 
         # Check if output folder of pre_process_step1 exists

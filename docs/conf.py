@@ -54,7 +54,7 @@ bibtex_bibfiles = ['references.bib']
 templates_path = ['_templates']
 
 # The suffix of source filenames.
-source_suffix = ['.rst', '.md', '.ipynb']
+source_suffix = ['.rst', '.md']
 
 # If True, the build process is continued even if an exception occurs:
 nbsphinx_allow_errors = True

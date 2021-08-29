@@ -20,11 +20,11 @@ Although, Sentinel-1 satellite data and a processing software are freely availab
 
 SenSARP was developed to provide a push-button option to easily apply a rigid pre-processing pipeline with sensible defaults to a Sentinel-1 Level 1 SLC time series data as well as single Sentinel-1 Level 1 SLC images.
 Thus, non-expert users in the field of pre-processing microwave data are able to use radiometric and geometric corrected sigma nought backscatter data for their specific applications.
-Beside a rigid pre-processing pipeline SenSARP provides filter options to retrieve only images of a specific year or images that contain a specific area of interest from a stack of downloaded Sentinel-1 data.
+Beside a rigid pre-processing pipeline, SenSARP provides filter options to retrieve only images of a specific year or images that contain a specific area of interest from a stack of downloaded Sentinel-1 data.
 Furthermore, the default processing scheme of SenSARP can handle if an area of interest is contained in two tiles of the same swath (due to storage reasons data of one Sentinel-1 satellite swath is provided by ESA within different tiles).
-Additionally, SenSARP checks if within a stack of Sentinel-1 images one specific image was multiple processed by ESA and uses the newest.
+Additionally, SenSARP checks if within a stack of Sentinel-1 images, one specific image was multiple processed by ESA and uses the newest.
 
-For expert users SenSARP provides the possibility to automate their pre-processing on a large scale by either modifying the default pre-processing scheme (modification of xml graph pre_processing_step1.xml) or create their own pre-processing scheme (create a new xml graph) with the graph builder of the SNAP software.
+For expert users, SenSARP provides the possibility to automate their pre-processing on a large scale by either modifying the default pre-processing scheme (modification of xml graph pre_processing_step1.xml) or create their own pre-processing scheme (create a new xml graph) with the graph builder of the SNAP software.
 They can benefit from the filter options, the default pre-processing step 2 (co-registration of images) and the SenSARP functions to stack all processed and co-registered images within a netCDF file with additional image information e.g. satellite name, relative orbit and orbitdirection.
 
 ## Content of this repository
@@ -38,7 +38,6 @@ They can benefit from the filter options, the default pre-processing step 2 (co-
 * `LICENSE.rst` - License of software in repository.
 * `README.md` - Readme.
 * `environmental.yml` - Requirements.
-* `sar_pre_processing_CLI.txt` - Renaming package to SenSARP
 * `setup.py` - main build script, to be run with Python 3.6
 
 ## How to install
@@ -57,13 +56,13 @@ To install all required modules, use
     conda env create --prefix ./env --file environment.yml
     conda activate ./env # activate the environment
 
-To install SenSARP into an existing Python environment just for the current user, use::
+To install SenSARP into an existing Python environment, use::
 
-    python setup.py install --user
+    python setup.py install
 
-To install for development and for the current user, use::
+To install for development, use::
 
-    python setup.py develop --user
+    python setup.py develop
 
 ### Installation with virtualenv and python
 
@@ -71,38 +70,41 @@ Install system requirements
 
     sudo apt install python3-pip python3-tk python3-virtualenv python3-venv virtualenv
 
-Create a vitural environment
+Create a virtual environment
 
     virtualenv -p /usr/bin/python3 env
-    source ~/env/bin/activate
+    source env/bin/activate # activate the environment
+    pip install --upgrade pip setuptools # update pip and setuptools
 
-To install SenSARP into an existing Python environment just for the current user, use::
+To install SenSARP into an existing Python environment, use::
 
-    python setup.py install --user
+    python setup.py install
 
-To install for development and for the current user, use::
+To install for development, use::
 
-    python setup.py develop --user
+    python setup.py develop
 
 GDAL package needs to be installed too
 
     sudo apt install gdal-bin libgdal-dev
 
-    pip install GDAL==$(gdal-config --version) remove !!!!!
     python -m pip install pygdal=="`gdal-config --version`.*"
 
 
 ### Further information
--------------------
 
-Please see the [environment file](environment.yml) for a list of dependencies.
-ESA's SNAP Sentinel-1 Toolbox (Version >8.0.3) has to be installed prerequisite. The Software can be downloaded [here](http://step.esa.int/main/download/snap-download/). To install the SNAP toolbox a terminal window and use
+Please see the [environment file](environment.yml) for a list of all installed dependencies during the installation process.
+Additionally, ESA's SNAP Sentinel-1 Toolbox (Version >8.0.3) has to be installed prerequisite. The Software can be downloaded [here](http://step.esa.int/main/download/snap-download/). To install the SNAP toolbox, open a terminal window and use
 
     bash esa-snap_sentinel_unix_8_0.sh
 
 SenSARP uses only functionalities of the Sentinel-1 Toolbox.
-Currently only SNAP version 8.0 can be downloaded from the website. To update SNAP to a version >8.0.3 please start the SNAP software. You will be asked if you want to search for update. Please serach for updates and install all updates. After the updates are installed you need to restart SNAP to initialize the updates correctly.
-SNAP Toolbox need libgfortran for specific operations but currently libgfortran is not installed during the installation process of SNAP therefore you might use
+Currently, only SNAP version 8.0 can be downloaded from the website.
+To update SNAP to a version >8.0.3 please start the SNAP software.
+You will be asked if you want to search for update.
+Please search for updates and install all updates.
+After the updates are installed, you need to restart SNAP to initialize the updates correctly.
+SNAP Toolbox need libgfortran for specific operations but currently libgfortran is not installed during the installation process of SNAP, therefore you might use
 
     sudo apt-get install gfortran
 

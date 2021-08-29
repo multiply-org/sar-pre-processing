@@ -4,14 +4,8 @@ Usage
 .. toctree::
     :maxdepth: 2
 
-    031_requirements
-    032_download
-    033_examples
-    034_visualization
-    035_config
-
-
-
-
-
+    ./notebooks/default_process_single_image.ipynb
+    ./notebooks/default_process_time_series.ipynb
+    ./notebooks/use_user_defined_graphs.ipynb
+    031_config
 

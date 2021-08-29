@@ -23,7 +23,6 @@ The different preprocessing steps are shown in :numref:`work_flow_step_1` and :n
 
     Preprocessing chain showing processing steps to archive co-registered images which are multi-temporal speckle filtered
 
-
 Sentinel-1 Level-1 SLC data
 ---------------------------
 The preprocessing work-flow of :numref:`work_flow_step_1` is based on Sentinel-1 Level-1 SLC data. Among some other sources Sentinel-1 data can be downloaded from ESA's Copernicus Open Access Hub (`<https://scihub.copernicus.eu/>`_).
@@ -238,11 +237,36 @@ Input:
 Output:
     - speckle filtered images
 
-Abbreviations and values within preprocessed data (netcdf stack file)
------------------------------------------------------------
+Folder and data creation during pre-processing steps
+----------------------------------------------------
+Creation of
+    - step1 (folder)
+        - temporary results after applying processing steps shown in :numref:`work_flow_step_1`
+    - step2 (folder)
+        - co-registered images of step1
+    - step3 (folder)
+        - final results
+    - foldername.nc (final netcdf stack file)
+within specified output folder (config file)
+
+Output layers of final netcdf stack file
+-----------------------------------------
+Output layer of default pre-processing chain
+    - theta (local incidence angle)
+    - sigma0_vv_single (single speckle filtered radiometric and geometric corrected sigma nought backscatter)
+    - sigma0_vh_single (single speckle filtered radiometric and geometric corrected sigma nought backscatter)
+    - sigma0_vv_multi (multi speckle filtered radiometric and geometric corrected sigma nought backscatter)
+    - sigma0_vh_multi (multi speckle filtered radiometric and geometric corrected sigma nought backscatter)
+    - sigma0_vv_norm_single (single speckle filtered radiometric and geometric corrected sigma nought backscatter normalized to a specific incidence angle)
+    - sigma0_vh_norm_single (single speckle filtered radiometric and geometric corrected sigma nought backscatter normalized to a specific incidence angle)
+    - sigma0_vv_norm_single (multi speckle filtered radiometric and geometric corrected sigma nought backscatter normalized to a specific incidence angle)
+    - sigma0_vh_norm_single (multi speckle filtered radiometric and geometric corrected sigma nought backscatter normalized to a specific incidence angle)
+
+Abbreviations and values within netcdf stack file
+---------------------------------------------------------------------
 
 Abbreviation within variable names
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     - theta = local incidence angle
     - sigma0 = radiometric and geometric corrected sigma nought backscatter
     - vv = VV polarization
