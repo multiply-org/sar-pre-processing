@@ -67,11 +67,12 @@ To install the SNAP toolbox, open a terminal window and use::
     bash esa-snap_sentinel_unix_8_0.sh
 
 SenSARP uses only functionalities of the Sentinel-1 Toolbox.
-Currently, only SNAP version 8.0 can be downloaded from the website.
-To update SNAP to a version >8.0.3 please start the SNAP software.
-You will be asked if you want to search for update.
-Please search for updates and install all updates.
-After the updates are installed, you need to restart SNAP to initialize the updates correctly.
+.. note::
+    Currently, only SNAP version 8.0 can be downloaded from the website.
+    To update SNAP to a version >8.0.3 please start the SNAP software.
+    You will be asked if you want to search for update.
+    Please search for updates and install all updates.
+    After the updates are installed, you need to restart SNAP to initialize the updates correctly.
 SNAP Toolbox need libgfortran for specific operations but currently libgfortran is not installed during the installation process of SNAP, therefore you might use::
 
     sudo apt-get install gfortran
