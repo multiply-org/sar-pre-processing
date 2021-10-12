@@ -17,6 +17,7 @@ from typing import List, Optional
 from .netcdf_stack import NetcdfStackCreator
 import math
 import numpy as np
+import pdb
 
 logging.getLogger().setLevel(logging.INFO)
 # Set up logging
@@ -33,7 +34,7 @@ class PreProcessor(object):
 
     def __init__(self, **kwargs):
         self.config_file = kwargs.get('config', None)
-        self.filelist = kwargs.get('filelist', None)
+        self.file_list = kwargs.get('filelist', None)
         self._check()
         self._load_config()
         if kwargs.get('input', None) is not None:
@@ -135,6 +136,19 @@ class SARPreProcessor(PreProcessor):
         return file_list
 
     @staticmethod
+    def _create_file_list_2(input_folder, expression):
+        """
+        Create list containing all files in input_folder (with subfolder)
+        that contain the provided expression within the filename
+        """
+        file_list = []
+        for root, dirnames, filenames in os.walk(input_folder):
+            for filename in filenames:
+                if fnmatch(filename, expression):
+                    file_list.append(os.path.join(root, filename))
+        return file_list
+
+    @staticmethod
     def _decompose_filename(file):
         """
         Decomposition of filename including path in
@@ -158,6 +172,7 @@ class SARPreProcessor(PreProcessor):
         """
         create a list with all to be processed file names
         """
+        # pdb.set_trace()
         self.file_list = SARList(config=self.config).create_list()
         return self.file_list
 
