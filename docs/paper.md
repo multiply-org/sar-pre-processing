@@ -72,7 +72,7 @@ This python package was developed within the Horizon 2020 project called MULTIsc
 Furthermore, data processed by this package is used within Sentinel-Synergy-Study S3 project (https://www.researchgate.net/project/Sentinel-Synergy-Study-S3).
 In addition, the python code was used to process Sentinel-1 time series images for the detection and analysis of temporary flooded vegetation [@tsyganskaya_detection_2018; @tsyganskaya_flood_2019] and for the evaluation of different radiative transfer models for microwave backscatter estimation of wheat fields [@weis_evaluation_2020].
 
-# Other available python software packages and interfaces using ESA's SNAP software to pre-process remote sensing data
+# Other available python software packages using ESA's SNAP software to pre-process SAR data
 
 The ESA's SNAP toolbox has been written in Java. For python users the developers provide a python interface called Snappy. However, the Snappy interface is lacking in terms of installation, processing performance and usability. Hence, the remote sensing community developed different wrappers (e.g. SenSARP, snapista or pyroSAR) to use SNAP processing functionalities by utilizing the SNAP Graph Processing Tool (GPT).
 
