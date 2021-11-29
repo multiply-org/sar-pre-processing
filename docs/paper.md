@@ -74,11 +74,11 @@ In addition, the python code was used to process Sentinel-1 time series images f
 
 # Other available python software packages and interfaces using ESA's SNAP software to pre-process remote sensing data
 
-The ESA's SNAP toolbox has been written in Java. For python users the developers provide a python interface called "Snappy". However, the Snappy interface is lacking in terms of installation, processing performance and usability. Hence, the remote sensing community developed different wrappers (e.g. SenSARP, snapista or pyroSAR) to use SNAP processing functionalities by utilizing the SNAP Graph Processing Tool (GPT).
+The ESA's SNAP toolbox has been written in Java. For python users the developers provide a python interface called Snappy. However, the Snappy interface is lacking in terms of installation, processing performance and usability. Hence, the remote sensing community developed different wrappers (e.g. SenSARP, snapista or pyroSAR) to use SNAP processing functionalities by utilizing the SNAP Graph Processing Tool (GPT).
 
-## snapista (https://snap-contrib.github.io/snapista/index.html)
+## snapista
 
-Snapista targets mainly experts remote sensing users with python programming skills.
+Snapista (https://snap-contrib.github.io/snapista/index.html) targets mainly experts remote sensing users with python programming skills.
 It provides access to the processing operators of all toolboxes (e.g. Sentinel-1, Sentinel-2 or Sentinel-3) within SNAP.
 Expert users can generate processing graphs and execute there generated graphs in a pure Pythonic way.
 A guideline which processing steps are needed for different applications or which processing steps can or have to be combined are not provided yet.
@@ -86,9 +86,9 @@ As guidelines how to process different satellite data for different applications
 Summarizing, snapista provides access to all SNAP toolboxes (not just to Sentinel-1 Toolbox) via python. But as it provides no default processing chains, snapista will be primarily usable by expert remote sensing users.
 The advantage of snapista is the accessibility of processing operators for SAR and optical data.
 
-## pyroSAR (https://pyrosar.readthedocs.io/en/latest/index.html)
+## pyroSAR
 
-PyroSAR is a python library which provides a python wrapper to SAR pre-processing software SNAP and GAMMA [@wegnuller_sentinel-1_2016; @werner_gamma_2000].
+PyroSAR (https://pyrosar.readthedocs.io/en/latest/index.html) is a python library which provides a python wrapper to SAR pre-processing software SNAP and GAMMA [@wegnuller_sentinel-1_2016; @werner_gamma_2000].
 The library provides utilities to read and store metadata information of downloaded satellite data within a database.
 Furthermore, pyroSAR provides access to processing operators of SNAP and GAMMA.
 A default workflow with different user options is provided to process single or time-series Sentinel-1 images.
@@ -99,22 +99,12 @@ Summarizing, pyroSAR provides a similar push-button option to process Sentinel-1
 PyroSAR, as a more complex library than SenSARP, provides on the one hand more changeable parameters within the processing workflow but on the other hand the usability for non-expert users might be narrowed compared to SenSARP.
 An advantage of SenSARP, especially for non-expert users, might be the provision of background information (theory/purpose) of the different pre-processing steps within the documentation.
 
-
-
-
-
-
-insert gamma references!!!!
-insert pyrosar references
-
-
-
 # Acknowledgements
 
 The project leading to this application has received funding from the European Union’s Horizon 2020 research and innovation program under Grant Agreement No. 687320.
 We would like to thank Alexander Löw and Philip Marzahn for guiding discussions that lead to this publication.
 We also would like to thank Thomas Ramsauer for discussions and suggestions.
 <!-- for providing comments on the manuscript -->
-<!-- The author also wishes to thank the reviewers and editors fortheir efforts and for their helpful comments to improve this paper and the software package -->
+The author also wishes to thank the reviewers and editors for their efforts and for their helpful comments to improve this paper and the software package
 
 # References
