@@ -6,8 +6,9 @@ pytest>=4.6
 PyYAML>=5.4
 setuptools
 m2r
-sphinxcontrib-bibtex
-nbsphinx
+sphinxcontrib-bibtex==2.3.0
+docutils==0.17.1
+nbsphinx==0.8.7
 ipykernel
 sentinelsat>=1.1.0
 matplotlib
