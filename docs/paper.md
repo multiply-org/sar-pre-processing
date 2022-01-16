@@ -46,19 +46,19 @@ Furthermore, the default processing scheme of SenSARP can handle if an area of i
 Additionally, SenSARP checks if within a stack of Sentinel-1 images, one specific image was multiple processed by ESA and uses the newest.
 
 For expert users, SenSARP provides the possibility to automate their pre-processing on a large scale by either modifying the default pre-processing scheme (modification of xml graph pre_processing_step1.xml) or create their own pre-processing scheme (create a new xml graph) with the graph builder of the SNAP software.
-They can benefit from the filter options, the default pre-processing step 2 (co-registration of images) and the SenSARP functions to stack all processed and co-registered images within a netCDF file with additional image information e.g. satellite name, relative orbit and orbitdirection.
+They can benefit from the filter options, the default pre-processing step 2 (co-registration of images) and the SenSARP functions to stack all processed and co-registered images within a netCDF file with additional image information e.g. satellite name, relative orbit and orbit direction.
 
 # Method
 
-This python package generates a file list of to be processed Sentinel-1 images (already downloaded and stored in a specific folder) based on different user defined criteria (specific year, area of interest).
+This Python package generates a file list of to be processed Sentinel-1 images (already downloaded and stored in a specific folder) based on different user defined criteria (specific year, area of interest).
 Additionally, specific cases of repeatedly processed data are handled, as sometimes Sentinel-1 data were initially processed multiple times and stored under similar names on the Copernicus Open Access Hub. Also, cases where Sentinel-1 data within the user-defined area of interest might be stored in consecutive tiles are considered.
 
-Based on the generated file list the default processing pipeline of the python package applies a pre-processing chain to Sentinel-1 Single Look Complex (SLC) time series or single images to generate radiometrically and geometrically corrected Sigma nought backscatter values.
+Based on the generated file list the default processing pipeline of the Python package applies a pre-processing chain to Sentinel-1 Single Look Complex (SLC) time series or single images to generate radiometrically and geometrically corrected sigma nought backscatter values.
 Furthermore, if a time series is processed the images are co-registered and additional output files of multi-temporal speckle filtered data are generated.
 In addition, a single speckle filter instead of a multi-temporal one is applied as well and the output will be stored as a separate layer.
-To pre-process the images, the python package uses the GPT (Graph Processing Tool) of SNAP to execute different operators provided by the Sentinel-1 Toolbox.
-The Sentinel Toolbox is available for download at step.esa.int, its source code is available in the senbox-org organization on GitHub.
-Each of these operators performs a pre-processing step. The operators can be chained together to form a graph, which is used by the python package to run on the Sentinel-1 data using the Graph Processing Framework (GPF). The graphs are stored in xml-files. Users may change the graphs by modifying the files directly or via the Sentinel Toolbox.
+To pre-process the images, the Python package uses the GPT (Graph Processing Tool) of SNAP to execute different operators provided by the Sentinel-1 Toolbox.
+The Sentinel Toolbox is available for download at http://step.esa.int/, its source code is available in the senbox-org organization on GitHub.
+Each of these operators performs a pre-processing step. The operators can be chained together to form a graph, which is used by the Python package to run on the Sentinel-1 data using the Graph Processing Framework (GPF). The graphs are stored in xml-files. Users may change the graphs by modifying the files directly or via the Sentinel Toolbox.
 User Guides to show how the GPF can be used are provided here: https://senbox.atlassian.net/wiki/spaces/SNAP/pages/70503053/Processing.
 
 After the pre-processing the resulting radiometrically and geometrically corrected images are stored for further usage within a NetCDF4 stack file.
@@ -68,27 +68,27 @@ In the future, many more new products and operational third party services based
 
 # Applications
 
-This python package was developed within the Horizon 2020 project called MULTIscale SENTINEL land surface information retrieval Platform (MULTIPLY) (http://www.multiply-h2020.eu/, https://cordis.europa.eu/project/id/687320, https://multiply.obs-website.eu-de.otc.t-systems.com).
+This Python package was developed within the Horizon 2020 project called MULTIscale SENTINEL land surface information retrieval Platform (MULTIPLY) (http://www.multiply-h2020.eu/, https://cordis.europa.eu/project/id/687320, https://multiply.obs-website.eu-de.otc.t-systems.com).
 Furthermore, data processed by this package is used within Sentinel-Synergy-Study S3 project (https://www.researchgate.net/project/Sentinel-Synergy-Study-S3).
-In addition, the python code was used to process Sentinel-1 time series images for the detection and analysis of temporary flooded vegetation [@tsyganskaya_detection_2018; @tsyganskaya_flood_2019] and for the evaluation of different radiative transfer models for microwave backscatter estimation of wheat fields [@weis_evaluation_2020].
+In addition, the Python code was used to process Sentinel-1 time series images for the detection and analysis of temporary flooded vegetation [@tsyganskaya_detection_2018; @tsyganskaya_flood_2019] and for the evaluation of different radiative transfer models for microwave backscatter estimation of wheat fields [@weis_evaluation_2020].
 
-# Other available python software packages using ESA's SNAP software to pre-process SAR data
+# Other available Python software packages using ESA's SNAP software to pre-process SAR data
 
-The ESA's SNAP toolbox has been written in Java. For python users the developers provide a python interface called Snappy. However, the Snappy interface is lacking in terms of installation, processing performance and usability. Hence, the remote sensing community developed different wrappers (e.g. SenSARP, snapista or pyroSAR) to use SNAP processing functionalities by utilizing the SNAP Graph Processing Tool (GPT).
+The ESA's SNAP toolbox has been written in Java. For Python users the developers provide a Python interface called Snappy. However, the Snappy interface is lacking in terms of installation, processing performance and usability. Hence, the remote sensing community developed different wrappers (e.g. SenSARP, snapista or pyroSAR) to use SNAP processing functionalities by utilizing the SNAP Graph Processing Tool (GPT).
 
 ## snapista
 
-Snapista (https://snap-contrib.github.io/snapista/index.html) targets mainly experts remote sensing users with python programming skills.
+Snapista (https://snap-contrib.github.io/snapista/index.html) targets mainly experts remote sensing users with Python programming skills.
 It provides access to the processing operators of all toolboxes (e.g. Sentinel-1, Sentinel-2 or Sentinel-3) within SNAP.
-Expert users can generate processing graphs and execute there generated graphs in a pure Pythonic way.
-A guideline which processing steps are needed for different applications or which processing steps can or have to be combined are not provided yet.
-As guidelines how to process different satellite data for different applications is not an easy task to do it exceeds the goal of snapista as a python wrapper for the SNAP software.
-Summarizing, snapista provides access to all SNAP toolboxes (not just to Sentinel-1 Toolbox) via python. But as it provides no default processing chains, snapista will be primarily usable by expert remote sensing users.
+Expert users can generate processing graphs and execute their generated graphs in a pure Pythonic way.
+Guidelines about which processing steps are needed for different applications, or about which processing steps can or have to be combined, are not provided yet.
+Establishing guidelines about how to process different satellite data for different applications is not an easy task to do and would exceed the goal of snapista as a Python wrapper for the SNAP software.
+Summarizing, snapista provides access to all SNAP toolboxes (not just to Sentinel-1 Toolbox) via Python. But as it provides no default processing chains, snapista will be primarily usable by expert remote sensing users.
 The advantage of snapista is the accessibility of processing operators for SAR and optical data.
 
 ## pyroSAR
 
-PyroSAR (https://pyrosar.readthedocs.io/en/latest/index.html) is a python library which provides a python wrapper to SAR pre-processing software SNAP and GAMMA [@wegnuller_sentinel-1_2016; @werner_gamma_2000].
+PyroSAR (https://pyrosar.readthedocs.io/en/latest/index.html) is a Python library which provides a Python wrapper to SAR pre-processing software SNAP and GAMMA [@wegnuller_sentinel-1_2016; @werner_gamma_2000].
 The library provides utilities to read and store metadata information of downloaded satellite data within a database.
 Furthermore, pyroSAR provides access to processing operators of SNAP and GAMMA.
 A default workflow with different user options is provided to process single or time-series Sentinel-1 images.
@@ -105,6 +105,6 @@ The project leading to this application has received funding from the European U
 We would like to thank Alexander Löw and Philip Marzahn for guiding discussions that lead to this publication.
 We also would like to thank Thomas Ramsauer for discussions and suggestions.
 <!-- for providing comments on the manuscript -->
-The author also wishes to thank the reviewers and editors for their efforts and for their helpful comments to improve this paper and the software package
+The author also wishes to thank the reviewers and editors for their efforts and for their helpful comments to improve this paper and the software package.
 
 # References
