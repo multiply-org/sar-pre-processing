@@ -1,2 +1,1 @@
-.. _changes:
-.. include:: ../CHANGES.md
+.. include:: ../CHANGES.rst

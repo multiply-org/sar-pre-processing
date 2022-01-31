@@ -14,8 +14,8 @@ Content
     03_Usage
     04_Theory
     annex_technical
-    Authors <authors>
-    Changelog <changes>
+    authors
+    changes
     License
 
 Credits
