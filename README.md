@@ -4,6 +4,8 @@
 
 [![Build Status](https://www.travis-ci.com/multiply-org/sar-pre-processing.svg?branch=master)](https://travis-ci.com/McWhity/sar-pre-processing)
 [![Documentation Status](https://readthedocs.org/projects/multiply-sar-pre-processing/badge/?version=master)](https://multiply-sar-pre-processing.readthedocs.io/en/master/?badge=master)
+[![DOI](https://joss.theoj.org/papers/10.21105/joss.03337/status.svg)](https://doi.org/10.21105/joss.03337)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 This repository contains the functionality SenSARP used within the MULTIPLY main platform.
 The [SenSARP specific documentation](https://multiply-sar-pre-processing.readthedocs.io/en/master/) is hosted on ReadTheDocs. It is part of the [MULTIPLY core documentation](http://multiply.readthedocs.io/).
@@ -140,3 +142,24 @@ To run unit tests, execute the following line from the root of the repository:
 ## License
 
 This project is licensed under the GPLv3 License - see the [LICENSE.rst](LICENSE.rst) file for details.
+
+## Citation
+
+If you used SenSARP - please cite the paper:
+
+APA-style format
+
+*Thomas Weiß, & Tonio Fincke (2022). SenSARP: A pipeline to pre-process Sentinel-1 SLC data by using ESA SNAP Sentinel-1 Toolbox. Journal of Open Source Software, 7(69), 3337, https://doi.org/10.21105/joss.03337*
+
+    @article{Weiß2022,
+      doi = {10.21105/joss.03337},
+      url = {https://doi.org/10.21105/joss.03337},
+      year = {2022},
+      publisher = {The Open Journal},
+      volume = {7},
+      number = {69},
+      pages = {3337},
+      author = {Thomas Weiß and Tonio Fincke},
+      title = {SenSARP: A pipeline to pre-process Sentinel-1 SLC data by using ESA SNAP Sentinel-1 Toolbox},
+      journal = {Journal of Open Source Software}
+    }
