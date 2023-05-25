@@ -559,8 +559,20 @@ class SARPreProcessor(PreProcessor):
                 # Divide filename of file of interest
                 file_path, filename, file_short_name, extension = self._decompose_filename(file)
 
+                try:
+                    format = self.config.single_file_output
+                    if format == 'tif':
+                        format = '.tif'
+                        format2 = 'GeoTIFF'
+                    else:
+                        format = '.nc'
+                        format2 = 'NetCDF4-CF'
+                except AttributeError:
+                    format = '.nc'
+                    format2 = 'NetCDF4-CF'
+
                 output_file = os.path.join(
-                    self.config.output_folder_step3, file_short_name + self.name_addition_step3 + '.nc')
+                    self.config.output_folder_step3, file_short_name + self.name_addition_step3 + format)
 
                 date = datetime.strptime(file_short_name[17:25], '%Y%m%d')
                 date = date.strftime('%d%b%Y')
@@ -569,7 +581,7 @@ class SARPreProcessor(PreProcessor):
 
                 call = '"' + self.config.gpt + '" "' + self.config.pre_process_step3_single_file + \
                        '" -Pinput2="' + file + \
-                       '" -Poutput="' + output_file + '" -Ptheta="' + theta + \
+                       '" -Poutput="' + output_file + '" -Poutput2="' + format2 + '" -Ptheta="' + theta + \
                        '" -Pname_change_vv_single="' + name_change_vv_single + \
                        '" -Pname_change_vh_single="' + name_change_vh_single + \
                        '" -Pname_change_vv_norm_single="' + name_change_vv_norm_single + \
@@ -640,8 +652,20 @@ class SARPreProcessor(PreProcessor):
                 # Divide filename of file of interest
                 file_path, filename, file_short_name, extension = self._decompose_filename(file)
 
+                try:
+                    format = self.config.single_file_output
+                    if format == 'tif':
+                        format = '.tif'
+                        format2 = 'GeoTIFF'
+                    else:
+                        format = '.nc'
+                        format2 = 'NetCDF4-CF'
+                except AttributeError:
+                    format = '.nc'
+                    format2 = 'NetCDF4-CF'
+
                 output_file = os.path.join(
-                    self.config.output_folder_step3, file_short_name + self.name_addition_step3 + '.nc')
+                    self.config.output_folder_step3, file_short_name + self.name_addition_step3 + format)
 
                 date = datetime.strptime(file_short_name[17:25], '%Y%m%d')
                 date = date.strftime('%d%b%Y')
@@ -650,7 +674,7 @@ class SARPreProcessor(PreProcessor):
 
                 call = '"' + self.config.gpt + '" "' + self.config.pre_process_step3_single_file + \
                        '" -Pinput2="' + file + \
-                       '" -Poutput="' + output_file + '" -Ptheta="' + theta + \
+                       '" -Poutput="' + output_file + '" -Poutput2="' + format2 + '" -Ptheta="' + theta + \
                        '" -Pname_change_vv_single="' + name_change_vv_single + \
                        '" -Pname_change_vh_single="' + name_change_vh_single + \
                        '" -Pname_change_vv_norm_single="' + name_change_vv_norm_single + \
