@@ -1,0 +1,19 @@
+---
+gpt: /home/tweiss/snap/bin/gpt
+input_folder: /media/AUF/GG/Geodatenverzeichnis-Uni/Fernerkundung/Satellitenbilder/Sentinel1/
+output_folder: /media/AUF/userdata/agvolution/
+region:
+  lr:
+    lat: 53.495793321294826
+    lon: 13.11798184787935
+  subset: 'yes'
+  ul:
+    lat: 53.629740251181914
+    lon: 12.878801247756456
+single_file: 'no'
+speckle_filter:
+  multi_temporal:
+    apply: 'yes'
+    files: '5'
+use_user_defined_graphs: 'no'
+year: '2023'
