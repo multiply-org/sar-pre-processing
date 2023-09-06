@@ -68,6 +68,7 @@ class NetcdfStackCreator(object):
         self.satellite = self.dataset.createVariable('satellite', np.float32, ('time'))
         self.latitude = self.dataset.createVariable('lat', np.float32, ('lat'))
         self.longitude = self.dataset.createVariable('lon', np.float32, ('lon'))
+        self.crs = self.dataset.createVariable('crs', np.int32, ('crs'))
 
         # create 3-D variables (localIncidenceangle ... )
 
@@ -93,6 +94,7 @@ class NetcdfStackCreator(object):
         data = Dataset(self.filelist[0])
         self.latitude[:] = data.variables['lat'][:]
         self.longitude[:] = data.variables['lon'][:]
+        self.crs = data.variables['crs']
 
         # loop over all files in filelist
         for index, sarfile in enumerate(self.filelist):
