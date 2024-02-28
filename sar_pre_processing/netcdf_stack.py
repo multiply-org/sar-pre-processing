@@ -58,6 +58,7 @@ class NetcdfStackCreator(object):
         self.lat = self.dataset.createDimension('lat', len(data.variables['lat'][:]))
         self.lon = self.dataset.createDimension('lon', len(data.variables['lon'][:]))
         self.time = self.dataset.createDimension('time', None)
+        self.crs = self.dataset.createDimension('crs', None)
 
         # create 1-D variables  (time, orbitdirection, relativorbit, satellite, latitude, longitude)
         self.times = self.dataset.createVariable('time', np.float32, ('time'))
